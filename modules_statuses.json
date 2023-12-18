@@ -1,0 +1,9 @@
+{
+    "Account": true,
+    "Bank": true,
+    "Customer": true,
+    "Supplier": true,
+    "Purchase": true,
+    "Product": true,
+    "Sale": true
+}
