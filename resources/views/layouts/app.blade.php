@@ -252,6 +252,7 @@
                                 @include('sale::layouts.menu_list')
                                 @include('account::layouts.menu_list')
                                 @include('bank::layouts.menu_list')
+                                @include('promotion::layouts.menu_list')
                             </ul>
                         </div>
                     </nav>

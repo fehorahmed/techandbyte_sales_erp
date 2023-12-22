@@ -27,7 +27,9 @@ return new class extends Migration
             $table->double('opening_balance', 20, 2)->nullable();
             $table->boolean('status')->default(1);
             $table->foreignId('created_by');
+            $table->foreignId('updated_by')->nullable();
             $table->foreign('created_by')->on('users')->references('id');
+            $table->foreign('updated_by')->on('users')->references('id');
             $table->foreign('client_category_id')->on('client_categories')->references('id');
             $table->timestamps();
         });

@@ -6,5 +6,6 @@
     "Purchase": true,
     "Product": true,
     "Sale": true,
-    "Client": true
+    "Client": true,
+    "Promotion": true
 }

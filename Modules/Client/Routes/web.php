@@ -18,12 +18,12 @@ use Modules\Client\Http\Controllers\ClientController;
 
 Route::prefix('client')->middleware('auth')->name('client.')->group(function () {
     // Client Category
-    Route::get('index', [ClientCategoryController::class, 'index'])->name('index');
-    Route::get('create', [ClientCategoryController::class, 'create'])->name('create');
-    Route::post('create', [ClientCategoryController::class, 'store'])->name('store');
-    Route::get('edit/{client_category}', [ClientCategoryController::class, 'edit'])->name('edit');
-    Route::post('edit/{client_category}', [ClientCategoryController::class, 'update'])->name('update');
-    Route::get('index/datatable', [ClientCategoryController::class, 'datatable'])->name('client_datatable');
+    Route::get('index', [ClientController::class, 'index'])->name('index');
+    Route::get('create', [ClientController::class, 'create'])->name('create');
+    Route::post('create', [ClientController::class, 'store'])->name('store');
+    Route::get('edit/{client}', [ClientController::class, 'edit'])->name('edit');
+    Route::post('edit/{client}', [ClientController::class, 'update'])->name('update');
+    Route::get('index/datatable', [ClientController::class, 'datatable'])->name('client_datatable');
 });
 
 Route::prefix('client-category')->middleware('auth')->name('client.')->group(function () {
