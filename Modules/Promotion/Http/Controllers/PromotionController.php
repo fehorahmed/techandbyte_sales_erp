@@ -22,7 +22,7 @@ class PromotionController extends Controller
 
     public function datatable()
     {
-        $query = Promotion::query();
+        $query = Promotion::with('creator');
         return DataTables::eloquent($query)
             ->addIndexColumn()
             ->addColumn('action', function (Promotion $promotion) {
@@ -47,7 +47,7 @@ class PromotionController extends Controller
     {
 
         $request->validate([
-            "title" => 'required|string|max:255',
+            "title" => 'required|string|max:255|unique:promotions,title',
             "promotion_type" => 'required|string|max:255',
             "platform" => 'required|string|max:255',
             "cost" => 'required|numeric',
@@ -83,15 +83,37 @@ class PromotionController extends Controller
      */
     public function edit($id)
     {
-        return view('promotion::promotion.edit');
+        $data = Promotion::findOrFail($id);
+        return view('promotion::promotion.edit', compact('data'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id): RedirectResponse
+    public function update(Request $request, $promotion): RedirectResponse
     {
-        //
+        $request->validate([
+            "title" => 'required|string|max:255|unique:promotions,title,' . $promotion,
+            "promotion_type" => 'required|string|max:255',
+            "platform" => 'required|string|max:255',
+            "cost" => 'required|numeric',
+            "date" => 'required|date|max:255',
+            "details" => 'nullable|string|max:255',
+        ]);
+
+        $data =  Promotion::findOrFail($promotion);
+        $data->title = $request->title;
+        $data->promotion_type = $request->promotion_type;
+        $data->platform = $request->platform;
+        $data->cost = $request->cost;
+        $data->date = $request->date;
+        $data->details = $request->details;
+        $data->updated_by = Auth::id();
+        if ($data->update()) {
+            return redirect()->route('promotion.index')->with('message', 'Information updated');
+        } else {
+            return redirect()->back()->with('error', 'Something went wrong.');
+        }
     }
 
     /**

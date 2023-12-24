@@ -10,7 +10,7 @@ $menu = ['promotion.index', 'promotion.create', 'promotion.edit'];
     <ul class="pcoded-submenu">
 
         <?php
-        $subMenu = ['promotion.index', 'promotion.create', 'promotion.edit'];
+        $subMenu = ['promotion.index'];
         ?>
         <li class="{{ in_array(Route::currentRouteName(), $subMenu) ? 'active' : '' }}">
             <a href="{{ route('promotion.index') }}">

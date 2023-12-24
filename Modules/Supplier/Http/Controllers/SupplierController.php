@@ -15,44 +15,48 @@ use Yajra\DataTables\Facades\DataTables;
 
 class SupplierController extends Controller
 {
-    public function index(){
+    public function index()
+    {
         return view('supplier::supplier.all');
     }
-    public function datatable(){
+    public function datatable()
+    {
         $query = Supplier::query();
         return DataTables::eloquent($query)
             ->addIndexColumn()
-            ->addColumn('action', function(Supplier $supplier) {
-                return '<a href="'.route('supplier.supplier_edit',['supplier'=>$supplier->id]).'" class="btn-edit"><i style="color:#01a9ac;font-size: 17px;" class="feather icon-edit"></i></a>';
+            ->addColumn('action', function (Supplier $supplier) {
+                return '<a href="' . route('supplier.supplier_edit', ['supplier' => $supplier->id]) . '" class="btn-edit"><i style="color:#01a9ac;font-size: 17px;" class="feather icon-edit"></i></a>';
             })
-            ->addColumn('status', function(Supplier $supplier) {
+            ->addColumn('status', function (Supplier $supplier) {
                 if ($supplier->status == 1)
                     return '<span class="badge badge-success">Active</span>';
                 else
                     return '<span class="badge badge-danger">Inactive</span>';
             })
-            ->rawColumns(['action','status'])
+            ->rawColumns(['action', 'status'])
             ->toJson();
     }
-    public function add(){
+    public function add()
+    {
         return view('supplier::supplier.add');
     }
 
-    public function addPost(Request $request){
+    public function addPost(Request $request)
+    {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => ['nullable','string','email','max:255',Rule::unique('suppliers')],
+            'email' => ['nullable', 'string', 'email', 'max:255', Rule::unique('suppliers')],
             'phone' => 'required|string|digits:11',
             'address' => 'nullable|string|max:255',
             'opening_balance' => 'required|numeric',
             'status' => 'required',
         ]);
 
-        $headcode = AccCoa::where('HeadLevel',4)->where('HeadCode','like','21110%')->max('HeadCode');
-        if($headcode != NULL){
+        $headcode = AccCoa::where('HeadLevel', 4)->where('HeadCode', 'like', '21110%')->max('HeadCode');
+        if ($headcode != NULL) {
             $headcode += 1;
-        }else{
-            $headcode="21110000001";
+        } else {
+            $headcode = "21110000001";
         }
 
         try {
@@ -67,45 +71,46 @@ class SupplierController extends Controller
             $supplier->created_by = Auth::user()->id;
             $supplier->save();
 
-            $acc_coa = new AccCoa();
-            $acc_coa->HeadCode = $headcode;
-            $acc_coa->HeadName = $request->name.'-'.$supplier->id;
-            $acc_coa->PHeadName = 'Suppliers';
-            $acc_coa->HeadLevel = 4;
-            $acc_coa->IsActive = 1;
-            $acc_coa->IsTransaction = 1;
-            $acc_coa->IsGL = 0;
-            $acc_coa->HeadType = 'L';
-            $acc_coa->IsBudget = 0;
-            $acc_coa->supplier_id = $supplier->id;
-            $acc_coa->IsDepreciation = 0;
-            $acc_coa->DepreciationRate = 0;
-            $acc_coa->CreateBy = Auth::user()->id;
-            $acc_coa->UpdateBy = 0;
+            // $acc_coa = new AccCoa();
+            // $acc_coa->HeadCode = $headcode;
+            // $acc_coa->HeadName = $request->name.'-'.$supplier->id;
+            // $acc_coa->PHeadName = 'Suppliers';
+            // $acc_coa->HeadLevel = 4;
+            // $acc_coa->IsActive = 1;
+            // $acc_coa->IsTransaction = 1;
+            // $acc_coa->IsGL = 0;
+            // $acc_coa->HeadType = 'L';
+            // $acc_coa->IsBudget = 0;
+            // $acc_coa->supplier_id = $supplier->id;
+            // $acc_coa->IsDepreciation = 0;
+            // $acc_coa->DepreciationRate = 0;
+            // $acc_coa->CreateBy = Auth::user()->id;
+            // $acc_coa->UpdateBy = 0;
             //dd($acc_coa);
             //$acc_coa->save();
 
-            $acc_subcode = new AccSubcode();
-            $acc_subcode->subTypeId = 4;
-            $acc_subcode->name = $request->name;
-            $acc_subcode->referenceNo = $supplier->id;
-            $acc_subcode->created_by = Auth::user()->id;
-            $acc_subcode->updated_by = 0;
-            $acc_subcode->status = 1;
-            $acc_subcode->save();
+            // $acc_subcode = new AccSubcode();
+            // $acc_subcode->subTypeId = 4;
+            // $acc_subcode->name = $request->name;
+            // $acc_subcode->referenceNo = $supplier->id;
+            // $acc_subcode->created_by = Auth::user()->id;
+            // $acc_subcode->updated_by = 0;
+            // $acc_subcode->status = 1;
+            // $acc_subcode->save();
 
             DB::commit();
-            return redirect()->route('supplier.supplier_all')->with('message','Information added');
-        }catch (\Exception $e){
+            return redirect()->route('supplier.supplier_all')->with('message', 'Information added');
+        } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error','Opps! Error occured!!!')->withInput();
+            return redirect()->back()->with('error', 'Opps! Error occured!!!')->withInput();
         }
     }
 
-    public function addAjaxPost(Request $request){
+    public function addAjaxPost(Request $request)
+    {
         $rules = [
             'name' => 'required|string|max:255',
-            'email' => ['nullable','string','email','max:255',Rule::unique('suppliers')],
+            'email' => ['nullable', 'string', 'email', 'max:255', Rule::unique('suppliers')],
             'phone' => 'required|string|digits:11',
             'address' => 'nullable|string|max:255',
         ];
@@ -136,21 +141,23 @@ class SupplierController extends Controller
             $acc_subcode->save();
 
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'added','supplier'=>$supplier]);
-        }catch (\Exception $e){
+            return response()->json(['success' => true, 'message' => 'added', 'supplier' => $supplier]);
+        } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => $e]);
         }
     }
 
-    public function edit(Supplier $supplier){
+    public function edit(Supplier $supplier)
+    {
         return view('supplier::supplier.edit', compact('supplier'));
     }
 
-    public function editPost(Request $request, Supplier $supplier){
+    public function editPost(Request $request, Supplier $supplier)
+    {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => ['nullable','string','email','max:255',Rule::unique('suppliers')->ignore($supplier)],
+            'email' => ['nullable', 'string', 'email', 'max:255', Rule::unique('suppliers')->ignore($supplier)],
             'phone' => 'required|string|digits:11',
             'address' => 'nullable|string|max:255',
             'opening_balance' => 'required|numeric',
@@ -169,17 +176,18 @@ class SupplierController extends Controller
             $supplier->save();
 
             //AccCoa::where('supplier_id',$supplier->id)->update(['HeadName'=>$request->name.'-'.$supplier->id]);
-            AccSubcode::where('referenceNo',$supplier->id)->where('subTypeId', 4)->update(['name'=>$request->name]);
+            AccSubcode::where('referenceNo', $supplier->id)->where('subTypeId', 4)->update(['name' => $request->name]);
 
             DB::commit();
-            return redirect()->route('supplier.supplier_all')->with('message','Information updated');
-        }catch (\Exception $e){
+            return redirect()->route('supplier.supplier_all')->with('message', 'Information updated');
+        } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error',$e)->withInput();
+            return redirect()->back()->with('error', $e)->withInput();
         }
     }
 
-    public function delete($id){
+    public function delete($id)
+    {
         //
     }
 }

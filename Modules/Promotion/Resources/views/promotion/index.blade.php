@@ -18,6 +18,7 @@
                                 <thead>
                                     <tr>
                                         <th>Title</th>
+                                        <th>Date</th>
                                         <th>Type</th>
                                         <th>Platform</th>
                                         <th>Cost</th>
@@ -49,6 +50,10 @@
                         name: 'title'
                     },
                     {
+                        data: 'date',
+                        name: 'date'
+                    },
+                    {
                         data: 'promotion_type',
                         name: 'promotion_type'
                     },
@@ -65,9 +70,8 @@
                         name: 'details'
                     },
                     {
-                        data: 'created_by',
-                        name: 'creator.name'
-
+                        data: 'creator.name',
+                        name: 'created_by',
                     },
                     {
                         data: 'action',

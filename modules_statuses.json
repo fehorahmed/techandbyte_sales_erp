@@ -7,5 +7,6 @@
     "Product": true,
     "Sale": true,
     "Client": true,
-    "Promotion": true
+    "Promotion": true,
+    "Warehouse": true
 }
