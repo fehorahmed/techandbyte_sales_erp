@@ -249,9 +249,9 @@
                                 @include('warehouse::layouts.menu_list')
                                 @include('client::layouts.menu_list')
                                 @include('product::layouts.menu_list')
-                                {{-- @include('purchase::layouts.menu_list') --}}
+                                @include('purchase::layouts.menu_list')
                                 {{-- @include('sale::layouts.menu_list') --}}
-                                @include('account::layouts.menu_list')
+                                {{-- @include('account::layouts.menu_list') --}}
                                 @include('bank::layouts.menu_list')
                                 @include('promotion::layouts.menu_list')
                             </ul>

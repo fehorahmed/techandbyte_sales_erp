@@ -1,7 +1,7 @@
 <?php return array (
   'app' => 
   array (
-    'name' => 'Tech & Byte',
+    'name' => 'VTM-ERP',
     'env' => 'local',
     'debug' => true,
     'url' => 'http://127.0.0.1:8000/',
@@ -242,7 +242,7 @@
         'driver' => 'octane',
       ),
     ),
-    'prefix' => 'tech_byte_cache_',
+    'prefix' => 'vtm_erp_cache_',
   ),
   'cors' => 
   array (
@@ -341,7 +341,7 @@
       'options' => 
       array (
         'cluster' => 'redis',
-        'prefix' => 'tech_byte_database_',
+        'prefix' => 'vtm_erp_database_',
       ),
       'default' => 
       array (
@@ -568,7 +568,7 @@
     'from' => 
     array (
       'address' => 'hello@example.com',
-      'name' => 'Tech & Byte',
+      'name' => 'VTM-ERP',
     ),
     'markdown' => 
     array (
@@ -997,7 +997,7 @@
       0 => 2,
       1 => 100,
     ),
-    'cookie' => 'tech_byte_session',
+    'cookie' => 'vtm_erp_session',
     'path' => '/',
     'domain' => NULL,
     'secure' => NULL,

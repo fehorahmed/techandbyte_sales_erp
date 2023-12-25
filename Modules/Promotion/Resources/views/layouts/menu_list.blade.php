@@ -5,7 +5,7 @@ $menu = ['promotion.index', 'promotion.create', 'promotion.edit'];
 <li class="pcoded-hasmenu {{ in_array(Route::currentRouteName(), $menu) ? 'active pcoded-trigger' : '' }}">
     <a href="javascript:void(0)">
         <span class="pcoded-micon"><i class="feather icon-user"></i></span>
-        <span class="pcoded-mtext">Promotion Management</span>
+        <span class="pcoded-mtext">Promotion Manage..</span>
     </a>
     <ul class="pcoded-submenu">
 
