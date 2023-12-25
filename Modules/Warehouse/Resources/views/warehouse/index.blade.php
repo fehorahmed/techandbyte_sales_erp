@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'All Promotion')
+@section('title', 'All Warehouse')
 @section('content')
     <div class="page-body">
         <div class="row">
@@ -10,7 +10,7 @@
                             <h4>@yield('title')</h4>
                         </div>
                         <h5 style="float: right"><a href="{{ route('warehouse.create') }}" class="btn btn-success">Add
-                                Promotion</a></h5>
+                                Warehouse</a></h5>
                     </div>
                     <div class="card-block mt-4">
                         <div class="dt-responsive table-responsive">
@@ -19,6 +19,8 @@
                                     <tr>
                                         <th>SL</th>
                                         <th>Name</th>
+                                        <th>Address</th>
+                                        <th>Created By</th>
                                         <th>Status</th>
                                         <th>Action</th>
                                     </tr>
@@ -40,34 +42,26 @@
                 processing: true,
                 serverSide: true,
                 buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
-                ajax: '{{ route('promotion.promotion_datatable') }}',
+                ajax: '{{ route('warehouse.warehouse_datatable') }}',
                 columns: [{
-                        data: 'title',
-                        name: 'title'
+                        data: 'id',
+                        name: 'id'
                     },
                     {
-                        data: 'date',
-                        name: 'date'
+                        data: 'name',
+                        name: 'name'
                     },
                     {
-                        data: 'promotion_type',
-                        name: 'promotion_type'
-                    },
-                    {
-                        data: 'platform',
-                        name: 'platform'
-                    },
-                    {
-                        data: 'cost',
-                        name: 'cost'
-                    },
-                    {
-                        data: 'details',
-                        name: 'details'
+                        data: 'address',
+                        name: 'address'
                     },
                     {
                         data: 'creator.name',
                         name: 'created_by',
+                    },
+                    {
+                        data: 'status',
+                        name: 'status',
                     },
                     {
                         data: 'action',

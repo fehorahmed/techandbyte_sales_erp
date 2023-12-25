@@ -94,7 +94,7 @@ $menu = ['product.unit_add', 'product.unit_all', 'product.brand_all', 'product.b
             </a>
         </li>
 
-        {{-- <?php
+        <?php
         $subMenu = ['product.sub_category_add'];
         ?>
         <li class="{{ in_array(Route::currentRouteName(), $subMenu) ? 'active' : '' }}">
@@ -113,7 +113,7 @@ $menu = ['product.unit_add', 'product.unit_all', 'product.brand_all', 'product.b
                         class="feather {{ in_array(Route::currentRouteName(), $subMenu) ? 'icon-check-circle' : 'icon-circle' }}"></i></span>
                 <span class="pcoded-mtext">All Sub Category</span>
             </a>
-        </li> --}}
+        </li>
 
 
     </ul>

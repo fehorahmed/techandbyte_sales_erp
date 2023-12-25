@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Promotion Edit')
+@section('title', 'Warehouse Edit')
 @section('content')
     <div class="page-body">
         <div class="row">
@@ -9,87 +9,60 @@
                         <div class="d-inline" style="float: left">
                             <h4>@yield('title')</h4>
                         </div>
-                        <h5 style="float: right"><a href="{{ route('promotion.index') }}" class="btn btn-success">All
-                                Promotion</a></h5>
+                        <h5 style="float: right"><a href="{{ route('warehouse.index') }}" class="btn btn-success">All
+                                Warehouse</a></h5>
                     </div>
                     <div class="card-block mt-4">
-                        <form id="main" method="post" action="{{ route('promotion.update', $data->id) }}">
+                        <form id="main" method="post" action="{{ route('warehouse.edit', $warehouse->id) }}">
                             @csrf
                             <div class="form-group row">
-                                <label class="col-sm-2 col-form-label text-right">Promotion Title</label>
+                                <label class="col-sm-2 col-form-label text-right">Warehouse Name</label>
                                 <div class="col-sm-4">
                                     <input type="text"
-                                        class="form-control {{ $errors->has('title') ? 'is-invalid' : 'is-valid' }}"
-                                        name="title" value="{{ old('title', $data->title) }}" id="title"
-                                        placeholder="Enter Promotion Title">
-                                    @error('title')
+                                        class="form-control {{ $errors->has('name') ? 'is-invalid' : 'is-valid' }}"
+                                        name="name" value="{{ old('name', $warehouse->name) }}" id="name"
+                                        placeholder="Enter Warehouse Name">
+                                    @error('name')
                                         <span class="help-block">{{ $message }}</span>
                                     @enderror
                                 </div>
-
-                                <label class="col-sm-2 col-form-label text-right">Promotion Type</label>
+                                <label class="col-sm-2 col-form-label text-right">Address</label>
                                 <div class="col-sm-4">
-                                    <select name="promotion_type" class="form-control" id="promotion_type">
-                                        <option value="">Select One</option>
-                                        <option
-                                            {{ old('promotion_type', $data->promotion_type) == 'Online' ? 'selected' : '' }}
-                                            value="Online">
-                                            Online
-                                        </option>
-                                        <option
-                                            {{ old('promotion_type', $data->promotion_type) == 'Offline' ? 'selected' : '' }}
-                                            value="Offline">
-                                            Offline
-                                        </option>
-
-                                    </select>
-                                    @error('promotion_type')
+                                    <textarea class="form-control {{ $errors->has('address') ? 'is-invalid' : 'is-valid' }}" id="address" name="address"
+                                        rows="3" placeholder="Enter Address">{{ old('address', $warehouse->address) }}</textarea>
+                                    @error('address')
                                         <span class="help-block">{{ $message }}</span>
                                     @enderror
                                 </div>
+
                             </div>
                             <div class="form-group row">
-                                <label class="col-sm-2 col-form-label text-right">Platform</label>
+                                <label class="col-sm-2 col-form-check text-right">Status</label>
                                 <div class="col-sm-4">
-                                    <input type="text"
-                                        class="form-control {{ $errors->has('platform') ? 'is-invalid' : 'is-valid' }}"
-                                        id="platform" name="platform" value="{{ old('platform', $data->platform) }}"
-                                        placeholder="Enter Platform">
-                                    @error('platform')
+                                    <div class="form-radio">
+                                        <div class="radio radiofill radio-primary radio-inline">
+                                            <label>
+                                                <input type="radio" name="status" value="1"
+                                                    {{ old('status', $warehouse->status) == '1' ? 'checked' : '' }}
+                                                    data-bv-field="status">
+                                                <i class="helper"></i>Active
+                                            </label>
+                                        </div>
+                                        <div class="radio radiofill radio-primary radio-inline">
+                                            <label>
+                                                <input type="radio" name="status" value="0"
+                                                    {{ old('status', $warehouse->status) == '0' ? 'checked' : '' }}
+                                                    data-bv-field="status">
+                                                <i class="helper"></i>Inactive
+                                            </label>
+                                        </div>
+                                    </div>
+                                    @error('status')
                                         <span class="help-block">{{ $message }}</span>
                                     @enderror
                                 </div>
+                            </div>
 
-                                <label class="col-sm-2 col-form-label text-right">Cost</label>
-                                <div class="col-sm-4">
-                                    <input type="number"
-                                        class="form-control {{ $errors->has('cost') ? 'is-invalid' : 'is-valid' }}"
-                                        id="cost" name="cost" value="{{ old('cost', $data->cost) }}">
-                                    @error('cost')
-                                        <span class="help-block">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-sm-2 col-form-label text-right">Date</label>
-                                <div class="col-sm-4">
-                                    <input type="date"
-                                        class="form-control {{ $errors->has('date') ? 'is-invalid' : 'is-valid' }}"
-                                        id="date" name="date" value="{{ old('date', $data->date) }}"
-                                        placeholder="Enter date">
-                                    @error('date')
-                                        <span class="help-block">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                                <label class="col-sm-2 col-form-label text-right">Details</label>
-                                <div class="col-sm-4">
-                                    <textarea class="form-control {{ $errors->has('details') ? 'is-invalid' : 'is-valid' }}" id="details" name="details"
-                                        rows="3" placeholder="Enter Details">{{ old('details', $data->details) }}</textarea>
-                                    @error('details')
-                                        <span class="help-block">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
                             <div class="form-group row">
                                 <label class="col-sm-2"></label>
                                 <div class="col-sm-10">

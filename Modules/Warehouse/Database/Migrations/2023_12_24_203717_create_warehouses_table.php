@@ -13,7 +13,12 @@ return new class extends Migration
     {
         Schema::create('warehouses', function (Blueprint $table) {
             $table->id();
-            
+            $table->string('name');
+            $table->string('address');
+            $table->boolean('status')->comment('1=Active, 2= Inactive');
+            $table->foreignId('created_by');
+            $table->foreign('created_by')->on('users')->references('id');
+
             $table->timestamps();
         });
     }
