@@ -44,8 +44,9 @@
                 buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
                 ajax: '{{ route('warehouse.warehouse_datatable') }}',
                 columns: [{
-                        data: 'id',
-                        name: 'id'
+                        data: 'DT_RowIndex',
+                        'orderable': false,
+                        'searchable': false
                     },
                     {
                         data: 'name',
