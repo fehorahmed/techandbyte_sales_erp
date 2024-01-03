@@ -9,6 +9,7 @@ use Modules\Account\Http\Controllers\CreditVoucherController;
 use Modules\Account\Http\Controllers\ContraVoucherController;
 use Modules\Account\Http\Controllers\JournalVoucherController;
 use Modules\Account\Http\Controllers\OpeningBalanceController;
+use Modules\Account\Http\Controllers\ExpenseController;
 
 /*
 |--------------------------------------------------------------------------
@@ -100,5 +101,20 @@ Route::prefix('account')->middleware('auth')->name('account.')->group(function()
     Route::get('service-payment', [AccountController::class,'index'])->name('service_payment');
     Route::get('cash-adjustment', [AccountController::class,'index'])->name('cash_adjustment');
     Route::get('voucher-approval', [AccountController::class,'index'])->name('voucher_approval');
+
+    //Expense
+    Route::get('expense-item', [ExpenseController::class,'index'])->name('expense_item_all');
+    Route::get('expense-item/datatable', [ExpenseController::class,'datatable'])->name('expense_item_datatable');
+    Route::get('add-expense-item', [ExpenseController::class,'add'])->name('expense_item_add');
+    Route::post('add-expense-item', [ExpenseController::class,'addPost']);
+    Route::get('edit-expense-item/{expenseItem}', [ExpenseController::class,'edit'])->name('expense_item_edit');
+    Route::post('edit-expense-item/{expenseItem}', [ExpenseController::class,'editPost']);
+
+    //Expense add
+    Route::get('expense', [ExpenseController::class,'expense'])->name('expense_all');
+    Route::get('expense/datatable', [ExpenseController::class,'expenseDatatable'])->name('expense_datatable');
+    Route::get('add-expense', [ExpenseController::class,'expenseAdd'])->name('expense_add');
+    Route::post('add-expense', [ExpenseController::class,'expenseAddPost']);
+
 
 });

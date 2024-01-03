@@ -131,7 +131,7 @@
                                             </td>
                                             <td>
                                                 <div class="form-group {{ $errors->has('amount.'.$loop->index) ? 'has-error' :'' }}">
-                                                    <input type="number" step="any" class="form-control unit" name="amount[]" value="{{ old('amount.'.$loop->index) }}">
+                                                    <input type="number" step="any" class="form-control amount" name="amount[]" value="{{ old('amount.'.$loop->index) }}">
                                                 </div>
                                             </td>
                                             <td class="text-center">
