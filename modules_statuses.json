@@ -8,5 +8,6 @@
     "Sale": true,
     "Client": true,
     "Promotion": true,
-    "Warehouse": true
+    "Warehouse": true,
+    "Loan": true
 }

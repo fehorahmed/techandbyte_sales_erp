@@ -1252,6 +1252,10 @@
   array (
     'name' => 'Customer',
   ),
+  'loan' => 
+  array (
+    'name' => 'Loan',
+  ),
   'product' => 
   array (
     'name' => 'Product',
