@@ -21,7 +21,9 @@
                             <table id="table" class="table table-striped table-bordered nowrap">
                                 <thead>
                                     <tr>
+                                        <th>Date</th>
                                         <th>Amount</th>
+                                        <th>Transaction Type</th>
                                         <th>Created By</th>
                                         <th>Action</th>
                                     </tr>
@@ -48,7 +50,7 @@
                     <form style="font-size: 12px;" enctype="multipart/form-data" id="newPaymentForm">
                         <div class="container">
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <input type="hidden" name="loan_id" value="{{ $loan->id }}">
                                     <div class="form-group">
                                         <label for="date">Date</label>
@@ -62,7 +64,21 @@
                                         @enderror
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
+
+                                    <div class="form-group">
+                                        <label for="transaction_type">Transaction Type</label>
+                                        <select name="transaction_type" class="form-control" id="transaction_type">
+                                            <option value="">Select One</option>
+                                            <option value="1">Cash</option>
+                                            <option value="2">Bank</option>
+                                        </select>
+                                        @error('transaction_type')
+                                            <span class="invalid-feedback">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="amount">Amount</label>
                                         <div class="input-group lc_no">
@@ -103,8 +119,16 @@
                 buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
                 ajax: '{{ route('loan.details.details_datatable', ['loan' => $loan->id]) }}',
                 columns: [{
+                        data: 'date',
+                        name: 'date'
+                    },
+                    {
                         data: 'amount',
                         name: 'amount'
+                    },
+                    {
+                        data: 'transaction_type',
+                        name: 'transaction_type'
                     },
                     {
                         data: 'creator.name',
@@ -143,16 +167,14 @@
                             contentType: false,
                         }).done(function(response) {
                             if (response.status) {
-                                // $('#newSupplierModal').modal('hide');
-                                // Swal.fire(
-                                //     'Successfully',
-                                //     response.message,
-                                //     'success'
-                                // ).then((result) => {
-                                //     $(".supplier").append('<option value="' +
-                                //         response.supplier.id + '" selected>' +
-                                //         response.supplier.name + '</option>');
-                                // });
+                                $('#newPaymentModal').modal('hide');
+                                Swal.fire(
+                                    'Successfully',
+                                    response.message,
+                                    'success'
+                                ).then((result) => {
+                                    location.reload();
+                                });
                             } else {
                                 Swal.fire({
                                     icon: 'error',

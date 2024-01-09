@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('loan_details', function (Blueprint $table) {
             $table->id();
             $table->foreignId('loan_id');
+            $table->date('date');
             $table->unsignedFloat('amount', 8, 2);
             $table->unsignedTinyInteger('transaction_type')->comment('1=cash,2=bank');
             $table->foreignId('created_by');

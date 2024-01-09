@@ -21,6 +21,10 @@ class Loan extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+    public function loanDetails()
+    {
+        return $this->hasMany(LoanDetail::class, 'loan_id', 'id');
+    }
 
     protected static function newFactory(): LoanFactory
     {

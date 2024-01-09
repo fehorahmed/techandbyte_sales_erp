@@ -26,7 +26,10 @@ class LoanDetailController extends Controller
         $query = LoanDetail::with('creator');
         return DataTables::eloquent($query)
             ->addIndexColumn()
-            ->addColumn('action', function (LoanDetail $promotion) {
+            ->editColumn('transaction_type', function (LoanDetail $loanDetail) {
+                return $loanDetail->transaction_type == 1 ? 'Cash' : ($loanDetail->transaction_type == 2 ? 'Bank' : '');
+            })
+            ->addColumn('action', function (LoanDetail $loanDetail) {
                 // return '<a href="' . route('promotion.edit', ['detail' => $promotion->id]) . '" class="btn-edit"><i style="color:#01a9ac;font-size: 17px;" class="feather icon-edit"></i></a>';
                 return '<a href="" class="btn-edit"><i style="color:#01a9ac;font-size: 17px;" class="feather icon-edit"></i></a>';
             })
@@ -51,12 +54,48 @@ class LoanDetailController extends Controller
             'loan_id' => 'required|numeric',
             'amount' => 'required|numeric',
             'date' => 'required|date',
+            'transaction_type' => 'required|numeric',
         ];
         $validation = Validator::make($request->all(), $rules);
         if ($validation->fails()) {
             return response([
                 'status' => false,
                 'message' => $validation->errors()->first(),
+            ]);
+        }
+        $ck = Loan::find($request->loan_id);
+        $ck_amount = $ck->loanDetails->sum('amount');
+        if ($ck_amount) {
+            if ($ck->amount < $ck_amount + $request->amount) {
+                return response([
+                    'status' => false,
+                    'message' => "Total amount is greater than loan amount",
+                ]);
+            }
+        } else {
+            if ($ck->amount < $request->amount) {
+                return response([
+                    'status' => false,
+                    'message' => "Total amount is greater than loan amount",
+                ]);
+            }
+        }
+
+        $loanDetails = new LoanDetail();
+        $loanDetails->loan_id = $request->loan_id;
+        $loanDetails->date = $request->date;
+        $loanDetails->amount = $request->amount;
+        $loanDetails->transaction_type = $request->transaction_type;
+        $loanDetails->created_by = auth()->id();
+        if ($loanDetails->save()) {
+            return response([
+                'status' => true,
+                'message' => "Payment create successfully.",
+            ]);
+        } else {
+            return response([
+                'status' => false,
+                'message' => "Something went wrong",
             ]);
         }
     }
