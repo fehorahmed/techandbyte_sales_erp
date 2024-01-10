@@ -69,19 +69,7 @@
                                         @enderror
                                     </div>
                                 </div>
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <label for="c_&_f">C&F</label>
-                                        <div class="input-group c_&_f">
-                                            <input type="text"
-                                                class="form-control {{ $errors->has('c_&_f') ? 'is-invalid' : 'is-valid' }}"
-                                                name="c_&_f" value="{{ old('c_&_f') }}" placeholder="C_&_F">
-                                        </div>
-                                        @error('c_&_f')
-                                            <span class="invalid-feedback">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                </div>
+
                                 <div class="col-md-2">
                                     <div class="form-group">
                                         <label for="notes">Payment Details (Narration)</label>
@@ -149,9 +137,9 @@
                                                     <td>
                                                         <div
                                                             class="form-group {{ $errors->has('unit.' . $loop->index) ? 'has-error' : '' }}">
-                                                            <input type="text" step="any"
-                                                                class="form-control unit" name="unit[]"
-                                                                value="{{ old('unit.' . $loop->index) }}" readonly>
+                                                            <input type="text" step="any" class="form-control unit"
+                                                                name="unit[]" value="{{ old('unit.' . $loop->index) }}"
+                                                                readonly>
                                                         </div>
                                                     </td>
                                                     {{-- <td>
@@ -352,11 +340,11 @@
 
                                             <div class="col-md-6">
                                                 <table class="table table-bordered">
-                                                    <tr>
+                                                    {{-- <tr>
                                                         <th colspan="4" class="text-right">Sub Total </th>
                                                         <th id="product_sub_total"> ৳0.00 </th>
-                                                    </tr>
-                                                    <tr>
+                                                    </tr> --}}
+                                                    {{-- <tr>
                                                         <th colspan="4" class="text-right">Purchase Discount (Tk/%)
                                                         </th>
                                                         <td>
@@ -374,21 +362,56 @@
                                                                     value="{{ empty(old('discount_percentage')) ? ($errors->has('discount_percentage') ? '' : '0') : old('discount_percentage') }}">
                                                             </div>
                                                         </td>
-                                                    </tr>
-                                                    <tr>
+                                                    </tr> --}}
+                                                    {{-- <tr>
                                                         <th colspan="4" class="text-right">Total Discount</th>
                                                         <th>
                                                             <input type="text" step="any"
                                                                 class="form-control total_discount is-valid-border"
                                                                 name="total_discount" readonly>
                                                         </th>
+                                                    </tr> --}}
+                                                    <tr>
+                                                        <th colspan="4" class="text-right">Duty</th>
+                                                        <th>
+                                                            <input type="number" step="any" id="duty"
+                                                                class="form-control duty is-valid-border" name="duty">
+                                                        </th>
                                                     </tr>
                                                     <tr>
-                                                        <th colspan="4" class="text-right">Total Vat</th>
+                                                        <th colspan="4" class="text-right">Freight</th>
                                                         <th>
-                                                            <input type="text" step="any"
-                                                                class="form-control total_vat is-valid-border"
-                                                                name="total_vat" readonly>
+                                                            <input type="number" step="any" id="freight"
+                                                                class="form-control freight is-valid-border"
+                                                                name="freight">
+                                                        </th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th colspan="4" class="text-right">C&F</th>
+                                                        <th>
+                                                            <input type="number" step="any" id="c_&_f"
+                                                                class="form-control c_&_f is-valid-border" name="c_&_f">
+                                                        </th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th colspan="4" class="text-right">AIT</th>
+                                                        <th>
+                                                            <input type="number" step="any" id="ait"
+                                                                class="form-control ait is-valid-border" name="ait">
+                                                        </th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th colspan="4" class="text-right">AT</th>
+                                                        <th>
+                                                            <input type="number" step="any" id="at"
+                                                                class="form-control at is-valid-border" name="at">
+                                                        </th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th colspan="4" class="text-right">ETC</th>
+                                                        <th>
+                                                            <input type="number" step="any" id="etc"
+                                                                class="form-control etc is-valid-border" name="etc">
                                                         </th>
                                                     </tr>
                                                     <tr>
