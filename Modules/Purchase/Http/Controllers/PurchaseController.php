@@ -75,11 +75,16 @@ class PurchaseController extends Controller{
             'product.*' => 'required|numeric|min:0',
             'quantity.*' => 'required|numeric|min:0',
             'product_rate.*' => 'required|numeric|min:0',
-            'batch_no.*' => 'required|string|max:255',
+           // 'batch_no.*' => 'required|string|max:255',
             'paid' => 'required|numeric|min:0',
-
+            "duty" => "required|numeric|min:0",
+            "freight" => "required|numeric|min:0",
+            "c_and_f" => "required|numeric|min:0",
+            "ait" => "required|numeric|min:0",
+            "at" => "required|numeric|min:0",
+            "etc" => "required|numeric|min:0",
         ];
-        dd($request->all());
+       // dd($request->all());
 
 
         $request->validate($rules);
@@ -99,6 +104,12 @@ class PurchaseController extends Controller{
         $productPurchase = new ProductPurchase();
         $productPurchase->lc_no = $request->lc_no;
         $productPurchase->supplier_id = $request->supplier;
+        $productPurchase->duty = $request->duty;
+        $productPurchase->freight = $request->freight;
+        $productPurchase->c_and_f = $request->c_and_f;
+        $productPurchase->ait = $request->ait;
+        $productPurchase->at = $request->at;
+        $productPurchase->etc = $request->etc;
         $productPurchase->purchase_date = Carbon::parse($request->date)->format('Y-m-d');
         $productPurchase->grand_total_amount = $request->grand_total_price;
         $productPurchase->purchase_details = $request->purchase_details;
@@ -125,12 +136,13 @@ class PurchaseController extends Controller{
             $productPurchaseDetail->product_id = $product->id;
             $productPurchaseDetail->rate = $request->product_rate[$counter];
             $productPurchaseDetail->quantity = $request->quantity[$counter];
-            $productPurchaseDetail->batch_id = $request->batch_no[$counter];
-            $productPurchaseDetail->discount_percent = $request->discount_percent[$counter]??'0';
-            $productPurchaseDetail->discount_amount = $request->discount_value[$counter];
-            $productPurchaseDetail->vat_amount_percent = $request->vat_percent[$counter] ?? '0';
-            $productPurchaseDetail->vat_amount = $request->vat_value[$counter];
-            $productPurchaseDetail->total_amount = ($request->quantity[$counter] * $request->product_rate[$counter])- $request->discount_value[$counter];
+            //$productPurchaseDetail->batch_id = $request->batch_no[$counter];
+           // $productPurchaseDetail->discount_percent = $request->discount_percent[$counter]??'0';
+           // $productPurchaseDetail->discount_amount = $request->discount_value[$counter];
+           // $productPurchaseDetail->vat_amount_percent = $request->vat_percent[$counter] ?? '0';
+           // $productPurchaseDetail->vat_amount = $request->vat_value[$counter];
+           // $productPurchaseDetail->total_amount = ($request->quantity[$counter] * $request->product_rate[$counter])- $request->discount_value[$counter];
+            $productPurchaseDetail->total_amount = ($request->quantity[$counter] * $request->product_rate[$counter]);
             $productPurchaseDetail->save();
 
             $subTotal += $productPurchaseDetail->total_amount+ $request->vat_value[$counter];
