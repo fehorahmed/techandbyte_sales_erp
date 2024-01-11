@@ -20,42 +20,45 @@ use Illuminate\Support\Facades\Validator;
 use SakibRahaman\DecimalToWords\DecimalToWords;
 use Yajra\DataTables\Facades\DataTables;
 
-class PurchaseController extends Controller{
-    public function addPurchase(){
-        $suppliers = Supplier::orderBy('name','desc')->get();
-        $paymentCodes= AccCoa::where('isBankNature',1)->orWhere('isCashNature',1)->where('HeadLevel', 4)->where('IsActive', 1)->orderBy('HeadName')->get();
-        return view('purchase::purchase.add_purchase',compact('suppliers','paymentCodes'));
+class PurchaseController extends Controller
+{
+    public function addPurchase()
+    {
+        $suppliers = Supplier::orderBy('name', 'desc')->get();
+        $paymentCodes = AccCoa::where('isBankNature', 1)->orWhere('isCashNature', 1)->where('HeadLevel', 4)->where('IsActive', 1)->orderBy('HeadName')->get();
+        return view('purchase::purchase.add_purchase', compact('suppliers', 'paymentCodes'));
     }
 
-    public function purchaseReceiptDatatable() {
+    public function purchaseReceiptDatatable()
+    {
         $query = ProductPurchase::with('supplier');
 
         return DataTables::eloquent($query)
-            ->addColumn('supplier', function(ProductPurchase $productPurchase) {
+            ->addColumn('supplier', function (ProductPurchase $productPurchase) {
                 return $productPurchase->supplier->name ?? '';
             })
-            ->addColumn('action', function(ProductPurchase $productPurchase) {
+            ->addColumn('action', function (ProductPurchase $productPurchase) {
 
-//                $btn   = '<a href="' . route('purchase_journal_voucher.details', ['order' => $productPurchase->id]) . '" class="btn btn-dark btn-sm">JV</i></a> ';
+                //                $btn   = '<a href="' . route('purchase_journal_voucher.details', ['order' => $productPurchase->id]) . '" class="btn btn-dark btn-sm">JV</i></a> ';
                 $btn  = '<a href="' . route('purchase.purchase_receipt_details', ['productPurchase' => $productPurchase->id]) . '" class="btn btn-primary btn-sm">Details</a> ';
-//                $btn  .= '<a class="btn btn-info btn-sm btn-pay" role="button" data-id="'.$productPurchase->id.'" data-order="'.$productPurchase->order_no.'" data-due="'.$productPurchase->due.'">Pay</a> ';
+                //                $btn  .= '<a class="btn btn-info btn-sm btn-pay" role="button" data-id="'.$productPurchase->id.'" data-order="'.$productPurchase->order_no.'" data-due="'.$productPurchase->due.'">Pay</a> ';
                 return $btn;
             })
-            ->editColumn('purchase_date', function(ProductPurchase $productPurchase) {
+            ->editColumn('purchase_date', function (ProductPurchase $productPurchase) {
                 return $productPurchase->purchase_date;
             })
 
             ->addColumn('quantity', function (ProductPurchase $productPurchase) {
                 return $productPurchase->quantity ?? '';
             })
-            ->editColumn('grand_total_amount', function(ProductPurchase $productPurchase) {
-                return '৳'.number_format($productPurchase->grand_total_amount, 2);
+            ->editColumn('grand_total_amount', function (ProductPurchase $productPurchase) {
+                return '৳' . number_format($productPurchase->grand_total_amount, 2);
             })
-            ->editColumn('paid_amount', function(ProductPurchase $productPurchase) {
-                return '৳'.number_format($productPurchase->paid_amount, 2);
+            ->editColumn('paid_amount', function (ProductPurchase $productPurchase) {
+                return '৳' . number_format($productPurchase->paid_amount, 2);
             })
-            ->editColumn('due_amount', function(ProductPurchase $productPurchase) {
-                return '৳'.number_format($productPurchase->due_amount, 2);
+            ->editColumn('due_amount', function (ProductPurchase $productPurchase) {
+                return '৳' . number_format($productPurchase->due_amount, 2);
             })
             ->orderColumn('purchase_date', function ($query, $productPurchase) {
                 $query->orderBy('purchase_date', $productPurchase)->orderBy('created_at', 'desc');
@@ -65,7 +68,8 @@ class PurchaseController extends Controller{
     }
 
 
-    public function addPurchasePost(Request $request){
+    public function addPurchasePost(Request $request)
+    {
 
         $rules = [
             'supplier' => 'required',
@@ -75,7 +79,7 @@ class PurchaseController extends Controller{
             'product.*' => 'required|numeric|min:0',
             'quantity.*' => 'required|numeric|min:0',
             'product_rate.*' => 'required|numeric|min:0',
-           // 'batch_no.*' => 'required|string|max:255',
+            // 'batch_no.*' => 'required|string|max:255',
             'paid' => 'required|numeric|min:0',
             "duty" => "required|numeric|min:0",
             "freight" => "required|numeric|min:0",
@@ -84,19 +88,18 @@ class PurchaseController extends Controller{
             "at" => "required|numeric|min:0",
             "etc" => "required|numeric|min:0",
         ];
-       // dd($request->all());
+        // dd($request->all());
 
 
         $request->validate($rules);
 
-        if($request->paid > $request->grand_total_price){
+        if ($request->paid > $request->grand_total_price) {
             return redirect()->back()->withInput()->with('error', 'Paid Amount Greater than Total Amount Paid');
         }
 
         if ($request->paid == 0) {
             $is_credit = 1;
-        }
-        else {
+        } else {
             $is_credit = '';
         }
 
@@ -116,12 +119,12 @@ class PurchaseController extends Controller{
         $productPurchase->paid_amount = $request->paid;
         $productPurchase->due_amount = 0;
         $productPurchase->total_discount = $request->discount;
-        $productPurchase->total_vat_amount = $request->total_vat??0;
+        $productPurchase->total_vat_amount = $request->total_vat ?? 0;
         $productPurchase->invoice_discount = 0;
         $productPurchase->status = 1;
         $productPurchase->payment_type = 1;
         $productPurchase->save();
-        $productPurchase->chalan_no = 'PO'.str_pad($productPurchase->id, 8, 0, STR_PAD_LEFT);
+        $productPurchase->chalan_no = 'PO' . str_pad($productPurchase->id, 8, 0, STR_PAD_LEFT);
         $productPurchase->save();
 
         $counter = 0;
@@ -137,22 +140,21 @@ class PurchaseController extends Controller{
             $productPurchaseDetail->rate = $request->product_rate[$counter];
             $productPurchaseDetail->quantity = $request->quantity[$counter];
             //$productPurchaseDetail->batch_id = $request->batch_no[$counter];
-           // $productPurchaseDetail->discount_percent = $request->discount_percent[$counter]??'0';
-           // $productPurchaseDetail->discount_amount = $request->discount_value[$counter];
-           // $productPurchaseDetail->vat_amount_percent = $request->vat_percent[$counter] ?? '0';
-           // $productPurchaseDetail->vat_amount = $request->vat_value[$counter];
-           // $productPurchaseDetail->total_amount = ($request->quantity[$counter] * $request->product_rate[$counter])- $request->discount_value[$counter];
+            // $productPurchaseDetail->discount_percent = $request->discount_percent[$counter]??'0';
+            // $productPurchaseDetail->discount_amount = $request->discount_value[$counter];
+            // $productPurchaseDetail->vat_amount_percent = $request->vat_percent[$counter] ?? '0';
+            // $productPurchaseDetail->vat_amount = $request->vat_value[$counter];
+            // $productPurchaseDetail->total_amount = ($request->quantity[$counter] * $request->product_rate[$counter])- $request->discount_value[$counter];
             $productPurchaseDetail->total_amount = ($request->quantity[$counter] * $request->product_rate[$counter]);
             $productPurchaseDetail->save();
 
             $subTotal += $productPurchaseDetail->total_amount;
-          //  $productDiscount += $request->discount_value[$counter];
+            //  $productDiscount += $request->discount_value[$counter];
 
             $counter++;
         }
 
-
-        $due = $subTotal - $request->paid-$request->discount;
+        $due = ($subTotal + $productPurchase->duty + $productPurchase->freight + $productPurchase->c_and_f + $productPurchase->ait + $productPurchase->at + $productPurchase->etc) - $request->paid;
         $productPurchase->due_amount = $due;
         //$productPurchase->invoice_discount = $productDiscount+$request->discount;
         $productPurchase->save();
@@ -170,21 +172,20 @@ class PurchaseController extends Controller{
             $reVID     = $predefineAccount->supplierCode;
             $subCode   = AccSubcode::where('referenceNo', $request->supplier)->where('subTypeId', 4)->first();
             $subCodeId = $subCode->id;
-            $this->insertPurchaseDebitVoucher($is_credit,$purchase_id,$COAID,$amountType,$amountPay,$Narration,$Comment,$reVID,$subCodeId);
-        }
-        else {
+            $this->insertPurchaseDebitVoucher($is_credit, $purchase_id, $COAID, $amountType, $amountPay, $Narration, $Comment, $reVID, $subCodeId);
+        } else {
             $amountType = 'Debit';
-            $paymentCodes= AccCoa::where('id',$request->payment_type)->first();
+            $paymentCodes = AccCoa::where('id', $request->payment_type)->first();
             $reVID = $paymentCodes->HeadCode;
             $amount_pay = $request->paid;
-            $this->insertPurchaseDebitVoucher($is_credit,$purchase_id,$COAID,$amountType,$amount_pay,$Narration,$Comment,$reVID);
+            $this->insertPurchaseDebitVoucher($is_credit, $purchase_id, $COAID, $amountType, $amount_pay, $Narration, $Comment, $reVID);
         }
 
         //Create Transaction Voucher
-        $vouchers = AccVoucher::where('referenceNo',$purchase_id)->where('status',0)->get();
-        $ApprovedBy=auth()->user()->id;
+        $vouchers = AccVoucher::where('referenceNo', $purchase_id)->where('status', 0)->get();
+        $ApprovedBy = auth()->user()->id;
 
-        if($vouchers){
+        if ($vouchers) {
             foreach ($vouchers as $voucher) {
                 $accTransaction = new AccTransaction();
                 $accTransaction->vid   =  $voucher->id;
@@ -213,9 +214,9 @@ class PurchaseController extends Controller{
 
             //Update Monthly record
 
-            if($accTransaction){
+            if ($accTransaction) {
 
-                    $this->storeTransactionSummery($voucher->COAID, $voucher->VDate);
+                $this->storeTransactionSummery($voucher->COAID, $voucher->VDate);
 
                 foreach ($vouchers as $voucher) {
                     $reverseAccTransaction = new AccTransaction();
@@ -245,7 +246,6 @@ class PurchaseController extends Controller{
 
                 $this->storeTransactionSummery($voucher->RevCodde, $voucher->VDate);
             }
-
         }
 
 
@@ -258,27 +258,31 @@ class PurchaseController extends Controller{
 
 
 
-//        return redirect()->route('purchase.purchase_receipt.details', ['order' => $productPurchase->id]);
+        //        return redirect()->route('purchase.purchase_receipt.details', ['order' => $productPurchase->id]);
         return redirect()->route('purchase.purchase_receipt_all');
     }
 
-    public function purchaseReceipt() {
+    public function purchaseReceipt()
+    {
         return view('purchase::purchase.receipt.all');
     }
 
-    public function purchaseReceiptDetails(ProductPurchase $productPurchase){
-//        $productPurchase = ProductPurchase::with('supplier','products')->where('id',$productPurchase)->first()->toArray();
-//        dd($productPurchase);
+    public function purchaseReceiptDetails(ProductPurchase $productPurchase)
+    {
+        //        $productPurchase = ProductPurchase::with('supplier','products')->where('id',$productPurchase)->first()->toArray();
+        //        dd($productPurchase);
 
-        return view('purchase::purchase.receipt.details',compact('productPurchase'));
+        return view('purchase::purchase.receipt.details', compact('productPurchase'));
     }
 
-    public function edit($id){
+    public function edit($id)
+    {
         return view('purchase::edit');
     }
 
     //Insert Purchase Debit Voucher
-    public function insertPurchaseDebitVoucher($is_credit = null,$purchase_id = null,$dbtid = null,$amountType = null,$amount = null,$Narration = null,$Comment = null,$reVID = null,$subCodeId = null){
+    public function insertPurchaseDebitVoucher($is_credit = null, $purchase_id = null, $dbtid = null, $amountType = null, $amount = null, $Narration = null, $Comment = null, $reVID = null, $subCodeId = null)
+    {
 
         $VDate = date('Y-m-d');
 
@@ -309,20 +313,20 @@ class PurchaseController extends Controller{
     {
         $currentMonth = Carbon::parse($date)->month;
         $fyear = financial_year();
-//        $summary = $this->getClosingBalance($coaid, $date);
+        //        $summary = $this->getClosingBalance($coaid, $date);
         $summary = 500;
         $existingRecord = AccMonthlyBalance::where('COAID', $coaid)->where('fyear', $fyear)->first();
 
         if (!$existingRecord) {
             $accMonthlyBalance = new AccMonthlyBalance();
-            $accMonthlyBalance->fyear =$fyear;
-            $accMonthlyBalance->COAID =$coaid;
-            $accMonthlyBalance['balance'.$currentMonth] =$summary;
+            $accMonthlyBalance->fyear = $fyear;
+            $accMonthlyBalance->COAID = $coaid;
+            $accMonthlyBalance['balance' . $currentMonth] = $summary;
             $accMonthlyBalance->save();
         } else {
-            $existingRecord->fyear =$fyear;
-            $existingRecord->COAID =$coaid;
-            $existingRecord['balance'.$currentMonth] = $summary;
+            $existingRecord->fyear = $fyear;
+            $existingRecord->COAID = $coaid;
+            $existingRecord['balance' . $currentMonth] = $summary;
             $existingRecord->save();
         }
 

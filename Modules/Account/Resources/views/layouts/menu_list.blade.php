@@ -39,7 +39,7 @@ $menu = [
 ];
 ?>
 
-<li class="pcoded-hasmenu {{ in_array(Route::currentRouteName(), $menu) ? 'active pcoded-trigger' : '' }}">
+{{-- <li class="pcoded-hasmenu {{ in_array(Route::currentRouteName(), $menu) ? 'active pcoded-trigger' : '' }}">
     <a href="javascript:void(0)">
         <span class="pcoded-micon"><i class="feather icon-briefcase"></i></span>
         <span class="pcoded-mtext">Accounts</span>
@@ -221,10 +221,10 @@ $menu = [
         </li>
 
     </ul>
-</li>
+</li> --}}
 
 
-{{-- Exense --}}
+{{-- ExPense --}}
 
 <?php
 $menu = ['account.expense_item_all', 'account.expense_item_add', 'account.expense_item_edit', 'account.expense_all', 'account.expense_add'];
