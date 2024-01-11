@@ -116,7 +116,7 @@ class PurchaseController extends Controller{
         $productPurchase->paid_amount = $request->paid;
         $productPurchase->due_amount = 0;
         $productPurchase->total_discount = $request->discount;
-        $productPurchase->total_vat_amount = $request->total_vat;
+        $productPurchase->total_vat_amount = $request->total_vat??0;
         $productPurchase->invoice_discount = 0;
         $productPurchase->status = 1;
         $productPurchase->payment_type = 1;
@@ -145,8 +145,8 @@ class PurchaseController extends Controller{
             $productPurchaseDetail->total_amount = ($request->quantity[$counter] * $request->product_rate[$counter]);
             $productPurchaseDetail->save();
 
-            $subTotal += $productPurchaseDetail->total_amount+ $request->vat_value[$counter];
-            $productDiscount += $request->discount_value[$counter];
+            $subTotal += $productPurchaseDetail->total_amount;
+          //  $productDiscount += $request->discount_value[$counter];
 
             $counter++;
         }
@@ -154,7 +154,7 @@ class PurchaseController extends Controller{
 
         $due = $subTotal - $request->paid-$request->discount;
         $productPurchase->due_amount = $due;
-        $productPurchase->invoice_discount = $productDiscount+$request->discount;
+        //$productPurchase->invoice_discount = $productDiscount+$request->discount;
         $productPurchase->save();
 
         $predefineAccount  = AccPredefineAccount::first();

@@ -47,10 +47,10 @@
                                                     <th>Product Name</th>
                                                     <th>Qty</th>
                                                     <th>Rate</th>
-                                                    <th>Discount%</th>
+                                                    {{-- <th>Discount%</th>
                                                     <th>Dis. Value</th>
                                                     <th>Vat %</th>
-                                                    <th>VAT Value</th>
+                                                    <th>VAT Value</th> --}}
                                                     <th>Total Amount</th>
                                                 </tr>
                                                 </thead>
@@ -66,10 +66,10 @@
                                                             <td>{{$product->product->product_name ?? ''}}</td>
                                                             <td>{{ $product->quantity }}</td>
                                                             <td>{{ $product->rate }}</td>
-                                                            <td>{{ $product->discount_percent }}</td>
+                                                            {{-- <td>{{ $product->discount_percent }}</td>
                                                             <td>{{ $product->discount_amount }}</td>
                                                             <td>{{ $product->vat_amount_percent }}</td>
-                                                            <td>{{ $product->vat_amount }}</td>
+                                                            <td>{{ $product->vat_amount }}</td> --}}
                                                             <td>{{ $product->total_amount }}</td>
                                                         </tr>
                                                         @php
@@ -95,28 +95,33 @@
                                                         <td>৳{{ number_format($subTotal, 2) }}</td>
                                                     </tr>
                                                     <tr>
-                                                        <th>Total Vat</th>
-                                                        <td>৳{{ number_format($productPurchase->total_vat_amount, 2) }}</td>
+                                                        <th>Duty Amount</th>
+                                                        <td>৳{{ number_format($productPurchase->duty, 2) }}</td>
                                                     </tr>
                                                     <tr>
-                                                        <th>Purchase Discount</th>
-                                                        <td>৳{{ number_format($productPurchase->total_discount, 2) }}</td>
+                                                        <th>Freight Amount</th>
+                                                        <td>৳{{ number_format($productPurchase->freight, 2) }}</td>
                                                     </tr>
                                                     <tr>
-                                                        <th>Total Discount</th>
-                                                        <td>৳{{ number_format($productPurchase->invoice_discount, 2) }}</td>
+                                                        <th>C&F Amount</th>
+                                                        <td>৳{{ number_format($productPurchase->c_and_f, 2) }}</td>
                                                     </tr>
                                                     <tr>
-                                                        <th>Grand Total</th>
+                                                        <th>AIT Total</th>
+                                                        <td>৳{{ number_format($productPurchase->ait	, 2) }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>AT Amount</th>
+                                                        <td>৳{{ number_format($productPurchase->at, 2) }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>ETC Amount</th>
+                                                        <td>৳{{ number_format($productPurchase->etc, 2) }}</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <th>Total Amount</th>
                                                         <td>৳{{ number_format($productPurchase->grand_total_amount, 2) }}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Paid Amount</th>
-                                                        <td>৳{{ number_format($productPurchase->paid_amount, 2) }}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Due Amount</th>
-                                                        <td>৳{{ number_format($productPurchase->due_amount, 2) }}</td>
                                                     </tr>
                                                     </tbody>
                                                 </table>
