@@ -18,6 +18,14 @@ return new class extends Migration
             $table->string('chalan_no')->nullable();
             $table->string('lc_no')->nullable();
             $table->bigInteger('supplier_id');
+
+            $table->float('duty',8,2);
+            $table->float('freight',8,2);
+            $table->float('c_and_f',8,2);
+            $table->float('ait',8,2);
+            $table->float('at',8,2);
+            $table->float('etc',8,2);
+
             $table->double('grand_total_amount',20,2);
             $table->double('paid_amount',20,2);
             $table->double('due_amount',20,2);

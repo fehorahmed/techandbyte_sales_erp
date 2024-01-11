@@ -389,8 +389,9 @@
                                                     <tr>
                                                         <th colspan="4" class="text-right">C&F</th>
                                                         <th>
-                                                            <input type="number" step="any" id="c_&_f"
-                                                                class="form-control c_&_f is-valid-border" name="c_&_f">
+                                                            <input type="number" step="any" id="c_and_f"
+                                                                class="form-control c_and_f is-valid-border"
+                                                                name="c_and_f">
                                                         </th>
                                                     </tr>
                                                     <tr>
@@ -607,11 +608,13 @@
             calculate();
             initSelect2();
             addProduct__delete();
-            $('body').on('keyup', '.quantity, .product_rate,.discount_percent,.vat_percent,.product,#discount',
+            $('body').on('keyup',
+                '.quantity, .product_rate,.discount_percent,.vat_percent,.product,#discount,#duty, #freight, #c_and_f,#ait,#at,#etc',
                 function() {
                     calculate();
                 });
-            $('body').on('change', '.quantity, .product_rate,.discount_percent,.vat_percent,.product,#discount',
+            $('body').on('change',
+                '.quantity, .product_rate,.discount_percent,.vat_percent,.product,#discount ,#duty, #freight, #c_and_f,#ait,#at,#etc',
                 function() {
                     calculate();
                 });
@@ -691,6 +694,16 @@
             let productVatTotal = 0;
             let discount = $("#discount").val() || "0";
 
+            let duty = parseFloat($("#duty").val()) || 0;
+            let freight = parseFloat($("#freight").val()) || 0;
+            let c_and_f = parseFloat($("#c_and_f").val()) || 0;
+            let ait = parseFloat($("#ait").val()) || 0;
+            let at = parseFloat($("#at").val()) || 0;
+            let etc = parseFloat($("#etc").val()) || 0;
+
+            let total_others = (duty + freight + c_and_f + ait + at + etc);
+          //  alert(total_others);
+
             $('.product-item').each(function(i) {
                 let product_rate = $('.product_rate').eq(i).val();
                 let quantity = $('.quantity').eq(i).val();
@@ -722,23 +735,24 @@
                 $('.total-cost').eq(i).html('৳' + (row_total_cost - row_discount_amount).toFixed(2));
                 productSubTotal += row_total_cost - row_discount_amount;
             });
+
             $('#total_amount').html('৳' + productSubTotal.toFixed(2));
             $('#product_sub_total').html('৳' + productSubTotal.toFixed(2));
 
             //discount formula
-            if (discount.includes('%')) {
-                let discount_percent = discount.split('%')[0];
-                purchase_discount_amount = (productSubTotal * discount_percent) / 100;
-                $('.discount_percentage').val(discount_percent);
-            } else {
-                purchase_discount_amount = discount;
-                $('.discount_percentage').val(0);
-            }
-            $('.total_discount').val(productDiscountTotal + parseInt(purchase_discount_amount));
-            $('.total_vat').val(productVatTotal);
+            // if (discount.includes('%')) {
+            //    let discount_percent = discount.split('%')[0];
+            //    purchase_discount_amount = (productSubTotal * discount_percent) / 100;
+            //    $('.discount_percentage').val(discount_percent);
+            // } else {
+            //     purchase_discount_amount = discount;
+            //     $('.discount_percentage').val(0);
+            // }
+            // $('.total_discount').val(productDiscountTotal + parseInt(purchase_discount_amount));
+            // $('.total_vat').val(productVatTotal);
 
-            let grandTotal = parseFloat(productSubTotal) - parseFloat(purchase_discount_amount) + productVatTotal;
-            $('#purchase_discount').html(parseFloat(purchase_discount_amount).toFixed(2));
+            let grandTotal = parseFloat(productSubTotal + total_others);
+            // $('#purchase_discount').html(parseFloat(purchase_discount_amount).toFixed(2));
 
             $('#paid').val(grandTotal);
             let paid = $('#paid').val() || 0;
@@ -748,7 +762,7 @@
                 confirm('Due amount is not negative');
             }
             $('.grand_total_price').val(grandTotal.toFixed(2));
-            $('.purchase_discount').val(purchase_discount_amount);
+            // $('.purchase_discount').val(purchase_discount_amount);
             $('#due').html('৳' + due.toFixed(2));
         }
 

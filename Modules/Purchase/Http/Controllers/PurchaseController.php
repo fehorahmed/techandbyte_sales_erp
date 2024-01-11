@@ -79,6 +79,7 @@ class PurchaseController extends Controller{
             'paid' => 'required|numeric|min:0',
 
         ];
+        dd($request->all());
 
 
         $request->validate($rules);
