@@ -9,5 +9,7 @@
     "Client": true,
     "Promotion": true,
     "Warehouse": true,
-    "Loan": true
+    "Loan": true,
+    "Task": true,
+    "Migrate": true
 }
