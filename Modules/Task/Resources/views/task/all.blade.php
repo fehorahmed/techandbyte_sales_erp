@@ -9,17 +9,18 @@
                         <div class="d-inline" style="float: left">
                             <h4>@yield('title')</h4>
                         </div>
-                        <h5 style="float: right"><a href="{{ route('supplier.supplier_add') }}" class="btn btn-success">Add
-                                Supplier</a></h5>
+                        <h5 style="float: right"><a href="{{ route('task.task_add') }}" class="btn btn-success">Add
+                                Task</a></h5>
                     </div>
                     <div class="card-block mt-4">
                         <div class="dt-responsive table-responsive">
                             <table id="table" class="table table-striped table-bordered nowrap">
                                 <thead>
                                     <tr>
-                                        <th>Name</th>
-                                        <th>Email</th>
-                                        <th>Phone</th>
+                                        <th>Title</th>
+                                        <th>Task Type</th>
+                                        <th>Date</th>
+                                        <th>User</th>
                                         <th>Status</th>
                                         <th>Action</th>
                                     </tr>
@@ -41,18 +42,22 @@
                 processing: true,
                 serverSide: true,
                 buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
-                ajax: '{{ route('supplier.supplier_datatable') }}',
+                ajax: '{{ route('task.task_datatable') }}',
                 columns: [{
-                        data: 'name',
-                        name: 'name'
+                        data: 'title',
+                        name: 'title'
                     },
                     {
-                        data: 'email',
-                        name: 'email'
+                        data: 'task_type',
+                        name: 'task_type'
                     },
                     {
-                        data: 'phone',
-                        name: 'phone'
+                        data: 'date',
+                        name: 'date'
+                    },
+                    {
+                        data: 'user_id',
+                        name: 'user_id'
                     },
                     {
                         data: 'status',

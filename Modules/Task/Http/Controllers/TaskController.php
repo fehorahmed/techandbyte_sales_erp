@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Modules\Task\Entities\Task;
+use Yajra\DataTables\Facades\DataTables;
 
 class TaskController extends Controller
 {
@@ -14,7 +16,25 @@ class TaskController extends Controller
      */
     public function index()
     {
-        return view('task::task.index');
+        return view('task::task.all');
+    }
+
+    public function datatable()
+    {
+        $query = Task::with('creator');
+        return DataTables::eloquent($query)
+            ->addIndexColumn()
+            ->addColumn('action', function (Task $task) {
+                return '<a href="' . route('warehouse.edit', ['warehouse' => $task->id]) . '" class="btn-edit"><i style="color:#01a9ac;font-size: 17px;" class="feather icon-edit"></i></a>';
+            })
+            ->addColumn('status', function (Task $task) {
+                if ($task->status == 1)
+                    return '<span class="badge badge-success">Active</span>';
+                else
+                    return '<span class="badge badge-danger">Inactive</span>';
+            })
+            ->rawColumns(['action', 'status'])
+            ->toJson();
     }
 
     /**
