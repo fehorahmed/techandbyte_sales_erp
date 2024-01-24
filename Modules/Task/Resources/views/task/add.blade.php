@@ -9,24 +9,29 @@
                     <div class="d-inline" style="float: left">
                         <h4>@yield('title')</h4>
                     </div>
-                    <h5 style="float: right"><a href="{{ route('supplier.supplier_all') }}" class="btn btn-success">All Supplier</a></h5>
+                    <h5 style="float: right"><a href="{{ route('task.task_all') }}" class="btn btn-success">All Task</a></h5>
                 </div>
                 <div class="card-block mt-4">
-                    <form id="main" method="post" action="{{ route('supplier.supplier_add') }}">
+                    <form id="main" method="post" action="{{ route('task.task_add') }}">
                         @csrf
                         <div class="form-group row">
-                            <label class="col-sm-2 col-form-label text-right">Supplier Name</label>
+                            <label class="col-sm-2 col-form-label text-right">Title</label>
                             <div class="col-sm-4">
-                                <input type="text" class="form-control {{ $errors->has('name') ? 'is-invalid' :'is-valid' }}" name="name" value="{{ old('name') }}" id="name" placeholder="Enter Name">
-                                @error('name')
+                                <input type="text" class="form-control {{ $errors->has('title') ? 'is-invalid' :'is-valid' }}" name="title" value="{{ old('title') }}" id="title" placeholder="Enter Title">
+                                @error('title')
                                    <span class="help-block">{{ $message }}</span>
                                 @enderror
                             </div>
 
-                            <label class="col-sm-2 col-form-label text-right">Email</label>
+                            <label class="col-sm-2 col-form-label text-right">User</label>
                             <div class="col-sm-4">
-                                <input type="email" class="form-control {{ $errors->has('email') ? 'is-invalid' :'is-valid' }}" id="email" name="email" value="{{ old('email') }}" placeholder="Enter Email">
-                                @error('email')
+                                <select name="user" id="user" class="form-control {{ $errors->has('email') ? 'is-invalid' :'is-valid' }}">
+                                    <option value="">Select One</option>
+                                    @foreach ($users as $user)
+                                    <option value="{{$user->id}}">{{$user->name}}</option>
+                                    @endforeach
+                                </select>
+                                @error('user')
                                    <span class="help-block">{{ $message }}</span>
                                 @enderror
                             </div>
@@ -98,7 +103,7 @@
                         </div>
                     </form>
                 </div>
-            </div>              
+            </div>
         </div>
     </div>
 </div>

@@ -22,8 +22,8 @@ Route::prefix('task')->middleware('auth')->name('task.')->group(function () {
     // Supplier
     Route::get('all-task', [TaskController::class, 'index'])->name('task_all');
     Route::get('all-task/datatable', [TaskController::class, 'datatable'])->name('task_datatable');
-    Route::get('add-task', [TaskController::class, 'add'])->name('task_add');
-    Route::post('add-task', [TaskController::class, 'addPost']);
+    Route::get('add-task', [TaskController::class, 'create'])->name('task_add');
+    Route::post('add-task', [TaskController::class, 'store']);
     Route::get('edit-task/{task}', [TaskController::class, 'edit'])->name('task_edit');
     Route::post('edit-task/{task}', [TaskController::class, 'editPost']);
 });

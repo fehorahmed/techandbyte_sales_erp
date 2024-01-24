@@ -3,6 +3,7 @@
 namespace Modules\Task\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -42,7 +43,8 @@ class TaskController extends Controller
      */
     public function create()
     {
-        return view('task::create');
+        $users=User::all();
+        return view('task::task.add',compact('users'));
     }
 
     /**
@@ -50,7 +52,14 @@ class TaskController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        //
+        $request->validate([
+            "title" => 'required|string|max:255|unique:promotions,title',
+            "promotion_type" => 'required|string|max:255',
+            "platform" => 'required|string|max:255',
+            "cost" => 'required|numeric',
+            "date" => 'required|date|max:255',
+            "details" => 'nullable|string|max:255',
+        ]);
     }
 
     /**
