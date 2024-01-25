@@ -2,6 +2,7 @@
 
 namespace Modules\Task\Entities;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Modules\Task\Database\factories\TaskFactory;
@@ -14,9 +15,13 @@ class Task extends Model
      * The attributes that are mass assignable.
      */
     protected $fillable = [];
-    
+
     protected static function newFactory(): TaskFactory
     {
         //return TaskFactory::new();
+    }
+
+    public function creator(){
+        return $this->belongsTo(User::class,'created_by');
     }
 }

@@ -25,7 +25,7 @@
 
                             <label class="col-sm-2 col-form-label text-right">User</label>
                             <div class="col-sm-4">
-                                <select name="user" id="user" class="form-control {{ $errors->has('email') ? 'is-invalid' :'is-valid' }}">
+                                <select name="user" id="user" class="form-control">
                                     <option value="">Select One</option>
                                     @foreach ($users as $user)
                                     <option value="{{$user->id}}">{{$user->name}}</option>
@@ -37,27 +37,32 @@
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label class="col-sm-2 col-form-label text-right">Phone</label>
+                            <label class="col-sm-2 col-form-label text-right" for="task_type">Task Type</label>
                             <div class="col-sm-4">
-                                <input type="text" class="form-control {{ $errors->has('phone') ? 'is-invalid' :'is-valid' }}" id="phone" name="phone" value="{{ old('phone') }}" placeholder="Enter Phone">
-                                @error('phone')
+                                <select name="task_type" id="task_type" class="form-control">
+                                    <option value="">Select One</option>
+                                    <option value="1">Individual</option>
+                                    <option value="2">Market visit	</option>
+
+                                </select>
+                                @error('task_type')
                                    <span class="help-block">{{ $message }}</span>
                                 @enderror
                             </div>
 
-                            <label class="col-sm-2 col-form-label text-right">Opening Balance</label>
+                            <label class="col-sm-2 col-form-label text-right" for="date">Date</label>
                             <div class="col-sm-4">
-                                <input type="text" class="form-control {{ $errors->has('opening_balance') ? 'is-invalid' :'is-valid' }}" id="opening_balance" name="opening_balance" value="{{ old('opening_balance',0) }}">
-                                @error('opening_balance')
+                                <input type="date" class="form-control {{ $errors->has('opening_balance') ? 'is-invalid' :'' }}" id="date" name="date" value="{{ old('date') }}">
+                                @error('date')
                                    <span class="help-block">{{ $message }}</span>
                                 @enderror
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label class="col-sm-2 col-form-label text-right">Address</label>
+                            <label class="col-sm-2 col-form-label text-right" for="reason">Reason</label>
                             <div class="col-sm-4">
-                                <textarea class="form-control {{ $errors->has('address') ? 'is-invalid' :'is-valid' }}" id="address" name="address" value="{{ old('address') }}" placeholder="Enter your address"></textarea>
-                                @error('address')
+                                <textarea class="form-control {{ $errors->has('reason') ? 'is-invalid' :'is-valid' }}" id="reason" rows="6" name="reason" value="{{ old('reason') }}" placeholder="Enter your address"></textarea>
+                                @error('reason')
                                    <span class="help-block">{{ $message }}</span>
                                 @enderror
                             </div>
@@ -73,7 +78,7 @@
                                 <span class="messages"></span>
                             </div>
                         </div> --}}
-                        <div class="form-group row">
+                        {{-- <div class="form-group row">
                             <label class="col-sm-2 col-form-check text-right">Status</label>
                             <div class="col-sm-4">
                                 <div class="form-radio">
@@ -94,7 +99,7 @@
                                    <span class="help-block">{{ $message }}</span>
                                 @enderror
                             </div>
-                        </div>
+                        </div> --}}
                         <div class="form-group row">
                             <label class="col-sm-2"></label>
                             <div class="col-sm-10">

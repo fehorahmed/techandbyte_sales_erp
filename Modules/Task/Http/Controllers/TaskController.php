@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Modules\Task\Entities\Task;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -52,14 +53,29 @@ class TaskController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+
         $request->validate([
-            "title" => 'required|string|max:255|unique:promotions,title',
-            "promotion_type" => 'required|string|max:255',
-            "platform" => 'required|string|max:255',
-            "cost" => 'required|numeric',
+            "title" => 'required|string|max:255',
+            "user" => 'required|numeric',
+            "task_type" => 'required|numeric',
             "date" => 'required|date|max:255',
-            "details" => 'nullable|string|max:255',
+            "reason" => 'nullable|string|max:255',
         ]);
+
+
+        $task = new Task();
+        $task->title=$request->title;
+        $task->user_id=$request->user;
+        $task->task_type=$request->task_type;
+        $task->date=$request->date;
+        $task->reason=$request->reason;
+        $task->status=1;
+        $task->created_by=Auth::id();
+        if($task->save()){
+            return redirect()->route('task.task_all')->with('message','Task Successfully Created.');
+        }else{
+            return redirect()->back()->with('error','Something went wrong.');
+        }
     }
 
     /**
