@@ -28,6 +28,20 @@
                                         <th>Action</th>
                                     </tr>
                                 </thead>
+                                <tbody>
+                                @foreach($loan->loanDetails as $loanDetail)
+                                    <tr>
+                                        <td>{{$loanDetail->date}}</td>
+                                        <td>{{$loanDetail->amount}}</td>
+                                        <td>{{$loanDetail->transaction_type == 1 ? 'Cash' : ($loanDetail->transaction_type == 2 ? 'Bank' : '')}}</td>
+                                        <td>{{$loanDetail->creator->name ?? ''}}</td>
+                                        <td>
+                                            <a href="#" class="btn-edit"><i style="color:#01a9ac;font-size: 17px;" class="feather icon-edit"></i></a>
+                                        </td>
+
+                                    </tr>
+                                @endforeach
+                                </tbody>
                             </table>
                         </div>
                     </div>
@@ -112,37 +126,37 @@
             $('#add_payment_form').click(function() {
                 $('#newPaymentModal').modal('show');
             });
-            $('#table').DataTable({
-                dom: 'Bfrtip',
-                processing: true,
-                serverSide: true,
-                buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
-                ajax: '{{ route('loan.details.details_datatable', ['loan' => $loan->id]) }}',
-                columns: [{
-                        data: 'date',
-                        name: 'date'
-                    },
-                    {
-                        data: 'amount',
-                        name: 'amount'
-                    },
-                    {
-                        data: 'transaction_type',
-                        name: 'transaction_type'
-                    },
-                    {
-                        data: 'creator.name',
-                        name: 'created_by',
-                    },
-                    {
-                        data: 'action',
-                        name: 'action',
-                        orderable: false
-                    },
-                ],
-                "responsive": true,
-                "autoWidth": false,
-            });
+            {{--$('#table').DataTable({--}}
+            {{--    dom: 'Bfrtip',--}}
+            {{--    processing: true,--}}
+            {{--    serverSide: true,--}}
+            {{--    buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],--}}
+            {{--    ajax: '{{ route('loan.details.details_datatable', ['loan' => $loan->id]) }}',--}}
+            {{--    columns: [{--}}
+            {{--            data: 'date',--}}
+            {{--            name: 'date'--}}
+            {{--        },--}}
+            {{--        {--}}
+            {{--            data: 'amount',--}}
+            {{--            name: 'amount'--}}
+            {{--        },--}}
+            {{--        {--}}
+            {{--            data: 'transaction_type',--}}
+            {{--            name: 'transaction_type'--}}
+            {{--        },--}}
+            {{--        {--}}
+            {{--            data: 'creator.name',--}}
+            {{--            name: 'created_by',--}}
+            {{--        },--}}
+            {{--        {--}}
+            {{--            data: 'action',--}}
+            {{--            name: 'action',--}}
+            {{--            orderable: false--}}
+            {{--        },--}}
+            {{--    ],--}}
+            {{--    "responsive": true,--}}
+            {{--    "autoWidth": false,--}}
+            {{--});--}}
 
             $('#newPaymentForm').submit(function(e) {
                 e.preventDefault();

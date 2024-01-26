@@ -38,8 +38,8 @@
     <link rel="stylesheet" type="text/css"
         href="{{ asset('themes/backend/files/assets/icon/icofont/css/icofont.css') }}">
 
-    <link rel="stylesheet" type="text/css"
-        href="{{ asset('themes/backend/files/assets/icon/feather/css/feather.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('themes/backend/files/assets/icon/feather/css/feather.css') }}">
+
     {{-- js tree --}}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
 
@@ -58,8 +58,7 @@
             background-color: #01a9ac !important;
             color: #fff !important;
         }
-
-        .pcoded-mtext::before {
+      oded-mtext::before {
             content: none !important;
         }
 
@@ -159,7 +158,12 @@
         .datepicker table tr td.active[disabled] {
             background-color: #E1694C;
         }
-
+        .swal-container-high-zindex {
+            z-index: 99999 !important;
+        }
+        .modal {
+            z-index: 10000 !important;
+        }
         .datepicker.datepicker-dropdown.dropdown-menu {
             z-index: 9999 !important;
         }
@@ -255,7 +259,6 @@
                                 @include('loan::layouts.menu_list')
                                 @include('bank::layouts.menu_list')
                                 @include('promotion::layouts.menu_list')
-                                @include('task::layouts.menu_list')
                             </ul>
                         </div>
                     </nav>

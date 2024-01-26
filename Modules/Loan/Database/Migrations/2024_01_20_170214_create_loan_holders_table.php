@@ -11,16 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('loans', function (Blueprint $table) {
+        Schema::create('loan_holders', function (Blueprint $table) {
             $table->id();
-            $table->enum('type', ['give', 'take']);
-            $table->integer('loan_holder_id');
-            $table->date('date');
-            $table->unsignedTinyInteger('transaction_type')->comment('1=cash,2=bank');
-            $table->unsignedFloat('amount', 8, 2);
-            $table->string('details')->nullable();
+            $table->string('name');
+            $table->string('address')->nullable();
+            $table->string('phone');
+            $table->boolean('status')->default(1);
             $table->foreignId('created_by');
+            $table->foreignId('updated_by')->nullable();
             $table->foreign('created_by')->on('users')->references('id');
+            $table->foreign('updated_by')->on('users')->references('id');
             $table->timestamps();
         });
     }
@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('loans');
+        Schema::dropIfExists('loan_holders');
     }
 };
