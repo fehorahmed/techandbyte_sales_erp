@@ -14,16 +14,27 @@ class Loan extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected $fillable = [];
+
+    protected $fillable = ['name'];
+
+    protected $searchable = ['name'];
 
 
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+    public function loanHolder()
+    {
+        return $this->belongsTo(LoanHolder::class, 'loan_holder_id','id');
+    }
     public function loanDetails()
     {
         return $this->hasMany(LoanDetail::class, 'loan_id', 'id');
+    }
+
+    public function loan_holders() {
+        return $this->hasMany(LoanHolder::class, 'id','loan_holder_id');
     }
 
     protected static function newFactory(): LoanFactory

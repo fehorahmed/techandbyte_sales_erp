@@ -18,14 +18,17 @@
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label text-right">Loan Title</label>
                                 <div class="col-sm-4">
-                                    <input type="text"
-                                        class="form-control {{ $errors->has('title') ? 'is-invalid' : 'is-valid' }}"
-                                        name="title" value="{{ old('title', $loan->title) }}" id="title"
-                                        placeholder="Enter Loan Title">
-                                    @error('title')
-                                        <span class="help-block">{{ $message }}</span>
+                                    <select name="loan_holder" class="form-control select2" id="loan_holder">
+                                        <option value="">Select One</option>
+                                        @foreach ($loanHolders as $loanHolder)
+                                            <option {{ old('loan_holder',$loan->loan_holder_id) == $loanHolder->id ? 'selected' : '' }} value="{{ $loanHolder->id }}">{{ $loanHolder->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('loan_holder')
+                                    <span class="help-block">{{ $message }}</span>
                                     @enderror
                                 </div>
+
 
                                 <label class="col-sm-2 col-form-label text-right">Loan Type</label>
                                 <div class="col-sm-4">
