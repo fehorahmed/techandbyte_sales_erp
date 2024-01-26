@@ -23,11 +23,21 @@ class TaskController extends Controller
 
     public function datatable()
     {
-        $query = Task::with('creator','user');
+        $query = Task::with('creator', 'user');
         return DataTables::eloquent($query)
             ->addIndexColumn()
             ->addColumn('action', function (Task $task) {
-                return '<a href="' . route('task.task_edit', ['task' => $task->id]) . '" class="btn-edit"><i style="color:#01a9ac;font-size: 17px;" class="feather icon-edit"></i></a>';
+                $msg = '';
+                if (auth()->user()->user_type == 1) {
+                    $msg .= '<a href="' . route('task.task_edit', ['task' => $task->id]) . '" class="btn-edit mr-3"><i style="color:#01a9ac;font-size: 17px;" class="feather icon-edit"></i></a>';
+                }
+                if (auth()->id() == $task->user_id) {
+                    $msg .= '<button data-id="' . $task->id . '" class="btn btn-primary">
+                    Remark
+                    </button>';
+                }
+                return $msg;
+                // return '<a href="' . route('task.task_edit', ['task' => $task->id]) . '" class="btn-edit"><i style="color:#01a9ac;font-size: 17px;" class="feather icon-edit"></i></a>';
             })
             ->addColumn('status', function (Task $task) {
                 if ($task->status == 1)
@@ -41,7 +51,7 @@ class TaskController extends Controller
                 else
                     return '<span class="badge badge-info">Market visit	</span>';
             })
-            ->rawColumns(['action', 'status','task_type'])
+            ->rawColumns(['action', 'status', 'task_type'])
             ->toJson();
     }
 
@@ -50,8 +60,8 @@ class TaskController extends Controller
      */
     public function create()
     {
-        $users=User::all();
-        return view('task::task.add',compact('users'));
+        $users = User::all();
+        return view('task::task.add', compact('users'));
     }
 
     /**
@@ -69,17 +79,17 @@ class TaskController extends Controller
         ]);
 
         $task = new Task();
-        $task->title=$request->title;
-        $task->user_id=$request->user;
-        $task->task_type=$request->task_type;
-        $task->date=$request->date;
-        $task->reason=$request->reason;
-        $task->status=1;
-        $task->created_by=Auth::id();
-        if($task->save()){
-            return redirect()->route('task.task_all')->with('message','Task Successfully Created.');
-        }else{
-            return redirect()->back()->with('error','Something went wrong.');
+        $task->title = $request->title;
+        $task->user_id = $request->user;
+        $task->task_type = $request->task_type;
+        $task->date = $request->date;
+        $task->reason = $request->reason;
+        $task->status = 1;
+        $task->created_by = Auth::id();
+        if ($task->save()) {
+            return redirect()->route('task.task_all')->with('message', 'Task Successfully Created.');
+        } else {
+            return redirect()->back()->with('error', 'Something went wrong.');
         }
     }
 
@@ -97,16 +107,34 @@ class TaskController extends Controller
     public function edit($id)
     {
         $task = Task::findOrFail($id);
-        $users=User::all();
-        return view('task::task.edit',compact('users','task'));
+        $users = User::all();
+        return view('task::task.edit', compact('users', 'task'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id): RedirectResponse
+    public function update(Request $request, $task): RedirectResponse
     {
-        //
+        $request->validate([
+            "title" => 'required|string|max:255',
+            "user" => 'required|numeric',
+            "task_type" => 'required|numeric',
+            "date" => 'required|date|max:255',
+            "reason" => 'nullable|string|max:255',
+        ]);
+
+        $data =  Task::findOrFail($task);
+        $data->title = $request->title;
+        $data->user_id = $request->user;
+        $data->task_type = $request->task_type;
+        $data->date = $request->date;
+        $data->reason = $request->reason;
+        if ($data->save()) {
+            return redirect()->route('task.task_all')->with('message', 'Task Successfully Updated.');
+        } else {
+            return redirect()->back()->with('error', 'Something went wrong.');
+        }
     }
 
     /**
