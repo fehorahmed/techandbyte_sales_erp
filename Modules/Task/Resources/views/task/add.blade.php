@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title','Supplier Add')
+@section('title','Task Add')
 @section('content')
 <div class="page-body">
     <div class="row">

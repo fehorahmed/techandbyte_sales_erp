@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title','Edit Supplier')
+@section('title','Task Edit')
 @section('content')
 <div class="page-body">
     <div class="row">
@@ -9,50 +9,60 @@
                     <div class="d-inline" style="float: left">
                         <h4>@yield('title')</h4>
                     </div>
-                    <h5 style="float: right"><a href="{{ route('supplier.supplier_all') }}" class="btn btn-success">All Supplier</a></h5>
+                    <h5 style="float: right"><a href="{{ route('task.task_all') }}" class="btn btn-success">All Task</a></h5>
                 </div>
                 <div class="card-block mt-4">
-                    <form id="main" method="post" action="{{ route('supplier.supplier_edit',['supplier'=>$supplier->id]) }}">
+                    <form id="main" method="post" action="{{ route('task.task_edit',$task->id) }}">
                         @csrf
                         <div class="form-group row">
-                            <label class="col-sm-2 col-form-label text-right">Supplier Name</label>
+                            <label class="col-sm-2 col-form-label text-right">Title</label>
                             <div class="col-sm-4">
-                                <input type="text" class="form-control {{ $errors->has('name') ? 'is-invalid' :'is-valid' }}" name="name" value="{{ old('name', $supplier->name) }}" id="name" placeholder="Enter Name">
-                                @error('name')
+                                <input type="text" class="form-control {{ $errors->has('title') ? 'is-invalid' :'is-valid' }}" name="title" value="{{ old('title',$task->title) }}" id="title" placeholder="Enter Title">
+                                @error('title')
                                    <span class="help-block">{{ $message }}</span>
                                 @enderror
                             </div>
 
-                            <label class="col-sm-2 col-form-label text-right">Email</label>
+                            <label class="col-sm-2 col-form-label text-right">User</label>
                             <div class="col-sm-4">
-                                <input type="email" class="form-control {{ $errors->has('email') ? 'is-invalid' :'is-valid' }}" id="email" name="email" value="{{ old('email',$supplier->email) }}" placeholder="Enter Email">
-                                @error('email')
+                                <select name="user" id="user" class="form-control">
+                                    <option value="">Select One</option>
+                                    @foreach ($users as $user)
+                                    <option {{$task->user_id==$user->id?'selected':''}} value="{{$user->id}}">{{$user->name}}</option>
+                                    @endforeach
+                                </select>
+                                @error('user')
                                    <span class="help-block">{{ $message }}</span>
                                 @enderror
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label class="col-sm-2 col-form-label text-right">Phone</label>
+                            <label class="col-sm-2 col-form-label text-right" for="task_type">Task Type</label>
                             <div class="col-sm-4">
-                                <input type="text" class="form-control {{ $errors->has('phone') ? 'is-invalid' :'is-valid' }}" id="phone" name="phone" value="{{ old('phone', $supplier->phone) }}" placeholder="Enter Phone">
-                                @error('phone')
+                                <select name="task_type" id="task_type" class="form-control">
+                                    <option value="">Select One</option>
+                                    <option {{$task->task_type=='1'? 'selected':''}} value="1">Individual</option>
+                                    <option {{$task->task_type=='2'? 'selected':''}} value="2">Market visit	</option>
+
+                                </select>
+                                @error('task_type')
                                    <span class="help-block">{{ $message }}</span>
                                 @enderror
                             </div>
 
-                            <label class="col-sm-2 col-form-label text-right">Opening Balance</label>
+                            <label class="col-sm-2 col-form-label text-right" for="date">Date</label>
                             <div class="col-sm-4">
-                                <input type="text" class="form-control {{ $errors->has('opening_balance') ? 'is-invalid' :'is-valid' }}" id="opening_balance" name="opening_balance" value="{{ old('opening_balance',$supplier->opening_balance) }}">
-                                @error('opening_balance')
+                                <input type="date" class="form-control {{ $errors->has('opening_balance') ? 'is-invalid' :'' }}" id="date" name="date" value="{{ old('date',$task->date) }}">
+                                @error('date')
                                    <span class="help-block">{{ $message }}</span>
                                 @enderror
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label class="col-sm-2 col-form-label text-right">Address</label>
+                            <label class="col-sm-2 col-form-label text-right" for="reason">Reason</label>
                             <div class="col-sm-4">
-                                <textarea class="form-control {{ $errors->has('address') ? 'is-invalid' :'is-valid' }}" id="address" name="address" placeholder="Enter your address">{{ old('address', $supplier->address) }}</textarea>
-                                @error('address')
+                                <textarea class="form-control {{ $errors->has('reason') ? 'is-invalid' :'is-valid' }}" id="reason" rows="6" name=""  placeholder="Enter your address">{{old('reason',$task->reason) }}</textarea>
+                                @error('reason')
                                    <span class="help-block">{{ $message }}</span>
                                 @enderror
                             </div>
@@ -68,19 +78,19 @@
                                 <span class="messages"></span>
                             </div>
                         </div> --}}
-                        <div class="form-group row">
+                        {{-- <div class="form-group row">
                             <label class="col-sm-2 col-form-check text-right">Status</label>
                             <div class="col-sm-4">
                                 <div class="form-radio">
                                     <div class="radio radiofill radio-primary radio-inline">
                                         <label>
-                                            <input type="radio" name="status" value="1" {{ old('status', $supplier->status) == '1' ? 'checked' : '' }} data-bv-field="status">
+                                            <input type="radio" name="status" value="1" {{ old('status','1') == '1' ? 'checked' : '' }} data-bv-field="status">
                                             <i class="helper"></i>Active
                                         </label>
                                     </div>
                                     <div class="radio radiofill radio-primary radio-inline">
                                         <label>
-                                            <input type="radio" name="status" value="0" {{ old('status', $supplier->status) == '0' ? 'checked' : '' }} data-bv-field="status">
+                                            <input type="radio" name="status" value="0" {{ old('status') == '0' ? 'checked' : '' }} data-bv-field="status">
                                             <i class="helper"></i>Inactive
                                         </label>
                                     </div>
@@ -89,7 +99,7 @@
                                    <span class="help-block">{{ $message }}</span>
                                 @enderror
                             </div>
-                        </div>
+                        </div> --}}
                         <div class="form-group row">
                             <label class="col-sm-2"></label>
                             <div class="col-sm-10">
@@ -98,7 +108,7 @@
                         </div>
                     </form>
                 </div>
-            </div>              
+            </div>
         </div>
     </div>
 </div>

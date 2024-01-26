@@ -23,19 +23,25 @@ class TaskController extends Controller
 
     public function datatable()
     {
-        $query = Task::with('creator');
+        $query = Task::with('creator','user');
         return DataTables::eloquent($query)
             ->addIndexColumn()
             ->addColumn('action', function (Task $task) {
-                return '<a href="' . route('warehouse.edit', ['warehouse' => $task->id]) . '" class="btn-edit"><i style="color:#01a9ac;font-size: 17px;" class="feather icon-edit"></i></a>';
+                return '<a href="' . route('task.task_edit', ['task' => $task->id]) . '" class="btn-edit"><i style="color:#01a9ac;font-size: 17px;" class="feather icon-edit"></i></a>';
             })
             ->addColumn('status', function (Task $task) {
                 if ($task->status == 1)
                     return '<span class="badge badge-success">Active</span>';
                 else
-                    return '<span class="badge badge-danger">Inactive</span>';
+                    return '<span class="badge badge-danger">Complete</span>';
             })
-            ->rawColumns(['action', 'status'])
+            ->editColumn('task_type', function (Task $task) {
+                if ($task->task_type == 1)
+                    return '<span class="badge badge-secondary">Individual</span>';
+                else
+                    return '<span class="badge badge-info">Market visit	</span>';
+            })
+            ->rawColumns(['action', 'status','task_type'])
             ->toJson();
     }
 
@@ -61,7 +67,6 @@ class TaskController extends Controller
             "date" => 'required|date|max:255',
             "reason" => 'nullable|string|max:255',
         ]);
-
 
         $task = new Task();
         $task->title=$request->title;
@@ -91,7 +96,9 @@ class TaskController extends Controller
      */
     public function edit($id)
     {
-        return view('task::edit');
+        $task = Task::findOrFail($id);
+        $users=User::all();
+        return view('task::task.edit',compact('users','task'));
     }
 
     /**

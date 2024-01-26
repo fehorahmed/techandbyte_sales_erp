@@ -56,8 +56,8 @@
                         name: 'date'
                     },
                     {
-                        data: 'user_id',
-                        name: 'user_id'
+                        data: 'user.name',
+                        name: 'user'
                     },
                     {
                         data: 'status',
