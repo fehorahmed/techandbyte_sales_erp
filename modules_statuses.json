@@ -11,5 +11,6 @@
     "Warehouse": true,
     "Loan": true,
     "Task": true,
-    "Migrate": true
+    "Migrate": true,
+    "Inventory": true
 }
