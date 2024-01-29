@@ -18,24 +18,25 @@ class LoanDetailController extends Controller
      */
     public function index(Loan $loan)
     {
+//        return($loan->loanDetails);
         return view('loan::load_detail.index', compact('loan'));
     }
 
-    public function detailsDatatable()
-    {
-        $query = LoanDetail::with('creator');
-        return DataTables::eloquent($query)
-            ->addIndexColumn()
-            ->editColumn('transaction_type', function (LoanDetail $loanDetail) {
-                return $loanDetail->transaction_type == 1 ? 'Cash' : ($loanDetail->transaction_type == 2 ? 'Bank' : '');
-            })
-            ->addColumn('action', function (LoanDetail $loanDetail) {
-                // return '<a href="' . route('promotion.edit', ['detail' => $promotion->id]) . '" class="btn-edit"><i style="color:#01a9ac;font-size: 17px;" class="feather icon-edit"></i></a>';
-                return '<a href="" class="btn-edit"><i style="color:#01a9ac;font-size: 17px;" class="feather icon-edit"></i></a>';
-            })
-            ->rawColumns(['action'])
-            ->toJson();
-    }
+//    public function detailsDatatable()
+//    {
+//        $query = LoanDetail::with('creator');
+//        return DataTables::eloquent($query)
+//            ->addIndexColumn()
+//            ->editColumn('transaction_type', function (LoanDetail $loanDetail) {
+//                return $loanDetail->transaction_type == 1 ? 'Cash' : ($loanDetail->transaction_type == 2 ? 'Bank' : '');
+//            })
+//            ->addColumn('action', function (LoanDetail $loanDetail) {
+//                // return '<a href="' . route('promotion.edit', ['detail' => $promotion->id]) . '" class="btn-edit"><i style="color:#01a9ac;font-size: 17px;" class="feather icon-edit"></i></a>';
+//                return '<a href="" class="btn-edit"><i style="color:#01a9ac;font-size: 17px;" class="feather icon-edit"></i></a>';
+//            })
+//            ->rawColumns(['action'])
+//            ->toJson();
+//    }
 
     /**
      * Show the form for creating a new resource.

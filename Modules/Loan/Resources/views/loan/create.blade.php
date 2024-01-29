@@ -16,14 +16,16 @@
                         <form id="main" method="post" action="{{ route('loan.create') }}">
                             @csrf
                             <div class="form-group row">
-                                <label class="col-sm-2 col-form-label text-right">Loan Title</label>
+                                <label class="col-sm-2 col-form-label text-right">Loan Holder</label>
                                 <div class="col-sm-4">
-                                    <input type="text"
-                                        class="form-control {{ $errors->has('title') ? 'is-invalid' : 'is-valid' }}"
-                                        name="title" value="{{ old('title') }}" id="title"
-                                        placeholder="Enter Loan Title">
-                                    @error('title')
-                                        <span class="help-block">{{ $message }}</span>
+                                    <select name="loan_holder" class="form-control select2" id="loan_holder">
+                                        <option value="">Select One</option>
+                                        @foreach ($loanHolders as $loanHolder)
+                                            <option {{ old('loan_holder') == $loanHolder->id ? 'selected' : '' }}value="{{ $loanHolder->id }}">{{ $loanHolder->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('loan_holder')
+                                    <span class="help-block">{{ $message }}</span>
                                     @enderror
                                 </div>
 
@@ -47,9 +49,7 @@
                             <div class="form-group row">
                                 <label class="col-sm-2 col-form-label text-right">Date</label>
                                 <div class="col-sm-4">
-                                    <input type="date"
-                                        class="form-control {{ $errors->has('date') ? 'is-invalid' : 'is-valid' }}"
-                                        id="date" name="date" value="{{ old('date') }}" placeholder="Enter date">
+                                    <input type="date" class="form-control {{ $errors->has('date') ? 'is-invalid' : 'is-valid' }}" id="date" name="date" value="{{ old('date') }}" placeholder="Enter date">
                                     @error('date')
                                         <span class="help-block">{{ $message }}</span>
                                     @enderror
