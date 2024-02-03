@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('inventory_id');
             $table->foreignId('order_id')->comment('Inventory oder id or Sale order id');
-            $table->enum('type', ['stock_in', 'stock_out']);
+            $table->enum('type', ['stock_in', 'stock_out'])->comment('stock_in,stock_out');
             $table->string('remark')->nullable()->comment('type of order/Invoice no');
             $table->foreign('inventory_id')->on('inventories')->references('id');
             $table->timestamps();
