@@ -20,6 +20,7 @@ use Modules\Purchase\Entities\ProductPurchaseDetail;
 use Modules\Supplier\Entities\Supplier;
 use Modules\Product\Entities\Product;
 use Illuminate\Support\Facades\Validator;
+use Modules\Inventory\Entities\InventoryLog;
 use SakibRahaman\DecimalToWords\DecimalToWords;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -44,8 +45,12 @@ class PurchaseController extends Controller
 
                 //                $btn   = '<a href="' . route('purchase_journal_voucher.details', ['order' => $productPurchase->id]) . '" class="btn btn-dark btn-sm">JV</i></a> ';
                 $btn  = '<a href="' . route('purchase.purchase_receipt_details', ['productPurchase' => $productPurchase->id]) . '" class="btn btn-primary btn-sm">Details</a> ';
-//                $btn  .= '<a class="btn btn-info btn-sm btn-pay" role="button" data-id="'.$productPurchase->id.'" data-order="'.$productPurchase->order_no.'" data-due="'.$productPurchase->due.'">Pay</a> ';
-                $btn  .= '<a href="' . route('purchase.purchase_sent_inventory', ['productPurchase' => $productPurchase->id]) . '" class="btn btn-info" >Sent Inventory</a> ';
+                //                $btn  .= '<a class="btn btn-info btn-sm btn-pay" role="button" data-id="'.$productPurchase->id.'" data-order="'.$productPurchase->order_no.'" data-due="'.$productPurchase->due.'">Pay</a> ';
+                if ($productPurchase->status == 1) {
+                    $btn  .= '<a href="' . route('purchase.purchase_sent_inventory', ['productPurchase' => $productPurchase->id]) . '" class="btn btn-info" >Sent Inventory</a> ';
+                } else {
+                    $btn  .= '<a href="#" class="btn btn-success" >On Inventory</a> ';
+                }
                 return $btn;
             })
             ->editColumn('purchase_date', function (ProductPurchase $productPurchase) {
@@ -337,15 +342,16 @@ class PurchaseController extends Controller
         return true;
     }
 
-    public function sentInInventory(ProductPurchase $productPurchase){
+    public function sentInInventory(ProductPurchase $productPurchase)
+    {
 
         $suppliers = Supplier::orderBy('name', 'desc')->get();
         $paymentCodes = AccCoa::where('isBankNature', 1)->orWhere('isCashNature', 1)->where('HeadLevel', 4)->where('IsActive', 1)->orderBy('HeadName')->get();
-        return view('purchase::purchase.edit_purchase', compact('suppliers', 'paymentCodes','productPurchase'));
-
+        return view('purchase::purchase.edit_purchase', compact('suppliers', 'paymentCodes', 'productPurchase'));
     }
 
-    public function sentInInventoryPost(ProductPurchase $productPurchase, Request $request){
+    public function sentInInventoryPost(ProductPurchase $productPurchase, Request $request)
+    {
 
         $rules = [
             'supplier' => 'required',
@@ -372,8 +378,6 @@ class PurchaseController extends Controller
         if ($request->paid > $request->grand_total_price) {
             return redirect()->back()->withInput()->with('error', 'Paid Amount Greater than Total Amount Paid');
         }
-
-
 
         $inventoryOrder = new InventoryOrder();
         $inventoryOrder->product_purchase_id  = $productPurchase->id;
@@ -424,7 +428,15 @@ class PurchaseController extends Controller
             $inventory->product_id = $product->id;
             $inventory->selling_rate = $request->selling_rate[$counter];
             $inventory->quantity = $request->quantity[$counter];
-            $inventory->save();
+            if ($inventory->save()) {
+                $inv_log = new InventoryLog();
+                $inv_log->inventory_id =  $inventory->id;
+                $inv_log->order_id =  $inventoryOrder->id;
+                $inv_log->quantity =  $request->quantity[$counter];
+                $inv_log->type =  'stock_in';
+                $inv_log->remark =  'Inventory Order';
+                $inv_log->save();
+            }
 
             $counter++;
         }
@@ -434,10 +446,12 @@ class PurchaseController extends Controller
 
         $inventoryOrder->save();
 
+        ProductPurchase::where('id', $productPurchase->id)->update([
+            'status' => 0,
+        ]);
 
 
-        return redirect()->route('inventory.inventory_receipt_details',['inventoryOrder'=>$inventoryOrder->id]);
+
+        return redirect()->route('inventory.inventory_receipt_details', ['inventoryOrder' => $inventoryOrder->id]);
     }
 }
-
-
