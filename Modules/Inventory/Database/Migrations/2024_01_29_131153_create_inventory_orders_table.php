@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('product_purchase_id');
             $table->string('chalan_no')->nullable();
             $table->string('lc_no')->unique()->nullable();
-            $table->string('Batch_no')->unique()->nullable();
+            $table->string('batch_no')->unique()->nullable();
             $table->bigInteger('supplier_id');
 
             $table->float('duty',8,2);

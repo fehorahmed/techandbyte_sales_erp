@@ -21,5 +21,9 @@ Route::prefix('purchase')->middleware('auth')->name('purchase.')->group(function
     Route::get('purchase-receipt/datatable', [PurchaseController::class,'purchaseReceiptDatatable'])->name('purchase_receipt_datatable');
     Route::get('purchase-receipt/details/{productPurchase}', [PurchaseController::class,'purchaseReceiptDetails'])->name('purchase_receipt_details');
 
+    //Purchase sent in inventory
+    Route::get('purchase-sent-in-inventory/{productPurchase}', [PurchaseController::class,'sentInInventory'])->name('purchase_sent_inventory');
+    Route::post('purchase-sent-in-inventory/{productPurchase}', [PurchaseController::class,'sentInInventoryPost']);
+
 
 });

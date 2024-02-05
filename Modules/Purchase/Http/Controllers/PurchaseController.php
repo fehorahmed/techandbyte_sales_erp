@@ -12,6 +12,9 @@ use Modules\Account\Entities\AccPredefineAccount;
 use Modules\Account\Entities\AccSubcode;
 use Modules\Account\Entities\AccTransaction;
 use Modules\Account\Entities\AccVoucher;
+use Modules\Inventory\Entities\Inventory;
+use Modules\Inventory\Entities\InventoryOrder;
+use Modules\Inventory\Entities\InventoryOrderDetail;
 use Modules\Purchase\Entities\ProductPurchase;
 use Modules\Purchase\Entities\ProductPurchaseDetail;
 use Modules\Supplier\Entities\Supplier;
@@ -41,7 +44,8 @@ class PurchaseController extends Controller
 
                 //                $btn   = '<a href="' . route('purchase_journal_voucher.details', ['order' => $productPurchase->id]) . '" class="btn btn-dark btn-sm">JV</i></a> ';
                 $btn  = '<a href="' . route('purchase.purchase_receipt_details', ['productPurchase' => $productPurchase->id]) . '" class="btn btn-primary btn-sm">Details</a> ';
-                //                $btn  .= '<a class="btn btn-info btn-sm btn-pay" role="button" data-id="'.$productPurchase->id.'" data-order="'.$productPurchase->order_no.'" data-due="'.$productPurchase->due.'">Pay</a> ';
+//                $btn  .= '<a class="btn btn-info btn-sm btn-pay" role="button" data-id="'.$productPurchase->id.'" data-order="'.$productPurchase->order_no.'" data-due="'.$productPurchase->due.'">Pay</a> ';
+                $btn  .= '<a href="' . route('purchase.purchase_sent_inventory', ['productPurchase' => $productPurchase->id]) . '" class="btn btn-info" >Sent Inventory</a> ';
                 return $btn;
             })
             ->editColumn('purchase_date', function (ProductPurchase $productPurchase) {
@@ -332,4 +336,108 @@ class PurchaseController extends Controller
 
         return true;
     }
+
+    public function sentInInventory(ProductPurchase $productPurchase){
+
+        $suppliers = Supplier::orderBy('name', 'desc')->get();
+        $paymentCodes = AccCoa::where('isBankNature', 1)->orWhere('isCashNature', 1)->where('HeadLevel', 4)->where('IsActive', 1)->orderBy('HeadName')->get();
+        return view('purchase::purchase.edit_purchase', compact('suppliers', 'paymentCodes','productPurchase'));
+
+    }
+
+    public function sentInInventoryPost(ProductPurchase $productPurchase, Request $request){
+
+        $rules = [
+            'supplier' => 'required',
+            'lc_no' => 'nullable',
+            'date' => 'required|date',
+            'batch_no' => 'required|string|max:255',
+            'purchase_details' => 'nullable',
+            'product.*' => 'required|numeric|min:0',
+            'quantity.*' => 'required|numeric|min:0',
+            'selling_rate.*' => 'required|numeric|min:0',
+            'product_rate.*' => 'required|numeric|min:0',
+            'paid' => 'required|numeric|min:0',
+            "duty" => "required|numeric|min:0",
+            "freight" => "required|numeric|min:0",
+            "c_and_f" => "required|numeric|min:0",
+            "ait" => "required|numeric|min:0",
+            "at" => "required|numeric|min:0",
+            "etc" => "required|numeric|min:0",
+        ];
+
+
+        $request->validate($rules);
+
+        if ($request->paid > $request->grand_total_price) {
+            return redirect()->back()->withInput()->with('error', 'Paid Amount Greater than Total Amount Paid');
+        }
+
+
+
+        $inventoryOrder = new InventoryOrder();
+        $inventoryOrder->product_purchase_id  = $productPurchase->id;
+        $inventoryOrder->lc_no = $request->lc_no;
+        $inventoryOrder->batch_no = $request->batch_no;
+        $inventoryOrder->supplier_id = $request->supplier;
+        $inventoryOrder->duty = $request->duty;
+        $inventoryOrder->freight = $request->freight;
+        $inventoryOrder->c_and_f = $request->c_and_f;
+        $inventoryOrder->ait = $request->ait;
+        $inventoryOrder->at = $request->at;
+        $inventoryOrder->etc = $request->etc;
+        $inventoryOrder->purchase_date = Carbon::parse($request->date)->format('Y-m-d');
+        $inventoryOrder->grand_total_amount = $request->grand_total_price;
+        $inventoryOrder->purchase_details = $request->purchase_details;
+        $inventoryOrder->paid_amount = $request->paid;
+        $inventoryOrder->due_amount = 0;
+        $inventoryOrder->total_discount = $request->discount;
+        $inventoryOrder->total_vat_amount = $request->total_vat ?? 0;
+        $inventoryOrder->invoice_discount = 0;
+        $inventoryOrder->status = 1;
+        $inventoryOrder->payment_type = 1;
+        $inventoryOrder->save();
+        $inventoryOrder->chalan_no = 'IO' . str_pad($inventoryOrder->id, 8, 0, STR_PAD_LEFT);
+        $inventoryOrder->save();
+
+        $counter = 0;
+        $subTotal = 0;
+        $productDiscount = 0;
+
+        foreach ($request->product as $reqProduct) {
+            $product = Product::where('id', $reqProduct)->first();
+
+            $inventoryOrderDetail = new InventoryOrderDetail();
+            $inventoryOrderDetail->inventory_order_id = $inventoryOrder->id;
+            $inventoryOrderDetail->product_id = $product->id;
+            $inventoryOrderDetail->rate = $request->product_rate[$counter];
+            $inventoryOrderDetail->batch_id = $inventoryOrder->batch_no;
+            $inventoryOrderDetail->selling_rate = $request->selling_rate[$counter];
+            $inventoryOrderDetail->quantity = $request->quantity[$counter];
+            $inventoryOrderDetail->total_amount = ($request->quantity[$counter] * $request->product_rate[$counter]);
+            $inventoryOrderDetail->save();
+
+            $subTotal += $inventoryOrderDetail->total_amount;
+
+            $inventory = new Inventory();
+            $inventory->batch_no  = $inventoryOrder->batch_no;
+            $inventory->product_id = $product->id;
+            $inventory->selling_rate = $request->selling_rate[$counter];
+            $inventory->quantity = $request->quantity[$counter];
+            $inventory->save();
+
+            $counter++;
+        }
+
+        $due = ($subTotal + $inventoryOrder->duty + $inventoryOrder->freight + $inventoryOrder->c_and_f + $inventoryOrder->ait + $inventoryOrder->at + $inventoryOrder->etc) - $request->paid;
+        $inventoryOrder->due_amount = $due;
+
+        $inventoryOrder->save();
+
+
+
+        return redirect()->route('inventory.inventory_receipt_details',['inventoryOrder'=>$inventoryOrder->id]);
+    }
 }
+
+
