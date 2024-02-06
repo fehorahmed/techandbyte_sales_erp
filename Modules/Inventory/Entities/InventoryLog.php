@@ -14,9 +14,9 @@ class InventoryLog extends Model
      * The attributes that are mass assignable.
      */
     protected $fillable = [];
-    
-    protected static function newFactory(): InventoryLogFactory
+
+    public function inventory()
     {
-        //return InventoryLogFactory::new();
+        return $this->belongsTo(Inventory::class, 'inventory_id', 'id');
     }
 }

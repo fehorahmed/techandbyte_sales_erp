@@ -251,7 +251,7 @@
                                 @include('product::layouts.menu_list')
                                 @include('purchase::layouts.menu_list')
                                 @include('inventory::layouts.menu_list')
-                                {{-- @include('sale::layouts.menu_list') --}}
+                                @include('sale::layouts.menu_list')
                                 @include('account::layouts.menu_list')
                                 @include('loan::layouts.menu_list')
                                 @include('bank::layouts.menu_list')

@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title','Invoice')
+@section('title', 'Invoice')
 @section('content')
     <div class="page-body">
         <div class="row">
@@ -20,13 +20,15 @@
                                 <div class="invoice p-3 mb-3">
                                     <div class="row invoice-info">
                                         <div class="col-sm-4 invoice-col"> From <address>
-                                                <strong>{{$invoice->customer->name ?? ''}}</strong>
-                                                <br> 795 Folsom Ave, Suite 600 <br> San Francisco, CA 94107 <br> Phone: (804) 123-5432 <br> Email: info@almasaeedstudio.com
+                                                <strong>{{ $invoice->customer->name ?? '' }}</strong>
+                                                <br> 795 Folsom Ave, Suite 600 <br> San Francisco, CA 94107 <br> Phone:
+                                                (804) 123-5432 <br> Email: info@almasaeedstudio.com
                                             </address>
                                         </div>
                                         <div class="col-sm-4 invoice-col"> To <address>
                                                 <strong>{{ config('app.name') }}</strong>
-                                                <br> 795 Folsom Ave, Suite 600 <br> San Francisco, CA 94107 <br> Phone: (555) 539-1037 <br> Email: john.doe@example.com
+                                                <br> 795 Folsom Ave, Suite 600 <br> San Francisco, CA 94107 <br> Phone:
+                                                (555) 539-1037 <br> Email: john.doe@example.com
                                             </address>
                                         </div>
                                         <div class="col-sm-4 invoice-col">
@@ -42,42 +44,41 @@
                                         <div class="col-12 table-responsive">
                                             <table class="table table-striped">
                                                 <thead>
-                                                <tr>
-                                                    <th>SL.</th>
-                                                    <th>Product Name</th>
-                                                    <th>Qty</th>
-                                                    <th>Rate</th>
-                                                    <th>Discount%</th>
+                                                    <tr>
+                                                        <th>SL.</th>
+                                                        <th>Product Name</th>
+                                                        <th>Qty</th>
+                                                        <th>Rate</th>
+                                                        {{-- <th>Discount%</th>
                                                     <th>Dis. Value</th>
                                                     <th>Vat %</th>
-                                                    <th>VAT Value</th>
-                                                    <th>Total Amount</th>
-                                                </tr>
+                                                    <th>VAT Value</th> --}}
+                                                        <th>Total Amount</th>
+                                                    </tr>
                                                 </thead>
                                                 <tbody>
-                                                @if ($invoice->products)
+                                                    @if ($invoice->products)
                                                         @php
                                                             $subTotal = 0;
                                                         @endphp
-                                                    @foreach($invoice->products as $product)
+                                                        @foreach ($invoice->products as $product)
+                                                            <tr>
+                                                                <td>{{ $loop->iteration }}</td>
+                                                                <td>{{ $product->product->product_name ?? '' }}</td>
+                                                                <td>{{ $product->quantity }}</td>
+                                                                <td>{{ $product->rate }}</td>
+                                                                {{-- <td>{{ $product->discount_per }}</td>
+                                                                <td>{{ $product->discount }}</td>
+                                                                <td>{{ $product->vat_amnt_per }}</td>
+                                                                <td>{{ $product->vat_amnt }}</td> --}}
+                                                                <td>{{ $product->total_price }}</td>
+                                                            </tr>
+                                                            @php
+                                                                $subTotal += $product->total_price;
+                                                            @endphp
+                                                        @endforeach
 
-                                                        <tr>
-                                                            <td>{{$loop->iteration}}</td>
-                                                            <td>{{$product->product->product_name ?? ''}}</td>
-                                                            <td>{{ $product->quantity }}</td>
-                                                            <td>{{ $product->rate }}</td>
-                                                            <td>{{ $product->discount_per }}</td>
-                                                            <td>{{ $product->discount }}</td>
-                                                            <td>{{ $product->vat_amnt_per }}</td>
-                                                            <td>{{ $product->vat_amnt }}</td>
-                                                            <td>{{ $product->total_price }}</td>
-                                                        </tr>
-                                                        @php
-                                                            $subTotal += $product->total_price;
-                                                        @endphp
-                                                    @endforeach
-
-                                                @endif
+                                                    @endif
 
                                                 </tbody>
                                             </table>
@@ -90,34 +91,35 @@
                                             <div class="table-responsive">
                                                 <table class="table">
                                                     <tbody>
-                                                    <tr>
-                                                        <th style="width:50%">Total:</th>
-                                                        <td>৳{{ number_format($subTotal, 2) }}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Total Vat</th>
-                                                        <td>৳{{ number_format($invoice->total_vat_amnt, 2) }}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Purchase Discount</th>
-                                                        <td>৳{{ number_format($invoice->total_discount, 2) }}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Total Discount</th>
-                                                        <td>৳{{ number_format($invoice->total_discount+$invoice->invoice_discount, 2) }}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Grand Total</th>
-                                                        <td>৳{{ number_format($invoice->total_amount, 2) }}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Paid Amount</th>
-                                                        <td>৳{{ number_format($invoice->paid_amount, 2) }}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Due Amount</th>
-                                                        <td>৳{{ number_format($invoice->due_amount, 2) }}</td>
-                                                    </tr>
+                                                        <tr>
+                                                            <th style="width:50%">Total:</th>
+                                                            <td>৳{{ number_format($subTotal, 2) }}</td>
+                                                        </tr>
+                                                        {{-- <tr>
+                                                            <th>Total Vat</th>
+                                                            <td>৳{{ number_format($invoice->total_vat_amnt, 2) }}</td>
+                                                        </tr> --}}
+                                                        <tr>
+                                                            <th>Purchase Discount</th>
+                                                            <td>৳{{ number_format($invoice->total_discount, 2) }}</td>
+                                                        </tr>
+                                                        {{-- <tr>
+                                                            <th>Total Discount</th>
+                                                            <td>৳{{ number_format($invoice->total_discount + $invoice->invoice_discount, 2) }}
+                                                            </td>
+                                                        </tr> --}}
+                                                        <tr>
+                                                            <th>Grand Total</th>
+                                                            <td>৳{{ number_format($invoice->total_amount, 2) }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>Paid Amount</th>
+                                                            <td>৳{{ number_format($invoice->paid_amount, 2) }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>Due Amount</th>
+                                                            <td>৳{{ number_format($invoice->due_amount, 2) }}</td>
+                                                        </tr>
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -135,10 +137,11 @@
 
 @section('script')
     <script>
-        var APP_URL = '{!! url()->full()  !!}';
+        var APP_URL = '{!! url()->full() !!}';
+
         function getprint(prinarea) {
             // $('#heading_area').show();
-            $('body').html($('#'+prinarea).html());
+            $('body').html($('#' + prinarea).html());
             window.print();
             window.location.replace(APP_URL)
         }

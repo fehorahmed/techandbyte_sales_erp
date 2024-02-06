@@ -5,6 +5,7 @@ namespace Modules\Inventory\Entities;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Modules\Inventory\Database\factories\InventoryFactory;
+use Modules\Product\Entities\Product;
 
 class Inventory extends Model
 {
@@ -14,9 +15,9 @@ class Inventory extends Model
      * The attributes that are mass assignable.
      */
     protected $fillable = [];
-    
-    protected static function newFactory(): InventoryFactory
+
+    public function product()
     {
-        //return InventoryFactory::new();
+        return $this->belongsTo(Product::class, 'product_id', 'id');
     }
 }

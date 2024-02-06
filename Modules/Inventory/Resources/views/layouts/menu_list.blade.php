@@ -18,5 +18,15 @@ $menu = ['inventory.inventory_receipt_all', 'inventory.inventory_receipt_details
                 <span class="pcoded-mtext">All Order</span>
             </a>
         </li>
+        <?php
+        $subMenu = ['inventory.inventory_products_all'];
+        ?>
+        <li class="{{ in_array(Route::currentRouteName(), $subMenu) ? 'active' : '' }}">
+            <a href="{{ route('inventory.inventory_products_all') }}">
+                <span class="pcoded-micon"><i
+                        class="feather {{ in_array(Route::currentRouteName(), $subMenu) ? 'icon-check-circle' : 'icon-circle' }}"></i></span>
+                <span class="pcoded-mtext">All Products</span>
+            </a>
+        </li>
     </ul>
 </li>

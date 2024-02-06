@@ -18,12 +18,15 @@ use Modules\Inventory\Http\Controllers\InventoryController;
 //    Route::resource('inventory', InventoryController::class)->names('inventory');
 //});
 
-Route::prefix('inventory')->middleware('auth')->name('inventory.')->group(function() {
+Route::prefix('inventory')->middleware('auth')->name('inventory.')->group(function () {
 
     // Inventory
 
-    Route::get('inventory-receipt', [InventoryController::class,'inventoryReceipt'])->name('inventory_receipt_all');
-    Route::get('inventory-receipt/datatable', [InventoryController::class,'inventoryReceiptDatatable'])->name('inventory_receipt_datatable');
-    Route::get('inventory-receipt/details/{inventoryOrder}', [InventoryController::class,'inventoryReceiptDetails'])->name('inventory_receipt_details');
+    Route::get('inventory-receipt', [InventoryController::class, 'inventoryReceipt'])->name('inventory_receipt_all');
+    Route::get('inventory-receipt/datatable', [InventoryController::class, 'inventoryReceiptDatatable'])->name('inventory_receipt_datatable');
+    Route::get('inventory-receipt/details/{inventoryOrder}', [InventoryController::class, 'inventoryReceiptDetails'])->name('inventory_receipt_details');
 
+    Route::get('inventory-products', [InventoryController::class, 'inventoryProducts'])->name('inventory_products_all');
+    Route::get('inventory-products/datatable', [InventoryController::class, 'inventoryProductDatatable'])->name('inventory_product_datatable');
+    Route::get('inventory-products/{inventory}/logs', [InventoryController::class, 'inventoryProductLogDetails'])->name('inventory_log_details');
 });
