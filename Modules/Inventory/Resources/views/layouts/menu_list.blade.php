@@ -1,5 +1,5 @@
 <?php
-$menu = ['inventory.inventory_receipt_all', 'inventory.inventory_receipt_details'];
+$menu = ['inventory.inventory_receipt_all', 'inventory.inventory_receipt_details', 'inventory.inventory_products_all'];
 ?>
 
 <li class="pcoded-hasmenu {{ in_array(Route::currentRouteName(), $menu) ? 'active pcoded-trigger' : '' }}">
@@ -18,6 +18,7 @@ $menu = ['inventory.inventory_receipt_all', 'inventory.inventory_receipt_details
                 <span class="pcoded-mtext">All Order</span>
             </a>
         </li>
+
         <?php
         $subMenu = ['inventory.inventory_products_all'];
         ?>
@@ -28,5 +29,7 @@ $menu = ['inventory.inventory_receipt_all', 'inventory.inventory_receipt_details
                 <span class="pcoded-mtext">All Products</span>
             </a>
         </li>
+
+
     </ul>
 </li>
