@@ -148,7 +148,7 @@ class SaleController extends Controller
             $product = Product::where('id', $reqProduct)->first();
 
             // $inventory = ProductPurchaseDetail::where('product_id', $product->id)->where('batch_id', $request->batch_no[$counter])->first();
-            $inventory = Inventory::where('product_id', $product->id)->where('batch_no', $request->batch_no[$counter])->first();
+            $inventory = Inventory::where('product_id', $product->id)->where('batch_no', $request->batch_name[$counter])->first();
             // $purchaseAverageRate = ProductPurchaseDetail::where('product_id', $product->id)
             //     ->selectRaw('product_id, AVG(rate) as product_rate')
             //     ->groupBy('product_id')
