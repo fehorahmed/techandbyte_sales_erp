@@ -30,7 +30,7 @@ return new class extends Migration
             $table->string('note')->nullable();
 
             $table->foreign('account_head_type_id')->on('account_head_types')->references('id');
-            $table->foreignId('account_head_sub_type_id')->on('account_head_sub_types')->references('id');
+            $table->foreign('account_head_sub_type_id')->on('account_head_sub_types')->references('id');
             $table->foreign('bank_id')->on('banks')->references('id');
 
             $table->timestamps();
