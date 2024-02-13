@@ -36,15 +36,64 @@ $menu = [
     'account.credit_voucher_add',
     'account.credit_voucher_edit',
     'account.credit_voucher_view',
+    'account.account_head_type_add',
+    'account.account_head_type_edit',
+    'account.account_head_type_all',
+    'account.account_sub_head_add',
+    'account.account_sub_head_edit',
+    'account.account_sub_head_all',
 ];
 ?>
 
-{{-- <li class="pcoded-hasmenu {{ in_array(Route::currentRouteName(), $menu) ? 'active pcoded-trigger' : '' }}">
+ <li class="pcoded-hasmenu {{ in_array(Route::currentRouteName(), $menu) ? 'active pcoded-trigger' : '' }}">
     <a href="javascript:void(0)">
         <span class="pcoded-micon"><i class="feather icon-briefcase"></i></span>
         <span class="pcoded-mtext">Accounts</span>
     </a>
     <ul class="pcoded-submenu">
+        <?php
+        $subMenu = ['account.account_head_type_add'];
+        ?>
+        <li class="{{ in_array(Route::currentRouteName(), $subMenu) ? 'active' : '' }}">
+            <a href="{{ route('account.account_head_type_add') }}">
+                <span class="pcoded-micon"><i
+                        class="feather {{ in_array(Route::currentRouteName(), $subMenu) ? 'icon-check-circle' : 'icon-circle' }}"></i></span>
+                <span class="pcoded-mtext">Head Type Add</span>
+            </a>
+        </li> <?php
+        $subMenu = ['account.account_head_type_all'];
+        ?>
+        <li class="{{ in_array(Route::currentRouteName(), $subMenu) ? 'active' : '' }}">
+            <a href="{{ route('account.account_head_type_all') }}">
+                <span class="pcoded-micon"><i
+                        class="feather {{ in_array(Route::currentRouteName(), $subMenu) ? 'icon-check-circle' : 'icon-circle' }}"></i></span>
+                <span class="pcoded-mtext">Head Type All</span>
+            </a>
+        </li>
+
+        <?php
+        $subMenu = ['account.account_sub_head_add'];
+        ?>
+        <li class="{{ in_array(Route::currentRouteName(), $subMenu) ? 'active' : '' }}">
+            <a href="{{ route('account.account_sub_head_add') }}">
+            <span class="pcoded-micon"><i
+                    class="feather {{ in_array(Route::currentRouteName(), $subMenu) ? 'icon-check-circle' : 'icon-circle' }}"></i></span>
+                <span class="pcoded-mtext">Sub Head Add</span>
+            </a>
+        </li> <?php
+        $subMenu = ['account.account_sub_head_all'];
+        ?>
+        <li class="{{ in_array(Route::currentRouteName(), $subMenu) ? 'active' : '' }}">
+            <a href="{{ route('account.account_sub_head_all') }}">
+            <span class="pcoded-micon"><i
+                    class="feather {{ in_array(Route::currentRouteName(), $subMenu) ? 'icon-check-circle' : 'icon-circle' }}"></i></span>
+                <span class="pcoded-mtext">Sub Head All</span>
+            </a>
+        </li>
+
+
+
+            {{--
         <?php
         $subMenu = ['account.chart_of_account'];
         ?>
@@ -219,9 +268,9 @@ $menu = [
                 <span class="pcoded-mtext">Voucher Approval</span>
             </a>
         </li>
-
+--}}
     </ul>
-</li> --}}
+</li>
 
 
 {{-- ExPense --}}

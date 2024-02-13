@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
+use Modules\Account\Entities\AccountHeadType;
+use Yajra\DataTables\Facades\DataTables;
 
 class AccountHeadTypeController extends Controller
 {
@@ -14,7 +17,31 @@ class AccountHeadTypeController extends Controller
      */
     public function index()
     {
-        return view('account::index');
+        return view('account::account_head_type.index');
+    }
+
+    public function datatable()
+    {
+        $query = AccountHeadType::query();
+        return DataTables::eloquent($query)
+            ->addIndexColumn()
+            ->addColumn('action', function (AccountHeadType $accountHeadType) {
+                return '<a href="' . route('account.account_head_type_edit', ['accountHeadType' => $accountHeadType->id]) . '" class="btn-edit"><i style="color:#01a9ac;font-size: 17px;" class="feather icon-edit"></i></a>';
+            })
+            ->addColumn('status', function (AccountHeadType $accountHeadType) {
+                if ($accountHeadType->status == 1)
+                    return '<span class="badge badge-success">Active</span>';
+                else
+                    return '<span class="badge badge-danger">Inactive</span>';
+            })
+            ->addColumn('type', function (AccountHeadType $accountHeadType) {
+                if ($accountHeadType->transaction_type == 1)
+                    return 'Income';
+                else
+                    return 'Expense';
+            })
+            ->rawColumns(['action', 'status','type'])
+            ->toJson();
     }
 
     /**
@@ -22,7 +49,8 @@ class AccountHeadTypeController extends Controller
      */
     public function create()
     {
-        return view('account::create');
+
+        return view('account::account_head_type.create');
     }
 
     /**
@@ -30,7 +58,19 @@ class AccountHeadTypeController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        //
+
+        $request->validate([
+            'type' => 'required',
+            'name' => 'required|string|max:255',
+            'status' => 'required',
+        ]);
+        $accountHeadType = new AccountHeadType();
+        $accountHeadType->name = $request->name;
+        $accountHeadType->transaction_type = $request->type;
+        $accountHeadType->status = $request->status;
+        $accountHeadType->save();
+
+        return redirect()->route('account.account_head_type_all')->with('message', 'Information added successfully');
     }
 
     /**
@@ -46,15 +86,27 @@ class AccountHeadTypeController extends Controller
      */
     public function edit($id)
     {
-        return view('account::edit');
+        $accountHeadType = AccountHeadType::findOrFail($id);
+
+        return view('account::account_head_type.edit', compact('accountHeadType'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id): RedirectResponse
+    public function update(Request $request, AccountHeadType $accountHeadType): RedirectResponse
     {
-        //
+        $request->validate([
+            'type' => 'required',
+            'name' => 'required|string|max:255',
+            'status' => 'required',
+        ]);
+        $accountHeadType->name = $request->name;
+        $accountHeadType->transaction_type = $request->type;
+        $accountHeadType->status = $request->status;
+        $accountHeadType->update();
+
+        return redirect()->route('account.account_head_type_all')->with('message', 'Information updated successfully');
     }
 
     /**

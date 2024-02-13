@@ -14,9 +14,15 @@ class AccountHeadSubType extends Model
      * The attributes that are mass assignable.
      */
     protected $fillable = [];
-    
+
     protected static function newFactory(): AccountHeadSubTypeFactory
     {
         //return AccountHeadSubTypeFactory::new();
     }
+
+    public function accountHead()
+    {
+        return $this->belongsTo(AccountHeadType::class, 'account_head_type_id','id');
+    }
+
 }

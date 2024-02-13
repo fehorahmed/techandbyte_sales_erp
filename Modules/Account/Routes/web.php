@@ -10,6 +10,8 @@ use Modules\Account\Http\Controllers\ContraVoucherController;
 use Modules\Account\Http\Controllers\JournalVoucherController;
 use Modules\Account\Http\Controllers\OpeningBalanceController;
 use Modules\Account\Http\Controllers\ExpenseController;
+use Modules\Account\Http\Controllers\AccountHeadTypeController;
+use Modules\Account\Http\Controllers\AccountHeadSubTypeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,6 +26,24 @@ use Modules\Account\Http\Controllers\ExpenseController;
 
 
 Route::prefix('account')->middleware('auth')->name('account.')->group(function() {
+
+    //Account head
+    Route::get('all-account-head-type', [AccountHeadTypeController::class, 'index'])->name('account_head_type_all');
+    Route::get('all-account-head-type/datatable', [AccountHeadTypeController::class, 'datatable'])->name('account_head_type_datatable');
+    Route::get('add-account-head-type', [AccountHeadTypeController::class, 'create'])->name('account_head_type_add');
+    Route::post('add-account-head-type', [AccountHeadTypeController::class, 'store']);
+    Route::get('edit-account-head-type/{accountHeadType}', [AccountHeadTypeController::class, 'edit'])->name('account_head_type_edit');
+    Route::post('edit-account-head-type/{accountHeadType}', [AccountHeadTypeController::class, 'update']);
+
+    //Account head
+    Route::get('all-account-sub-head', [AccountHeadSubTypeController::class, 'index'])->name('account_sub_head_all');
+    Route::get('all-account-sub-head/datatable', [AccountHeadSubTypeController::class, 'datatable'])->name('account_sub_head_datatable');
+    Route::get('add-account-sub-head', [AccountHeadSubTypeController::class, 'create'])->name('account_sub_head_add');
+    Route::post('add-account-sub-head', [AccountHeadSubTypeController::class, 'store']);
+    Route::get('edit-account-sub-head/{accountHeadSubType}', [AccountHeadSubTypeController::class, 'edit'])->name('account_sub_head_edit');
+    Route::post('edit-account-sub-head/{accountHeadSubType}', [AccountHeadSubTypeController::class, 'update']);
+
+
     // Chart of Account
     Route::get('chart-of-account', [ChartOfAccountController::class,'chartOfAccount'])->name('chart_of_account');
     //Sub Account
