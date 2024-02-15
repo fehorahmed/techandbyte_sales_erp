@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->tinyInteger('transaction_type')->comment('1=Income; 2=Expense');
             $table->foreignId('account_head_type_id');
-            $table->integer('receipt_no');
+            $table->integer('receipt_no')->nullable();
             $table->foreignId('account_head_sub_type_id');
             $table->tinyInteger('transaction_method')->comment('1=Cash; 2=Bank');
             $table->foreignId('bank_id')->nullable();

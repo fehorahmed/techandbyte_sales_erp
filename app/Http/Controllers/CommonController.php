@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+
 use Illuminate\Http\Request;
 use Modules\Account\Entities\AccCoa;
+use Modules\Account\Entities\AccountHeadSubType;
 use Modules\Account\Entities\AccSubcode;
 use Modules\Customer\Entities\Customer;
 use Modules\Inventory\Entities\Inventory;
@@ -11,6 +13,7 @@ use Modules\Product\Entities\Product;
 use Modules\Product\Entities\SupplierProduct;
 use Modules\Purchase\Entities\ProductPurchaseDetail;
 use Modules\Supplier\Entities\Supplier;
+use Modules\Account\Entities\AccountHeadType;
 
 class CommonController extends Controller
 {
@@ -214,4 +217,22 @@ class CommonController extends Controller
         }
         echo json_encode($data);
     }
+
+    public function getAccountHeadType(Request $request) {
+        $types = AccountHeadType::where('transaction_type', $request->type)
+            ->where('status', 1)
+            ->orderBy('name')
+            ->get()->toArray();
+
+        return response()->json($types);
+    }
+    public function getAccountHeadSubType(Request $request) {
+        $subTypes = AccountHeadSubType::where('account_head_type_id', $request->typeId)
+            ->where('status', 1)
+            ->orderBy('name')
+            ->get()->toArray();
+
+        return response()->json($subTypes);
+    }
+
 }

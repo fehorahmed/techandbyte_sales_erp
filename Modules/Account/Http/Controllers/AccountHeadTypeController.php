@@ -36,9 +36,9 @@ class AccountHeadTypeController extends Controller
             })
             ->addColumn('type', function (AccountHeadType $accountHeadType) {
                 if ($accountHeadType->transaction_type == 1)
-                    return 'Income';
+                    return '<span class="badge badge-primary">Income</span>';
                 else
-                    return 'Expense';
+                    return '<span class="badge badge-warning">Expense</span>';
             })
             ->rawColumns(['action', 'status','type'])
             ->toJson();

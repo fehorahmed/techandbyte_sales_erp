@@ -42,6 +42,8 @@ $menu = [
     'account.account_sub_head_add',
     'account.account_sub_head_edit',
     'account.account_sub_head_all',
+
+
 ];
 ?>
 
@@ -52,16 +54,7 @@ $menu = [
     </a>
     <ul class="pcoded-submenu">
         <?php
-        $subMenu = ['account.account_head_type_add'];
-        ?>
-        <li class="{{ in_array(Route::currentRouteName(), $subMenu) ? 'active' : '' }}">
-            <a href="{{ route('account.account_head_type_add') }}">
-                <span class="pcoded-micon"><i
-                        class="feather {{ in_array(Route::currentRouteName(), $subMenu) ? 'icon-check-circle' : 'icon-circle' }}"></i></span>
-                <span class="pcoded-mtext">Head Type Add</span>
-            </a>
-        </li> <?php
-        $subMenu = ['account.account_head_type_all'];
+            $subMenu = ['account.account_head_type_all'];
         ?>
         <li class="{{ in_array(Route::currentRouteName(), $subMenu) ? 'active' : '' }}">
             <a href="{{ route('account.account_head_type_all') }}">
@@ -72,22 +65,23 @@ $menu = [
         </li>
 
         <?php
-        $subMenu = ['account.account_sub_head_add'];
-        ?>
-        <li class="{{ in_array(Route::currentRouteName(), $subMenu) ? 'active' : '' }}">
-            <a href="{{ route('account.account_sub_head_add') }}">
-            <span class="pcoded-micon"><i
-                    class="feather {{ in_array(Route::currentRouteName(), $subMenu) ? 'icon-check-circle' : 'icon-circle' }}"></i></span>
-                <span class="pcoded-mtext">Sub Head Add</span>
-            </a>
-        </li> <?php
-        $subMenu = ['account.account_sub_head_all'];
+            $subMenu = ['account.account_sub_head_all'];
         ?>
         <li class="{{ in_array(Route::currentRouteName(), $subMenu) ? 'active' : '' }}">
             <a href="{{ route('account.account_sub_head_all') }}">
             <span class="pcoded-micon"><i
                     class="feather {{ in_array(Route::currentRouteName(), $subMenu) ? 'icon-check-circle' : 'icon-circle' }}"></i></span>
                 <span class="pcoded-mtext">Sub Head All</span>
+            </a>
+        </li>
+        <?php
+            $subMenu = ['account.transaction_all','account.transaction_add'];
+        ?>
+        <li class="{{ in_array(Route::currentRouteName(), $subMenu) ? 'active' : '' }}">
+            <a href="{{ route('account.transaction_all') }}">
+            <span class="pcoded-micon"><i
+                    class="feather {{ in_array(Route::currentRouteName(), $subMenu) ? 'icon-check-circle' : 'icon-circle' }}"></i></span>
+                <span class="pcoded-mtext">Transaction</span>
             </a>
         </li>
 

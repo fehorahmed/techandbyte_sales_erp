@@ -12,6 +12,8 @@ use Modules\Account\Http\Controllers\OpeningBalanceController;
 use Modules\Account\Http\Controllers\ExpenseController;
 use Modules\Account\Http\Controllers\AccountHeadTypeController;
 use Modules\Account\Http\Controllers\AccountHeadSubTypeController;
+use Modules\Account\Http\Controllers\TransactionController;
+use App\Http\Controllers\CommonController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,13 +37,20 @@ Route::prefix('account')->middleware('auth')->name('account.')->group(function()
     Route::get('edit-account-head-type/{accountHeadType}', [AccountHeadTypeController::class, 'edit'])->name('account_head_type_edit');
     Route::post('edit-account-head-type/{accountHeadType}', [AccountHeadTypeController::class, 'update']);
 
-    //Account head
+    //Account head sub
     Route::get('all-account-sub-head', [AccountHeadSubTypeController::class, 'index'])->name('account_sub_head_all');
     Route::get('all-account-sub-head/datatable', [AccountHeadSubTypeController::class, 'datatable'])->name('account_sub_head_datatable');
     Route::get('add-account-sub-head', [AccountHeadSubTypeController::class, 'create'])->name('account_sub_head_add');
     Route::post('add-account-sub-head', [AccountHeadSubTypeController::class, 'store']);
     Route::get('edit-account-sub-head/{accountHeadSubType}', [AccountHeadSubTypeController::class, 'edit'])->name('account_sub_head_edit');
     Route::post('edit-account-sub-head/{accountHeadSubType}', [AccountHeadSubTypeController::class, 'update']);
+
+    //Account head sub
+    Route::get('all-transaction', [TransactionController::class, 'index'])->name('transaction_all');
+    Route::get('all-transaction/datatable', [TransactionController::class, 'datatable'])->name('transaction_datatable');
+    Route::get('add-transaction', [TransactionController::class, 'create'])->name('transaction_add');
+    Route::post('add-transaction', [TransactionController::class, 'store']);
+    Route::get('transaction-details/{transaction}', [TransactionController::class, 'transactionDetails'])->name('transaction_details');
 
 
     // Chart of Account
@@ -136,5 +145,11 @@ Route::prefix('account')->middleware('auth')->name('account.')->group(function()
     Route::get('add-expense', [ExpenseController::class,'expenseAdd'])->name('expense_add');
     Route::post('add-expense', [ExpenseController::class,'expenseAddPost']);
 
+
+
+    //CommonController
+
+    Route::get('get-account-head-type', [CommonController::class,'getAccountHeadType'])->name('get_account_head_type');
+    Route::get('get-account-head-sub-type', [CommonController::class,'getAccountHeadSubType'])->name('get_account_head_sub_type');
 
 });

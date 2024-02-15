@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'All Account Head Type')
+@section('title', 'Transaction')
 @section('content')
     <div class="page-body">
         <div class="row">
@@ -9,18 +9,19 @@
                         <div class="d-inline" style="float: left">
                             <h4>@yield('title')</h4>
                         </div>
-                        <h5 style="float: right"><a href="{{ route('account.account_head_type_add') }}" class="btn btn-success">Add
-                                Account Head Type</a></h5>
+                        <h5 style="float: right"><a href="{{ route('account.transaction_add') }}" class="btn btn-success">Add Transaction</a></h5>
                     </div>
                     <div class="card-block mt-4">
                         <div class="dt-responsive table-responsive">
                             <table id="table" class="table table-striped table-bordered nowrap">
                                 <thead>
                                     <tr>
-                                        <th>Name</th>
+                                        <th>Date</th>
                                         <th>Type</th>
+                                        <th>Account Head Type</th>
+                                        <th>Account Sub Head Type</th>
+                                        <th>Amount</th>
                                         <th>Action</th>
-                                        <th>Status</th>
                                     </tr>
                                 </thead>
                             </table>
@@ -40,18 +41,27 @@
                 processing: true,
                 serverSide: true,
                 buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
-                ajax: '{{ route('account.account_head_type_datatable') }}',
-                columns: [{
-                        data: 'name',
-                        name: 'name'
+                ajax: '{{ route('account.transaction_datatable') }}',
+                columns: [
+                    {
+                        data: 'date',
+                        name: 'date'
                     },
                     {
-                        data: 'type',
-                        name: 'type'
+                        data: 'transaction_type',
+                        name: 'transaction_type'
                     },
                     {
-                        data: 'status',
-                        name: 'status'
+                        data: 'headType',
+                        name: 'headType.name'
+                    },
+                    {
+                        data: 'subHeadType',
+                        name: 'subHeadType.name'
+                    },
+                    {
+                        data: 'amount',
+                        name: 'amount'
                     },
                     {
                         data: 'action',
