@@ -6,21 +6,24 @@ namespace Modules\Purchase\Http\Controllers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
 use Modules\Account\Entities\AccCoa;
 use Modules\Account\Entities\AccMonthlyBalance;
-use Modules\Account\Entities\AccPredefineAccount;
-use Modules\Account\Entities\AccSubcode;
-use Modules\Account\Entities\AccTransaction;
 use Modules\Account\Entities\AccVoucher;
+use Modules\Account\Entities\Cash;
+use Modules\Account\Entities\TransactionLog;
+use Modules\Bank\Entities\Bank;
 use Modules\Inventory\Entities\Inventory;
 use Modules\Inventory\Entities\InventoryOrder;
 use Modules\Inventory\Entities\InventoryOrderDetail;
 use Modules\Purchase\Entities\ProductPurchase;
 use Modules\Purchase\Entities\ProductPurchaseDetail;
+use Modules\Purchase\Entities\PurchasePayment;
 use Modules\Supplier\Entities\Supplier;
 use Modules\Product\Entities\Product;
 use Illuminate\Support\Facades\Validator;
 use Modules\Inventory\Entities\InventoryLog;
+use Ramsey\Uuid\Uuid;
 use SakibRahaman\DecimalToWords\DecimalToWords;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -29,8 +32,8 @@ class PurchaseController extends Controller
     public function addPurchase()
     {
         $suppliers = Supplier::orderBy('name', 'desc')->get();
-        $paymentCodes = AccCoa::where('isBankNature', 1)->orWhere('isCashNature', 1)->where('HeadLevel', 4)->where('IsActive', 1)->orderBy('HeadName')->get();
-        return view('purchase::purchase.add_purchase', compact('suppliers', 'paymentCodes'));
+        $banks = Bank::get();
+        return view('purchase::purchase.add_purchase', compact('suppliers', 'banks'));
     }
 
     public function purchaseReceiptDatatable()
@@ -88,7 +91,6 @@ class PurchaseController extends Controller
             'product.*' => 'required|numeric|min:0',
             'quantity.*' => 'required|numeric|min:0',
             'product_rate.*' => 'required|numeric|min:0',
-            // 'batch_no.*' => 'required|string|max:255',
             'paid' => 'required|numeric|min:0',
             "duty" => "required|numeric|min:0",
             "freight" => "required|numeric|min:0",
@@ -97,8 +99,16 @@ class PurchaseController extends Controller
             "at" => "required|numeric|min:0",
             "etc" => "required|numeric|min:0",
         ];
-        // dd($request->all());
 
+        if ($request->paid > 0) {
+             $rules['payment_type'] = 'required';
+        }
+
+        if ($request->payment_type == '2') {
+            $rules['bank'] = 'required';
+            $rules['cheque_no'] = 'nullable|string|max:255';
+            $rules['cheque_image'] = 'nullable|image';
+        }
 
         $request->validate($rules);
 
@@ -106,169 +116,139 @@ class PurchaseController extends Controller
             return redirect()->back()->withInput()->with('error', 'Paid Amount Greater than Total Amount Paid');
         }
 
-        if ($request->paid == 0) {
-            $is_credit = 1;
-        } else {
-            $is_credit = '';
+        if ($request->payment_type == 1) {
+            $cash = Cash::first();
+
+            if ($request->amount > $cash->amount)
+                return redirect()->back()->withInput()->with('error', 'Insufficient balance.');
+        }elseif($request->payment_type == 2){
+            $bankAccount = Bank::find($request->bank);
+
+            if ($request->amount > $bankAccount->amount)
+                return redirect()->back()->withInput()->with('error', 'Insufficient balance.');
         }
+        try {
 
+            DB::beginTransaction();
 
-        $productPurchase = new ProductPurchase();
-        $productPurchase->lc_no = $request->lc_no;
-        $productPurchase->supplier_id = $request->supplier;
-        $productPurchase->duty = $request->duty;
-        $productPurchase->freight = $request->freight;
-        $productPurchase->c_and_f = $request->c_and_f;
-        $productPurchase->ait = $request->ait;
-        $productPurchase->at = $request->at;
-        $productPurchase->etc = $request->etc;
-        $productPurchase->purchase_date = Carbon::parse($request->date)->format('Y-m-d');
-        $productPurchase->grand_total_amount = $request->grand_total_price;
-        $productPurchase->purchase_details = $request->purchase_details;
-        $productPurchase->paid_amount = $request->paid;
-        $productPurchase->due_amount = 0;
-        $productPurchase->total_discount = $request->discount;
-        $productPurchase->total_vat_amount = $request->total_vat ?? 0;
-        $productPurchase->invoice_discount = 0;
-        $productPurchase->status = 1;
-        $productPurchase->payment_type = 1;
-        $productPurchase->save();
-        $productPurchase->chalan_no = 'PO' . str_pad($productPurchase->id, 8, 0, STR_PAD_LEFT);
-        $productPurchase->save();
+            $productPurchase = new ProductPurchase();
+            $productPurchase->lc_no = $request->lc_no;
+            $productPurchase->supplier_id = $request->supplier;
+            $productPurchase->duty = $request->duty;
+            $productPurchase->freight = $request->freight;
+            $productPurchase->c_and_f = $request->c_and_f;
+            $productPurchase->ait = $request->ait;
+            $productPurchase->at = $request->at;
+            $productPurchase->etc = $request->etc;
+            $productPurchase->purchase_date = Carbon::parse($request->date)->format('Y-m-d');
+            $productPurchase->grand_total_amount = $request->grand_total_price;
+            $productPurchase->purchase_details = $request->purchase_details;
+            $productPurchase->paid_amount = $request->paid;
+            $productPurchase->due_amount = 0;
+            $productPurchase->total_discount = $request->discount;
+            $productPurchase->total_vat_amount = $request->total_vat ?? 0;
+            $productPurchase->invoice_discount = 0;
+            $productPurchase->status = 1;
+            $productPurchase->payment_type = 1;
+            $productPurchase->save();
+            $productPurchase->chalan_no = 'PO' . str_pad($productPurchase->id, 8, 0, STR_PAD_LEFT);
+            $productPurchase->save();
 
-        $counter = 0;
-        $subTotal = 0;
-        $productDiscount = 0;
+            $counter = 0;
+            $subTotal = 0;
 
-        foreach ($request->product as $reqProduct) {
-            $product = Product::where('id', $reqProduct)->first();
+            foreach ($request->product as $reqProduct) {
+                $product = Product::where('id', $reqProduct)->first();
 
-            $productPurchaseDetail = new ProductPurchaseDetail();
-            $productPurchaseDetail->product_purchase_id = $productPurchase->id;
-            $productPurchaseDetail->product_id = $product->id;
-            $productPurchaseDetail->rate = $request->product_rate[$counter];
-            $productPurchaseDetail->quantity = $request->quantity[$counter];
-            //$productPurchaseDetail->batch_id = $request->batch_no[$counter];
-            // $productPurchaseDetail->discount_percent = $request->discount_percent[$counter]??'0';
-            // $productPurchaseDetail->discount_amount = $request->discount_value[$counter];
-            // $productPurchaseDetail->vat_amount_percent = $request->vat_percent[$counter] ?? '0';
-            // $productPurchaseDetail->vat_amount = $request->vat_value[$counter];
-            // $productPurchaseDetail->total_amount = ($request->quantity[$counter] * $request->product_rate[$counter])- $request->discount_value[$counter];
-            $productPurchaseDetail->total_amount = ($request->quantity[$counter] * $request->product_rate[$counter]);
-            $productPurchaseDetail->save();
+                $productPurchaseDetail = new ProductPurchaseDetail();
+                $productPurchaseDetail->product_purchase_id = $productPurchase->id;
+                $productPurchaseDetail->product_id = $product->id;
+                $productPurchaseDetail->rate = $request->product_rate[$counter];
+                $productPurchaseDetail->quantity = $request->quantity[$counter];
+                $productPurchaseDetail->total_amount = ($request->quantity[$counter] * $request->product_rate[$counter]);
+                $productPurchaseDetail->save();
 
-            $subTotal += $productPurchaseDetail->total_amount;
-            //  $productDiscount += $request->discount_value[$counter];
+                $subTotal += $productPurchaseDetail->total_amount;
 
-            $counter++;
-        }
-
-        $due = ($subTotal + $productPurchase->duty + $productPurchase->freight + $productPurchase->c_and_f + $productPurchase->ait + $productPurchase->at + $productPurchase->etc) - $request->paid;
-        $productPurchase->due_amount = $due;
-        //$productPurchase->invoice_discount = $productDiscount+$request->discount;
-        $productPurchase->save();
-
-        $predefineAccount  = AccPredefineAccount::first();
-        $Narration          = "Purchase Voucher";
-        $Comment            = "Purchase Voucher for supplier";
-        $COAID              = $predefineAccount->purchaseCode;
-
-        $purchase_id = $productPurchase->id;
-
-        if ($request->paid == 0) {
-            $amountPay = $productPurchase->grand_total_amount;
-            $amountType = 'Credit';
-            $reVID     = $predefineAccount->supplierCode;
-            $subCode   = AccSubcode::where('referenceNo', $request->supplier)->where('subTypeId', 4)->first();
-            $subCodeId = $subCode->id;
-            $this->insertPurchaseDebitVoucher($is_credit, $purchase_id, $COAID, $amountType, $amountPay, $Narration, $Comment, $reVID, $subCodeId);
-        } else {
-            $amountType = 'Debit';
-            $paymentCodes = AccCoa::where('id', $request->payment_type)->first();
-            $reVID = $paymentCodes->HeadCode;
-            $amount_pay = $request->paid;
-            $this->insertPurchaseDebitVoucher($is_credit, $purchase_id, $COAID, $amountType, $amount_pay, $Narration, $Comment, $reVID);
-        }
-
-        //Create Transaction Voucher
-        $vouchers = AccVoucher::where('referenceNo', $purchase_id)->where('status', 0)->get();
-        $ApprovedBy = auth()->user()->id;
-
-        if ($vouchers) {
-            foreach ($vouchers as $voucher) {
-                $accTransaction = new AccTransaction();
-                $accTransaction->vid   =  $voucher->id;
-                $accTransaction->fyear = $voucher->fyear;
-                $accTransaction->VNo   =  $voucher->VNo;
-                $accTransaction->Vtype =  $voucher->Vtype;
-                $accTransaction->referenceNo  =  $voucher->referenceNo;
-                $accTransaction->VDate =  $voucher->VDate;
-                $accTransaction->COAID =  $voucher->COAID;
-                $accTransaction->Narration =  $voucher->Narration;
-                $accTransaction->chequeNo  =  $voucher->chequeNo ? $voucher->chequeNo : '';
-                $accTransaction->chequeDate =  $voucher->chequeDate;
-                $accTransaction->isHonour   =  $voucher->isHonour;
-                $accTransaction->ledgerComment  =  $voucher->ledgerComment;
-                $accTransaction->Debit  =  $voucher->Debit;
-                $accTransaction->Credit  =  $voucher->Credit;
-                $accTransaction->StoreID  =  0;
-                $accTransaction->IsPosted =  1;
-                $accTransaction->RevCodde =  $voucher->RevCodde;
-                $accTransaction->subType  =  $voucher->subType;
-                $accTransaction->subCode  =  $voucher->subCode;
-                $accTransaction->IsAppoved =  1;
-                $accTransaction->CreateBy = $ApprovedBy;
-                $accTransaction->save();
+                $counter++;
             }
 
-            //Update Monthly record
+            $due = ($subTotal + $productPurchase->duty + $productPurchase->freight + $productPurchase->c_and_f + $productPurchase->ait + $productPurchase->at + $productPurchase->etc) - $request->paid;
+            $productPurchase->due_amount = $due;
+            $productPurchase->save();
 
-            if ($accTransaction) {
+            // Purchase Payment
+            if ($request->paid > 0) {
+                if ($request->payment_type == 1) {
+                    $payment = new PurchasePayment();
+                    $payment->product_purchase_id  = $productPurchase->id;
+                    $payment->supplier_id = $request->supplier;
+                    $payment->transaction_method = $request->payment_type;
+                    $payment->amount = $request->paid;
+                    $payment->date = Carbon::parse($request->date)->format('Y-m-d');
+                    $payment->save();
 
-                $this->storeTransactionSummery($voucher->COAID, $voucher->VDate);
+                    Cash::first()->decrement('amount', $request->paid);
 
-                foreach ($vouchers as $voucher) {
-                    $reverseAccTransaction = new AccTransaction();
-                    $reverseAccTransaction->vid   =  $voucher->id;
-                    $reverseAccTransaction->fyear = $voucher->fyear;
-                    $reverseAccTransaction->VNo   =  $voucher->VNo;
-                    $reverseAccTransaction->Vtype =  $voucher->Vtype;
-                    $reverseAccTransaction->referenceNo  =  $voucher->referenceNo;
-                    $reverseAccTransaction->VDate =  $voucher->VDate;
-                    $reverseAccTransaction->COAID =  $voucher->RevCodde;
-                    $reverseAccTransaction->Narration =  $voucher->Narration;
-                    $reverseAccTransaction->chequeNo  =  $voucher->chequeNo ? $voucher->chequeNo : '';
-                    $reverseAccTransaction->chequeDate =  $voucher->chequeDate;
-                    $reverseAccTransaction->isHonour   =  $voucher->isHonour;
-                    $reverseAccTransaction->ledgerComment  =  $voucher->ledgerComment;
-                    $reverseAccTransaction->Debit  =  $voucher->Credit;
-                    $reverseAccTransaction->Credit  =  $voucher->Debit;
-                    $reverseAccTransaction->StoreID  =  0;
-                    $reverseAccTransaction->IsPosted =  1;
-                    $reverseAccTransaction->RevCodde =  $voucher->COAID;
-                    $reverseAccTransaction->subType  =  $voucher->subType;
-                    $reverseAccTransaction->subCode  =  $voucher->subCode;
-                    $reverseAccTransaction->IsAppoved =  1;
-                    $reverseAccTransaction->CreateBy = $ApprovedBy;
-                    $reverseAccTransaction->save();
+                    $log = new TransactionLog();
+                    $log->date = Carbon::parse($request->date)->format('Y-m-d');
+                    $log->particular = 'Paid to LC-' . $request->lc_no;
+                    $log->transaction_type = 2;
+                    $log->transaction_method = $request->payment_type;
+                    $log->amount = $request->paid;
+                    $log->purchase_payment_id  = $payment->id;
+                    $log->save();
+
+                } else {
+                    $image = 'img/no_image.png';
+
+                    if ($request->cheque_image) {
+                        $image = 'img/no_image.png';
+
+                        $file = $request->file('cheque_image');
+                        $filename = Uuid::uuid1()->toString() . '.' . $file->extension();
+                        $destinationPath = 'uploads/transaction_cheque';
+                        $file->move($destinationPath, $filename);
+                        $image = 'uploads/transaction_cheque/' . $filename;
+                    }
+
+                    $payment = new PurchasePayment();
+                    $payment->product_purchase_id  = $productPurchase->id;
+                    $payment->supplier_id = $request->supplier;
+                    $payment->transaction_method = $request->payment_type;
+                    $payment->amount = $request->paid;
+                    $payment->date = Carbon::parse($request->date)->format('Y-m-d');
+                    $payment->bank_id = $request->bank;
+                    $payment->cheque_no = $request->cheque_no;
+                    $payment->cheque_image = $image;
+                    $payment->amount = $request->paid;
+                    $payment->date = Carbon::parse($request->date)->format('Y-m-d');
+                    $payment->save();
+
+                    Bank::find($request->bank)->decrement('amount', $request->paid);
+
+                    $log = new TransactionLog();
+                    $log->date = Carbon::parse($request->date)->format('Y-m-d');
+                    $log->particular = 'Paid to LC-' . $request->lc_no;
+                    $log->transaction_type = 2;
+                    $log->transaction_method = $request->payment_type;
+                    $log->bank_id = $request->bank;
+                    $log->cheque_no = $request->cheque_no;
+                    $log->cheque_image = $image;
+                    $log->amount = $request->paid;
+                    $log->purchase_payment_id = $payment->id;
+                    $log->save();
+
                 }
-
-                $this->storeTransactionSummery($voucher->RevCodde, $voucher->VDate);
             }
+
+            DB::commit();
+            return redirect()->route('purchase.purchase_receipt_all');
+        }catch (\Exception $exception) {
+            DB::rollBack();
+            dd($exception);
+            return redirect()->back()->with('error', $exception)->withInput();
         }
-
-
-        foreach ($vouchers as $voucher) {
-            $voucher->isApproved = 1;
-            $voucher->approvedBy = $ApprovedBy;
-            $voucher->status = 1;
-            $voucher->save();
-        }
-
-
-
-        //        return redirect()->route('purchase.purchase_receipt.details', ['order' => $productPurchase->id]);
-        return redirect()->route('purchase.purchase_receipt_all');
     }
 
     public function purchaseReceipt()
@@ -278,8 +258,6 @@ class PurchaseController extends Controller
 
     public function purchaseReceiptDetails(ProductPurchase $productPurchase)
     {
-        //        $productPurchase = ProductPurchase::with('supplier','products')->where('id',$productPurchase)->first()->toArray();
-        //        dd($productPurchase);
 
         return view('purchase::purchase.receipt.details', compact('productPurchase'));
     }
@@ -346,8 +324,8 @@ class PurchaseController extends Controller
     {
 
         $suppliers = Supplier::orderBy('name', 'desc')->get();
-        $paymentCodes = AccCoa::where('isBankNature', 1)->orWhere('isCashNature', 1)->where('HeadLevel', 4)->where('IsActive', 1)->orderBy('HeadName')->get();
-        return view('purchase::purchase.edit_purchase', compact('suppliers', 'paymentCodes', 'productPurchase'));
+        $banks = Bank::get();
+        return view('purchase::purchase.edit_purchase', compact('suppliers', 'banks', 'productPurchase'));
     }
 
     public function sentInInventoryPost(ProductPurchase $productPurchase, Request $request)
@@ -372,12 +350,36 @@ class PurchaseController extends Controller
             "etc" => "required|numeric|min:0",
         ];
 
+        if ($request->paid > 0) {
+            $rules['payment_type'] = 'required';
+        }
+
+        if ($request->payment_type == '2') {
+            $rules['bank'] = 'required';
+            $rules['cheque_no'] = 'nullable|string|max:255';
+            $rules['cheque_image'] = 'nullable|image';
+        }
 
         $request->validate($rules);
 
         if ($request->paid > $request->grand_total_price) {
             return redirect()->back()->withInput()->with('error', 'Paid Amount Greater than Total Amount Paid');
         }
+
+        if ($request->payment_type == 1) {
+            $cash = Cash::first();
+
+            if ($request->amount > $cash->amount)
+                return redirect()->back()->withInput()->with('error', 'Insufficient balance.');
+        }elseif($request->payment_type == 2){
+            $bankAccount = Bank::find($request->bank);
+
+            if ($request->amount > $bankAccount->amount)
+                return redirect()->back()->withInput()->with('error', 'Insufficient balance.');
+        }
+        try {
+
+            DB::beginTransaction();
 
         $inventoryOrder = new InventoryOrder();
         $inventoryOrder->product_purchase_id  = $productPurchase->id;
@@ -393,6 +395,7 @@ class PurchaseController extends Controller
         $inventoryOrder->purchase_date = Carbon::parse($request->date)->format('Y-m-d');
         $inventoryOrder->grand_total_amount = $request->grand_total_price;
         $inventoryOrder->purchase_details = $request->purchase_details;
+        $inventoryOrder->previous_paid = $request->previous_paid;
         $inventoryOrder->paid_amount = $request->paid;
         $inventoryOrder->due_amount = 0;
         $inventoryOrder->total_discount = $request->discount;
@@ -406,7 +409,6 @@ class PurchaseController extends Controller
 
         $counter = 0;
         $subTotal = 0;
-        $productDiscount = 0;
 
         foreach ($request->product as $reqProduct) {
             $product = Product::where('id', $reqProduct)->first();
@@ -441,17 +443,89 @@ class PurchaseController extends Controller
             $counter++;
         }
 
-        $due = ($subTotal + $inventoryOrder->duty + $inventoryOrder->freight + $inventoryOrder->c_and_f + $inventoryOrder->ait + $inventoryOrder->at + $inventoryOrder->etc) - $request->paid;
+        $due = ($subTotal + $inventoryOrder->duty + $inventoryOrder->freight + $inventoryOrder->c_and_f + $inventoryOrder->ait + $inventoryOrder->at + $inventoryOrder->etc) - $request->paid-$request->previous_paid;
         $inventoryOrder->due_amount = $due;
 
         $inventoryOrder->save();
 
-        ProductPurchase::where('id', $productPurchase->id)->update([
-            'status' => 0,
-        ]);
+        $productPurchase->status = 0;
+        $productPurchase->save();
 
 
+        // Purchase Payment
+        if ($request->paid > 0) {
+            if ($request->payment_type == 1) {
+                $payment = new PurchasePayment();
+                $payment->product_purchase_id  = $productPurchase->id;
+                $payment->inventory_order_id   = $inventoryOrder->id;
+                $payment->supplier_id = $request->supplier;
+                $payment->transaction_method = $request->payment_type;
+                $payment->amount = $request->paid;
+                $payment->date = Carbon::parse($request->date)->format('Y-m-d');
+                $payment->save();
 
-        return redirect()->route('inventory.inventory_receipt_details', ['inventoryOrder' => $inventoryOrder->id]);
+
+                Cash::first()->decrement('amount', $request->paid);
+
+                $log = new TransactionLog();
+                $log->date = Carbon::parse($request->date)->format('Y-m-d');
+                $log->particular = 'Purchase Paid-' . $inventoryOrder->chalan_no;
+                $log->transaction_type = 2;
+                $log->transaction_method = $request->payment_type;
+                $log->amount = $request->paid;
+                $log->purchase_payment_id  = $payment->id;
+                $log->save();
+
+            } else {
+                $image = 'img/no_image.png';
+
+                if ($request->cheque_image) {
+                    $image = 'img/no_image.png';
+
+                    $file = $request->file('cheque_image');
+                    $filename = Uuid::uuid1()->toString() . '.' . $file->extension();
+                    $destinationPath = 'uploads/transaction_cheque';
+                    $file->move($destinationPath, $filename);
+                    $image = 'uploads/transaction_cheque/' . $filename;
+                }
+
+                $payment = new PurchasePayment();
+                $payment->product_purchase_id  = $productPurchase->id;
+                $payment->supplier_id = $request->supplier;
+                $payment->transaction_method = $request->payment_type;
+                $payment->amount = $request->paid;
+                $payment->date = Carbon::parse($request->date)->format('Y-m-d');
+                $payment->bank_id = $request->bank;
+                $payment->cheque_no = $request->cheque_no;
+                $payment->cheque_image = $image;
+                $payment->amount = $request->paid;
+                $payment->date = Carbon::parse($request->date)->format('Y-m-d');
+                $payment->save();
+
+                Bank::find($request->bank)->decrement('amount', $request->paid);
+
+                $log = new TransactionLog();
+                $log->date = Carbon::parse($request->date)->format('Y-m-d');
+                $log->particular = 'Purchase Paid' . $inventoryOrder->chalan_no;
+                $log->transaction_type = 2;
+                $log->transaction_method = $request->payment_type;
+                $log->bank_id = $request->bank;
+                $log->cheque_no = $request->cheque_no;
+                $log->cheque_image = $image;
+                $log->amount = $request->paid;
+                $log->purchase_payment_id = $payment->id;
+                $log->save();
+
+            }
+        }
+
+            DB::commit();
+            return redirect()->route('inventory.inventory_receipt_details', ['inventoryOrder' => $inventoryOrder->id]);
+        }catch (\Exception $exception) {
+            DB::rollBack();
+            dd($exception);
+            return redirect()->back()->with('error', $exception)->withInput();
+        }
+
     }
 }

@@ -27,8 +27,8 @@ class BankController extends Controller
             ->addColumn('action', function (Bank $bank) {
                 return '<a href="' . route('bank.bank_edit', ['bank' => $bank->id]) . '" class="btn-edit"><i style="color:#01a9ac;font-size: 17px;" class="feather icon-edit"></i></a>';
             })
-            ->editColumn('balance', function (Bank $bank) {
-                return $bank->bank_name . '123';
+            ->editColumn('amount', function (Bank $bank) {
+                return '৳'.number_format($bank->amount,2);
             })
             ->addColumn('signature_pic', function (Bank $bank) {
                 return '<img height="30px" src="' . asset($bank->signature_pic) . '"   alt="">';

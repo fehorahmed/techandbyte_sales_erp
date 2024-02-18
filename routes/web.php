@@ -27,6 +27,7 @@ Route::middleware('auth')->group(function () {
 //    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
 //    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 //    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('cash',[CommonController::class, 'cash'])->name('cash');
     Route::get('get-products-json',[CommonController::class, 'productsJson'])->name('get_products_json');
     Route::get('get-sale-products-json',[CommonController::class, 'saleProductsJson'])->name('get_sale_products_json');
     Route::get('get-product-info',[CommonController::class, 'productInfoJson'])->name('get_product_info');

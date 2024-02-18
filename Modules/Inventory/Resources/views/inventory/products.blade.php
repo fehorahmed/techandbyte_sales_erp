@@ -18,7 +18,6 @@
                                         <th>Product</th>
                                         <th>Batch No</th>
                                         <th>Quantity</th>
-
                                         <th>Action</th>
                                     </tr>
                                 </thead>

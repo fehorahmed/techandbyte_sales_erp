@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Modules\Account\Entities\AccCoa;
 use Modules\Account\Entities\AccountHeadSubType;
 use Modules\Account\Entities\AccSubcode;
+use Modules\Account\Entities\Cash;
 use Modules\Customer\Entities\Customer;
 use Modules\Inventory\Entities\Inventory;
 use Modules\Product\Entities\Product;
@@ -17,6 +18,12 @@ use Modules\Account\Entities\AccountHeadType;
 
 class CommonController extends Controller
 {
+    public function cash()
+    {
+        $cash = Cash::first();
+        return view('cash.all',compact('cash'));
+    }
+
     public function productsJson(Request $request)
     {
         if (!$request->searchTerm) {

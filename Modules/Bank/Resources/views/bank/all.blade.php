@@ -53,7 +53,7 @@
                     {data: 'ac_name', name: 'ac_name'},
                     {data: 'ac_number', name: 'ac_number'},
                     {data: 'branch', name: 'branch'},
-                    {data: 'balance', name: 'balance'},
+                    {data: 'amount', name: 'amount'},
                     {data: 'signature_pic', name: 'signature_pic'},
                     {data: 'action', name: 'action', orderable: false},
                 ],

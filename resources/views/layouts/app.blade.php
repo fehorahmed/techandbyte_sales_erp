@@ -244,17 +244,28 @@
                                         <span class="pcoded-mtext">Dashboard</span>
                                     </a>
                                 </li>
+                                <?php
+                                $menu = [
+                                    'cash'
+                                ];
+                                ?>
+                                <li class="{{ Route::currentRouteName() == 'cash' ? 'active' : '' }}">
+                                    <a href="{{ route('cash') }}">
+                                        <span class="pcoded-micon"><i class="feather icon-briefcase"></i></span>
+                                        <span class="pcoded-mtext">Cash</span>
+                                    </a>
+                                </li>
+                                @include('bank::layouts.menu_list')
                                 @include('supplier::layouts.menu_list')
-                                {{-- @include('customer::layouts.menu_list') --}}
                                 @include('warehouse::layouts.menu_list')
                                 @include('client::layouts.menu_list')
                                 @include('product::layouts.menu_list')
                                 @include('purchase::layouts.menu_list')
                                 @include('inventory::layouts.menu_list')
+                                @include('customer::layouts.menu_list')
                                 @include('sale::layouts.menu_list')
                                 @include('account::layouts.menu_list')
                                 @include('loan::layouts.menu_list')
-                                @include('bank::layouts.menu_list')
                                 @include('promotion::layouts.menu_list')
                                 @include('task::layouts.menu_list')
                             </ul>

@@ -297,28 +297,35 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label>Sale Details</label>
-                                                    <textarea class="form-control is-valid-border" name="inva_details"></textarea>
-                                                </div>
-                                                <div class="form-group">
                                                     <label>Payment Type</label>
-                                                    <select class="form-control is-valid-border select2"
-                                                        id="modal-pay-type" name="payment_type">
-                                                        @foreach ($paymentCodes as $paymentCode)
-                                                            <option value="{{ $paymentCode->id }}"
-                                                                {{ old('payment_type') == $paymentCode->id ? 'selected' : '' }}
-                                                                data-isBank="{{ $paymentCode->isBankNature }}">
-                                                                {{ $paymentCode->HeadName }}</option>
-                                                        @endforeach
+                                                    <select class="form-control is-valid-border select2" name="payment_type" id="payment_type">
+                                                        <option value="">Select Option</option>
+                                                        <option value="1" {{ old('payment_type') == '1' ? 'selected' : '' }}>Cash</option>
+                                                        <option value="2" {{ old('payment_type') == '2' ? 'selected' : '' }}>Bank</option>
                                                     </select>
                                                 </div>
                                                 <div id="isBankNature">
                                                     <div class="form-group">
-                                                        <label>Cheque No.</label>
-                                                        <input class="form-control is-valid-border" type="text"
-                                                            name="cheque_no" placeholder="Enter Cheque No."
-                                                            value="{{ old('cheque_no') }}">
+                                                        <label>Bank</label>
+                                                        <select class="form-control is-valid-border select2" name="bank">
+                                                            <option value="">Select Bank</option>
+                                                            @foreach($banks as $bank)
+                                                                <option value="{{ $bank->id }}"{{ old('bank') == $bank->id ? ' selected' : '' }}>{{ $bank->bank_name }} (Ac : {{$bank->ac_number}})</option>
+                                                            @endforeach
+                                                        </select>
                                                     </div>
+                                                    <div class="form-group">
+                                                        <label>Cheque No.</label>
+                                                        <input class="form-control is-valid-border" type="text" name="cheque_no" placeholder="Enter Cheque No." value="{{ old('cheque_no') }}">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label>Cheque Image.</label>
+                                                        <input type="file" name="cheque_image" class="form-control value="{{ old('cheque_image') }}">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Sale Details</label>
+                                                    <textarea class="form-control is-valid-border" name="inva_details"></textarea>
                                                 </div>
 
                                             </div>
@@ -348,22 +355,7 @@
                                                             </div>
                                                         </td>
                                                     </tr>
-                                                    {{-- <tr>
-                                                        <th colspan="4" class="text-right">Total Discount</th>
-                                                        <th>
-                                                            <input type="text" step="any"
-                                                                class="form-control total_discount is-valid-border"
-                                                                name="total_discount" readonly>
-                                                        </th>
-                                                    </tr> --}}
-                                                    {{-- <tr>
-                                                        <th colspan="4" class="text-right">Total Vat</th>
-                                                        <th>
-                                                            <input type="text" step="any"
-                                                                class="form-control total_vat is-valid-border"
-                                                                name="total_vat" readonly>
-                                                        </th>
-                                                    </tr> --}}
+
                                                     <tr>
                                                         <th colspan="4" class="text-right">Grand Total</th>
                                                         <th>
@@ -444,28 +436,7 @@
                             name="quantity[]">
                     </div>
                 </td>
-                {{-- <td>
-                    <div class="form-group">
-                        <input type="text" class="form-control discount_percent is-valid-border"
-                            name="discount_percent[]">
-                    </div>
-                </td>
-                <td>
-                    <div class="form-group">
-                        <input type="text" class="form-control discount_value is-valid-border" name="discount_value[]"
-                            readonly>
-                    </div>
-                </td>
-                <td>
-                    <div class="form-group">
-                        <input type="text" class="form-control vat_percent is-valid-border" name="vat_percent[]">
-                    </div>
-                </td>
-                <td>
-                    <div class="form-group">
-                        <input type="text" class="form-control vat_value is-valid-border" name="vat_value[]" readonly>
-                    </div>
-                </td> --}}
+
                 <td class="total-cost" style="vertical-align: middle">৳0.00</td>
                 <td class="text-center">
                     <a role="button" class="btn-sm btn-remove" style="cursor: pointer;"><i
@@ -593,15 +564,15 @@
                 }
             });
 
-            $('#modal-pay-type').change(function() {
-                $isBank = $('option:selected', this).attr('data-isBank');
-                if ($isBank == 1) {
+            $('#payment_type').change(function() {
+
+                if ($(this).val() == '2') {
                     $('#isBankNature').show();
                 } else {
                     $('#isBankNature').hide();
                 }
             });
-            $('#modal-pay-type').trigger('change');
+            $('#payment_type').trigger('change');
 
             $('#add_new_customer_form').click(function() {
                 $('#newCustomerModal').modal('show');

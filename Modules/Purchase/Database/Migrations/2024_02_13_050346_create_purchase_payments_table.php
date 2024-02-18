@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('purchase_payments', function (Blueprint $table) {
             $table->id();
+            $table->bigInteger('supplier_id');
             $table->foreignId('product_purchase_id');
             $table->foreignId('inventory_order_id')->nullable();
             $table->tinyInteger('transaction_method')->comment('1=Cash; 2=Bank');

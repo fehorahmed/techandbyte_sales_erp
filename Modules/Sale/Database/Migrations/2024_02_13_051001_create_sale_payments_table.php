@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('sale_payments', function (Blueprint $table) {
             $table->id();
+            $table->bigInteger('customer_id');
             $table->foreignId('invoice_id');
             $table->tinyInteger('transaction_method')->comment('1=Cash; 2=Bank; 3=Mobile Banking');
             $table->foreignId('bank_id')->nullable();

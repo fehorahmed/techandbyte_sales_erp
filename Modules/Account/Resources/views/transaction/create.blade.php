@@ -98,7 +98,7 @@
                                 <div class="form-group row">
                                     <label class="col-sm-2 col-form-label text-right">Cheque Image </label>
                                     <div class="col-sm-8">
-                                        <input type="file" name="cheque_image" class="form-control value="{{ old('cheque_image') }}">
+
                                         @error('cheque_image')
                                         <span class="help-block">{{ $message }}</span>
                                         @enderror

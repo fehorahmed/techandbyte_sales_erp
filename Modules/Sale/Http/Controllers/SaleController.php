@@ -6,12 +6,16 @@ use Carbon\Carbon;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
 use Modules\Account\Entities\AccCoa;
 use Modules\Account\Entities\AccMonthlyBalance;
 use Modules\Account\Entities\AccPredefineAccount;
 use Modules\Account\Entities\AccSubcode;
 use Modules\Account\Entities\AccTransaction;
 use Modules\Account\Entities\AccVoucher;
+use Modules\Account\Entities\Cash;
+use Modules\Account\Entities\TransactionLog;
+use Modules\Bank\Entities\Bank;
 use Modules\Customer\Entities\Customer;
 use Modules\Inventory\Entities\Inventory;
 use Modules\Inventory\Entities\InventoryLog;
@@ -19,6 +23,8 @@ use Modules\Product\Entities\Product;
 use Modules\Purchase\Entities\ProductPurchaseDetail;
 use Modules\Sale\Entities\Invoice;
 use Modules\Sale\Entities\InvoiceDetail;
+use Modules\Sale\Entities\SalePayment;
+use Ramsey\Uuid\Uuid;
 use Yajra\DataTables\Facades\DataTables;
 
 class SaleController extends Controller
@@ -27,8 +33,8 @@ class SaleController extends Controller
     {
 
         $customers = Customer::orderBy('name', 'desc')->get();
-        $paymentCodes = AccCoa::where('isBankNature', 1)->orWhere('isCashNature', 1)->where('HeadLevel', 4)->where('IsActive', 1)->orderBy('HeadName')->get();
-        return view('sale::sale.add_sale', compact('customers', 'paymentCodes'));
+        $banks = Bank::get();
+        return view('sale::sale.add_sale', compact('customers', 'banks'));
     }
 
     public function saleReceiptDatatable()
@@ -73,7 +79,6 @@ class SaleController extends Controller
     public function addSalePost(Request $request)
     {
 
-
         $rules = [
             'customer' => 'required',
             'lc_no' => 'nullable',
@@ -90,7 +95,7 @@ class SaleController extends Controller
 
 
         $request->validate($rules);
-        // dd($request->all());
+
         $counter1 = 0;
         foreach ($request->product as $reqProduct) {
 
@@ -102,16 +107,9 @@ class SaleController extends Controller
             $counter1++;
         }
 
+        try {
 
-
-        if ($request->paid == 0) {
-            $is_credit = 1;
-        } else {
-            $is_credit = '';
-        }
-        //        $is_fixed   = 1;
-        //        $is_dynamic = 0;
-        //        $paid_tax = $request->total_vat;
+            DB::beginTransaction();
 
         $invoice_no = Invoice::max('invoice');
         if ($invoice_no) {
@@ -119,6 +117,7 @@ class SaleController extends Controller
         } else {
             $invoice_no = 1000;
         }
+
 
         $invoice = new Invoice();
         $invoice->customer_id = $request->customer;
@@ -140,21 +139,15 @@ class SaleController extends Controller
         $counter = 0;
         $subTotal = 0;
         $sumVal = 0;
-        $productDiscount = 0;
+
 
 
         foreach ($request->product as $reqProduct) {
 
             $product = Product::where('id', $reqProduct)->first();
 
-            // $inventory = ProductPurchaseDetail::where('product_id', $product->id)->where('batch_id', $request->batch_no[$counter])->first();
             $inventory = Inventory::where('product_id', $product->id)->where('batch_no', $request->batch_name[$counter])->first();
-            // $purchaseAverageRate = ProductPurchaseDetail::where('product_id', $product->id)
-            //     ->selectRaw('product_id, AVG(rate) as product_rate')
-            //     ->groupBy('product_id')
-            //     ->first();
-            // dd($inventory,$request->batch_no[$counter]);
-            // dd($inventory);
+
             $invoiceDetail = new InvoiceDetail();
             $invoiceDetail->invoice_id = $invoice->id;
             $invoiceDetail->product_id = $product->id;
@@ -162,18 +155,12 @@ class SaleController extends Controller
             $invoiceDetail->quantity = $request->quantity[$counter];
 
             $invoiceDetail->batch_id = $request->batch_no[$counter];
-            // $invoiceDetail->discount_per = $request->discount_percent[$counter];
-            // $invoiceDetail->discount = $request->discount_value[$counter];
-            // $invoiceDetail->vat_amnt_per = $request->vat_percent[$counter];
-            // $invoiceDetail->vat_amnt = $request->vat_value[$counter];
-            // $invoiceDetail->total_price = ($request->quantity[$counter] * $request->product_rate[$counter]) - $request->discount_value[$counter];
+
             $invoiceDetail->total_price = ($request->quantity[$counter] * $request->product_rate[$counter]);
             $invoiceDetail->save();
 
-
-            // $subTotal += $invoiceDetail->total_price + $request->vat_value[$counter];
             $subTotal += $invoiceDetail->total_price;
-            // $productDiscount += $invoiceDetail->discount;
+
 
             $inventory->quantity = $inventory->quantity - $request->quantity[$counter];
             if ($inventory->save()) {
@@ -198,119 +185,77 @@ class SaleController extends Controller
 
         $invoice->save();
 
-        //Insert Tax
+        // Sales Payment
+        if ($request->paid > 0) {
+            if ($request->payment_type == 1 ) {
+                $payment = new SalePayment();
+                $payment->invoice_id = $invoice->id;
+                $payment->customer_id = $request->customer;
+                $payment->transaction_method = $request->payment_type;
+                $payment->amount = $request->paid;
+                $payment->date = Carbon::parse($request->date)->format('Y-m-d');
+                $payment->save();
 
-        //        if($tax_v > 0){
-        //            $this->db->insert('tax_collection',$taxdata);
-        //        }
+                Cash::first()->increment('amount', $request->paid);
 
-        $predefineAccount  = AccPredefineAccount::first();
-        $Narration          = "Sales Voucher";
-        $Comment            = "Sales Voucher for customer";
-        $reVID              = $predefineAccount->salesCode;
+                $log = new TransactionLog();
+                $log->date = Carbon::parse($request->date)->format('Y-m-d');
+                $log->particular = 'Payment for ' . $invoice_no;
+                $log->transaction_type = 1;
+                $log->transaction_method = $request->payment_type;
+                $log->amount = $request->paid;
+                $log->sale_payment_id = $payment->id;
+                $log->save();
+            } else {
+                $image = 'img/no_image.png';
 
-        $invoice_id = $invoice->id;
+                if ($request->cheque_image) {
+                    $image = 'img/no_image.png';
 
-        if ($request->paid == 0) {
-            $amountPay = $invoice->total_amount;
-            $amountType = 'Debit';
-            $COAID      = $predefineAccount->customerCode;
-            $subCode   = AccSubcode::where('referenceNo', $request->customer)->where('subTypeId', 3)->first();
-            $subCodeId = $subCode->id;
-            $this->insertSaleCreditVoucher($is_credit, $invoice_id, $COAID, $amountType, $amountPay, $Narration, $Comment, $reVID, $subCodeId);
-        } else {
-            $amountType = 'Credit';
-            $paymentCodes = AccCoa::where('id', $request->payment_type)->first();
-            $COAID = $paymentCodes->HeadCode;
-            $amount_pay = $request->paid;
-            $this->insertSaleCreditVoucher($is_credit, $invoice_id, $COAID, $amountType, $amount_pay, $Narration, $Comment, $reVID);
-        }
-
-        // for inventory & cost of goods sold start
-        $goodsCOAID     = $predefineAccount->costs_of_good_solds;
-        $purchasevalue  = $sumVal;
-        $goodsNarration = "Sales cost of goods Voucher";
-        $goodsComment   = "Sales cost of goods Voucher for customer";
-        $goodsreVID     = $predefineAccount->inventoryCode;
-
-        $this->insertSaleInventoryVoucher($invoice_id, $goodsCOAID, $purchasevalue, $goodsNarration, $goodsComment, $goodsreVID);
-
-        //Debit Transaction Voucher
-        $vouchers = AccVoucher::where('referenceNo', $invoice_id)->where('status', 0)->get();
-        $ApprovedBy = auth()->user()->id;
-
-        if ($vouchers) {
-            foreach ($vouchers as $voucher) {
-                $accTransaction = new AccTransaction();
-                $accTransaction->vid   =  $voucher->id;
-                $accTransaction->fyear = $voucher->fyear;
-                $accTransaction->VNo   =  $voucher->VNo;
-                $accTransaction->Vtype =  $voucher->Vtype;
-                $accTransaction->referenceNo  =  $voucher->referenceNo;
-                $accTransaction->VDate =  $voucher->VDate;
-                $accTransaction->COAID =  $voucher->COAID;
-                $accTransaction->Narration =  $voucher->Narration;
-                $accTransaction->chequeNo  =  $voucher->chequeNo ? $voucher->chequeNo : '';
-                $accTransaction->chequeDate =  $voucher->chequeDate;
-                $accTransaction->isHonour   =  $voucher->isHonour;
-                $accTransaction->ledgerComment  =  $voucher->ledgerComment;
-                $accTransaction->Debit  =  $voucher->Debit;
-                $accTransaction->Credit  =  $voucher->Credit;
-                $accTransaction->StoreID  =  0;
-                $accTransaction->IsPosted =  1;
-                $accTransaction->RevCodde =  $voucher->RevCodde;
-                $accTransaction->subType  =  $voucher->subType;
-                $accTransaction->subCode  =  $voucher->subCode;
-                $accTransaction->IsAppoved =  1;
-                $accTransaction->CreateBy = $ApprovedBy;
-                $accTransaction->save();
-            }
-
-            //Update Monthly record
-
-            if ($accTransaction) {
-
-                $this->storeTransactionSummery($voucher->COAID, $voucher->VDate);
-
-                foreach ($vouchers as $voucher) {
-                    $reverseAccTransaction = new AccTransaction();
-                    $reverseAccTransaction->vid   =  $voucher->id;
-                    $reverseAccTransaction->fyear = $voucher->fyear;
-                    $reverseAccTransaction->VNo   =  $voucher->VNo;
-                    $reverseAccTransaction->Vtype =  $voucher->Vtype;
-                    $reverseAccTransaction->referenceNo  =  $voucher->referenceNo;
-                    $reverseAccTransaction->VDate =  $voucher->VDate;
-                    $reverseAccTransaction->COAID =  $voucher->RevCodde;
-                    $reverseAccTransaction->Narration =  $voucher->Narration;
-                    $reverseAccTransaction->chequeNo  =  $voucher->chequeNo ? $voucher->chequeNo : '';
-                    $reverseAccTransaction->chequeDate =  $voucher->chequeDate;
-                    $reverseAccTransaction->isHonour   =  $voucher->isHonour;
-                    $reverseAccTransaction->ledgerComment  =  $voucher->ledgerComment;
-                    $reverseAccTransaction->Debit  =  $voucher->Credit;
-                    $reverseAccTransaction->Credit  =  $voucher->Debit;
-                    $reverseAccTransaction->StoreID  =  0;
-                    $reverseAccTransaction->IsPosted =  1;
-                    $reverseAccTransaction->RevCodde =  $voucher->COAID;
-                    $reverseAccTransaction->subType  =  $voucher->subType;
-                    $reverseAccTransaction->subCode  =  $voucher->subCode;
-                    $reverseAccTransaction->IsAppoved =  1;
-                    $reverseAccTransaction->CreateBy = $ApprovedBy;
-                    $reverseAccTransaction->save();
+                    $file = $request->file('cheque_image');
+                    $filename = Uuid::uuid1()->toString() . '.' . $file->extension();
+                    $destinationPath = 'uploads/transaction_cheque';
+                    $file->move($destinationPath, $filename);
+                    $image = 'uploads/transaction_cheque/' . $filename;
                 }
 
-                $this->storeTransactionSummery($voucher->RevCodde, $voucher->VDate);
+                $payment = new SalePayment();
+                $payment->invoice_id = $invoice->id;
+                $payment->customer_id = $request->customer;
+                $payment->transaction_method = 2;
+                $payment->bank_id = $request->bank;
+                $payment->cheque_no = $request->cheque_no;
+                $payment->cheque_image = $image;
+                $payment->amount = $request->paid;
+                $payment->date = Carbon::parse($request->date)->format('Y-m-d');
+                $payment->save();
+
+                Bank::find($request->bank)->increment('amount', $request->paid);
+
+
+                $log = new TransactionLog();
+                $log->date = Carbon::parse($request->date)->format('Y-m-d');
+                $log->particular = 'Payment for ' . $invoice_no;
+                $log->transaction_type = 1;
+                $log->transaction_method = 2;
+                $log->bank_id = $request->bank;
+                $log->cheque_no = $request->cheque_no;
+                $log->cheque_image = $image;
+                $log->amount = $request->paid;
+                $log->sale_payment_id = $payment->id;
+                $log->save();
             }
         }
 
-        foreach ($vouchers as $voucher) {
-            $voucher->isApproved = 1;
-            $voucher->approvedBy = $ApprovedBy;
-            $voucher->status = 1;
-            $voucher->save();
+            DB::commit();
+            return redirect()->route('sale.sale_receipt_all');
+        }catch (\Exception $exception) {
+            DB::rollBack();
+            dd($exception);
+            return redirect()->back()->with('error', $exception)->withInput();
         }
 
-        //        return redirect()->route('purchase.purchase_receipt.details', ['order' => $invoice->id]);
-        return redirect()->route('sale.sale_receipt_all');
+
     }
 
     public function saleReceipt()

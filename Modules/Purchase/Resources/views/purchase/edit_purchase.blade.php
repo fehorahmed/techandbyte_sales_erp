@@ -89,18 +89,12 @@
                                 <table class="table table-bordered table-striped">
                                     <thead>
                                     <tr>
-                                        <th style="white-space: nowrap" width="30%">Product<span
-                                                class="text-danger">*</span></th>
+                                        <th style="white-space: nowrap" width="30%">Product<span class="text-danger">*</span></th>
                                         <th style="white-space: nowrap" width="15%">Stock/Qty</th>
                                         <th style="white-space: nowrap" width="15%">Unit</th>
                                         <th style="white-space: nowrap" width="20%">Rate<span class="text-danger">*</span></th>
-                                        <th style="white-space: nowrap" width="20%">Quantity<span
-                                                class="text-danger">*</span></th>
+                                        <th style="white-space: nowrap" width="20%">Quantity<span class="text-danger">*</span></th>
                                         <th style="white-space: nowrap" width="20%">Selling Rate<span class="text-danger">*</span></th>
-                                        {{-- <th style="white-space: nowrap" width="20%">Discount(%)</th>
-                                        <th style="white-space: nowrap" width="20%">Discount Value</th>
-                                        <th style="white-space: nowrap" width="20%">Vat(%)</th>
-                                        <th style="white-space: nowrap" width="20%">Vat Value</th> --}}
                                         <th style="white-space: nowrap" width="15%">Total Cost</th>
                                         <th></th>
                                     </tr>
@@ -116,21 +110,11 @@
                                                                 id="product" name="product[]" required>
                                                             <option value="">Select Product</option>
                                                             @if (old('product.' . $loop->index) != '')
-                                                                <option value="{{ old('product.' . $loop->index) }}"
-                                                                        selected>{{ old('product_name.' . $loop->index) }}
-                                                                </option>
+                                                                <option value="{{ old('product.' . $loop->index) }}" selected>{{ old('product_name.' . $loop->index) }}</option>
                                                             @endif
                                                         </select>
                                                     </div>
                                                 </td>
-{{--                                                 <td>--}}
-{{--                                                    <div--}}
-{{--                                                        class="form-group {{ $errors->has('batch_no.' . $loop->index) ? 'has-error' : '' }}">--}}
-{{--                                                        <input type="text" step="any"--}}
-{{--                                                            class="form-control batch_no" name="batch_no[]"--}}
-{{--                                                            value="{{ old('batch_no.' . $loop->index) }}">--}}
-{{--                                                    </div>--}}
-{{--                                                </td>--}}
                                                 <td>
                                                     <div
                                                         class="form-group {{ $errors->has('stock.' . $loop->index) ? 'has-error' : '' }}">
@@ -169,39 +153,6 @@
                                                         <input type="text" class="form-control selling_rate" name="selling_rate[]" value="{{ old('selling_rate.' . $loop->index) }}">
                                                     </div>
                                                 </td>
-                                                {{-- <td>
-                                                    <div
-                                                        class="form-group {{ $errors->has('discount_percent.' . $loop->index) ? 'has-error' : '' }}">
-                                                        <input type="text" class="form-control discount_percent"
-                                                            name="discount_percent[]"
-                                                            value="{{ old('discount_percent.' . $loop->index) }}">
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div
-                                                        class="form-group {{ $errors->has('discount_value.' . $loop->index) ? 'has-error' : '' }}">
-                                                        <input type="text" class="form-control discount_value"
-                                                            name="discount_value[]"
-                                                            value="{{ old('discount_value.' . $loop->index) }}"
-                                                            readonly>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div
-                                                        class="form-group {{ $errors->has('vat_percent.' . $loop->index) ? 'has-error' : '' }}">
-                                                        <input type="text" class="form-control vat_percent"
-                                                            name="vat_percent[]"
-                                                            value="{{ old('vat_percent.' . $loop->index) }}">
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div
-                                                        class="form-group {{ $errors->has('vat_value.' . $loop->index) ? 'has-error' : '' }}">
-                                                        <input type="text" class="form-control vat_value"
-                                                            name="vat_value[]"
-                                                            value="{{ old('vat_value.' . $loop->index) }}" readonly>
-                                                    </div>
-                                                </td> --}}
                                                 <td class="total-cost" style="vertical-align: middle">৳0.00</td>
                                                 <td class="text-center">
                                                     <a role="button" class="btn-sm btn-remove"
@@ -229,13 +180,6 @@
                                                         </div>
                                                     </td>
 
-{{--                                                     <td>--}}
-{{--                                                        <div class="form-group">--}}
-{{--                                                            <input type="text" step="any"--}}
-{{--                                                                class="form-control batch_no is-valid-border"--}}
-{{--                                                                name="batch_no[]">--}}
-{{--                                                        </div>--}}
-{{--                                                    </td>--}}
                                                     <td>
                                                         <div class="form-group">
                                                             <input type="text" step="any"
@@ -266,34 +210,6 @@
                                                             <input type="text" class="form-control selling_rate is-valid-border" value="" name="selling_rate[]">
                                                         </div>
                                                     </td>
-                                                    {{-- <td>
-                                                        <div class="form-group">
-                                                            <input type="text"
-                                                                class="form-control discount_percent is-valid-border"
-                                                                name="discount_percent[]">
-                                                        </div>
-                                                    </td> --}}
-                                                    {{-- <td>
-                                                        <div class="form-group">
-                                                            <input type="text"
-                                                                class="form-control discount_value is-valid-border"
-                                                                name="discount_value[]" readonly>
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <div class="form-group">
-                                                            <input type="text"
-                                                                class="form-control vat_percent is-valid-border"
-                                                                name="vat_percent[]">
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <div class="form-group">
-                                                            <input type="text"
-                                                                class="form-control vat_value is-valid-border"
-                                                                name="vat_value[]" readonly>
-                                                        </div>
-                                                    </td> --}}
                                                     <td class="total-cost" style="vertical-align: middle">৳0.00</td>
                                                     <td class="text-center">
                                                         <a role="button" class="btn-sm btn-remove"
@@ -331,59 +247,36 @@
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label>Payment Type</label>
-                                                    <select class="form-control is-valid-border select2"
-                                                            id="modal-pay-type" name="payment_type">
-                                                        @foreach ($paymentCodes as $paymentCode)
-                                                            <option value="{{ $paymentCode->id }}"
-                                                                    {{ old('payment_type') == $paymentCode->id ? 'selected' : '' }}
-                                                                    data-isBank="{{ $paymentCode->isBankNature }}">
-                                                                {{ $paymentCode->HeadName }}</option>
-                                                        @endforeach
+                                                    <select class="form-control is-valid-border select2" name="payment_type" id="payment_type">
+                                                        <option value="">Select Option</option>
+                                                        <option value="1" {{ old('payment_type') == '1' ? 'selected' : '' }}>Cash</option>
+                                                        <option value="2" {{ old('payment_type') == '2' ? 'selected' : '' }}>Bank</option>
                                                     </select>
                                                 </div>
                                                 <div id="isBankNature">
                                                     <div class="form-group">
+                                                        <label>Bank</label>
+                                                        <select class="form-control is-valid-border select2" name="bank">
+                                                            <option value="">Select Bank</option>
+                                                            @foreach($banks as $bank)
+                                                                <option value="{{ $bank->id }}"{{ old('bank') == $bank->id ? ' selected' : '' }}>{{ $bank->bank_name }} (Ac : {{$bank->ac_number}})</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-group">
                                                         <label>Cheque No.</label>
-                                                        <input class="form-control is-valid-border" type="text"
-                                                               name="cheque_no" placeholder="Enter Cheque No."
-                                                               value="{{ old('cheque_no') }}">
+                                                        <input class="form-control is-valid-border" type="text" name="cheque_no" placeholder="Enter Cheque No." value="{{ old('cheque_no') }}">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label>Cheque Image.</label>
+                                                        <input type="file" name="cheque_image" class="form-control value="{{ old('cheque_image') }}">
                                                     </div>
                                                 </div>
                                             </div>
 
                                             <div class="col-md-6">
                                                 <table class="table table-bordered">
-                                                    {{-- <tr>
-                                                        <th colspan="4" class="text-right">Sub Total </th>
-                                                        <th id="product_sub_total"> ৳0.00 </th>
-                                                    </tr> --}}
-                                                    {{-- <tr>
-                                                        <th colspan="4" class="text-right">Purchase Discount (Tk/%)
-                                                        </th>
-                                                        <td>
-                                                            <div class="form-group">
-                                                                <input type="text"
-                                                                    class="form-control {{ $errors->has('discount') ? 'is-invalid' : 'is-valid-border' }}"
-                                                                    id="discount"
-                                                                    value="{{ empty(old('discount')) ? ($errors->has('discount') ? '' : '0') : old('discount') }}">
-                                                                <span>৳<span id="purchase_discount">0.00</span></span>
-                                                                <input type="hidden" class="purchase_discount"
-                                                                    name="discount"
-                                                                    value="{{ empty(old('discount')) ? ($errors->has('discount') ? '' : '0') : old('discount') }}">
-                                                                <input type="hidden" class="discount_percentage"
-                                                                    name="discount_percentage"
-                                                                    value="{{ empty(old('discount_percentage')) ? ($errors->has('discount_percentage') ? '' : '0') : old('discount_percentage') }}">
-                                                            </div>
-                                                        </td>
-                                                    </tr> --}}
-                                                    {{-- <tr>
-                                                        <th colspan="4" class="text-right">Total Discount</th>
-                                                        <th>
-                                                            <input type="text" step="any"
-                                                                class="form-control total_discount is-valid-border"
-                                                                name="total_discount" readonly>
-                                                        </th>
-                                                    </tr> --}}
+
                                                     <tr>
                                                         <th colspan="4" class="text-right">Duty</th>
                                                         <th>
@@ -431,19 +324,21 @@
                                                     <tr>
                                                         <th colspan="4" class="text-right">Grand Total</th>
                                                         <th>
-                                                            <input type="text" step="any"
-                                                                   class="form-control grand_total_price is-valid-border"
-                                                                   name="grand_total_price" readonly>
+                                                            <input type="text" step="any" class="form-control grand_total_price is-valid-border" name="grand_total_price" readonly>
                                                         </th>
                                                     </tr>
                                                     <tr>
-                                                        <th colspan="4" class="text-right"> Paid *</th>
+                                                        <th colspan="4" class="text-right">Previous Paid</th>
+                                                        <th>
+                                                            <input type="text" step="any" class="form-control previous_paid" name="previous_paid" value="{{number_format($productPurchase->paid_amount,2)}}" readonly>
+                                                        </th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th colspan="4" class="text-right">Paid *</th>
                                                         <td>
                                                             <div
                                                                 class="form-group {{ $errors->has('paid') ? 'has-error' : '' }}">
-                                                                <input type="text" style="border: 2px solid #2a28a7"
-                                                                       class="form-control is-valid-border" name="paid"
-                                                                       id="paid" value="{{ old('paid', 0) }}" required>
+                                                                <input type="text" style="border: 2px solid #2a28a7" class="form-control is-valid-border" name="paid" id="paid" value="{{ old('paid', 0) }}" required>
                                                             </div>
                                                         </td>
                                                     </tr>
@@ -477,13 +372,6 @@
                         <input type="hidden" name="product_name[]" class="product_name">
                     </div>
                 </td>
-
-{{--                 <td>--}}
-{{--                    <div class="form-group">--}}
-{{--                        <input type="text" step="any" class="form-control is-valid-border batch_no"--}}
-{{--                            name="batch_no[]">--}}
-{{--                    </div>--}}
-{{--                </td>--}}
                 <td>
                     <div class="form-group">
                         <input type="text" step="any" class="form-control stock is-valid-border" name="stock[]"
@@ -513,28 +401,6 @@
                         <input type="text" class="form-control  is-valid-border selling_rate" name="selling_rate[]">
                     </div>
                 </td>
-                {{-- <td>
-                    <div class="form-group">
-                        <input type="text" class="form-control discount_percent is-valid-border"
-                            name="discount_percent[]">
-                    </div>
-                </td> --}}
-                {{-- <td>
-                    <div class="form-group">
-                        <input type="text" class="form-control discount_value is-valid-border" name="discount_value[]"
-                            readonly>
-                    </div>
-                </td>
-                <td>
-                    <div class="form-group">
-                        <input type="text" class="form-control vat_percent is-valid-border" name="vat_percent[]">
-                    </div>
-                </td>
-                <td>
-                    <div class="form-group">
-                        <input type="text" class="form-control vat_value is-valid-border" name="vat_value[]" readonly>
-                    </div>
-                </td> --}}
                 <td class="total-cost" style="vertical-align: middle">৳0.00</td>
                 <td class="text-center">
                     <a role="button" class="btn-sm btn-remove" style="cursor: pointer;"><i
@@ -639,15 +505,15 @@
                     calculate();
                 });
 
-            $('#modal-pay-type').change(function() {
-                $isBank = $('option:selected', this).attr('data-isBank');
-                if ($isBank == 1) {
+            $('#payment_type').change(function() {
+
+                if ($(this).val() == '2') {
                     $('#isBankNature').show();
                 } else {
                     $('#isBankNature').hide();
                 }
             });
-            $('#modal-pay-type').trigger('change');
+            $('#payment_type').trigger('change');
 
             $('#add_new_supplier_form').click(function() {
                 $('#newSupplierModal').modal('show');
@@ -700,8 +566,9 @@
 
             $(document).on('input', '#paid', function() {
                 let total = $('.grand_total_price').val();
+                let previous_paid = $('.previous_paid').val();
                 let paid = $(this).val();
-                let due = total - paid;
+                let due = total - paid - previous_paid;
                 $('#due').html('৳' + due.toFixed(2));
             });
 
@@ -770,14 +637,14 @@
             // }
             // $('.total_discount').val(productDiscountTotal + parseInt(purchase_discount_amount));
             // $('.total_vat').val(productVatTotal);
-
+            let previous_paid = $('.previous_paid').val();
             let grandTotal = parseFloat(productSubTotal + total_others);
             // $('#purchase_discount').html(parseFloat(purchase_discount_amount).toFixed(2));
 
-            $('#paid').val(grandTotal);
+            $('#paid').val(grandTotal-previous_paid);
             let paid = $('#paid').val() || 0;
 
-            let due = parseFloat(grandTotal) - parseFloat(paid);
+            let due = parseFloat(grandTotal) - parseFloat(paid)- parseFloat(previous_paid);
             if (due < 0) {
                 confirm('Due amount is not negative');
             }

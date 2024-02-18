@@ -48,10 +48,6 @@
                                                     <th>Qty</th>
                                                     <th>Purchase Rate</th>
                                                     <th>Selling Rate</th>
-                                                    {{-- <th>Discount%</th>
-                                                    <th>Dis. Value</th>
-                                                    <th>Vat %</th>
-                                                    <th>VAT Value</th> --}}
                                                     <th>Total Amount</th>
                                                 </tr>
                                                 </thead>
@@ -68,10 +64,6 @@
                                                             <td>{{ $product->quantity }}</td>
                                                             <td>{{ $product->rate }}</td>
                                                             <td>{{ $product->selling_rate }}</td>
-                                                            {{-- <td>{{ $product->discount_percent }}</td>
-                                                            <td>{{ $product->discount_amount }}</td>
-                                                            <td>{{ $product->vat_amount_percent }}</td>
-                                                            <td>{{ $product->vat_amount }}</td> --}}
                                                             <td>{{ $product->total_amount }}</td>
                                                         </tr>
                                                         @php
@@ -123,6 +115,18 @@
                                                     <tr>
                                                         <th>Total Amount</th>
                                                         <td>৳{{ number_format($inventoryOrder->grand_total_amount, 2) }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Previous Paid</th>
+                                                        <td>৳{{ number_format($inventoryOrder->previous_paid, 2) }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Paid</th>
+                                                        <td>৳{{ number_format($inventoryOrder->paid_amount, 2) }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Due</th>
+                                                        <td>৳{{ number_format($inventoryOrder->due_amount, 2) }}</td>
                                                     </tr>
                                                     </tbody>
                                                 </table>
