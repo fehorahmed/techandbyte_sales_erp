@@ -182,7 +182,7 @@ class ReportController extends Controller
     {
         //        $party_discount_amount = 0;
 
-        $clients = Customer::where('status', 1)->orderBy('name')
+        $clients = Client::where('status', 1)->orderBy('name')
             ->get();
         $clientName = '';
         $clientHistories = [];
@@ -196,7 +196,7 @@ class ReportController extends Controller
             $startDateArray = [];
             $endDateArray = [];
 
-            $clientName = $openingDue = Customer::where('id', $request->client)
+            $clientName = $openingDue = Client::where('id', $request->client)
                 ->first();
 
             $firstOrder = Invoice::where('customer_id', $request->client)
@@ -531,7 +531,7 @@ class ReportController extends Controller
             $startDateArray = [];
             $endDateArray = [];
 
-            $clientName = $openingDue = Customer::where('id', $request->client)
+            $clientName = $openingDue = Client::where('id', $request->client)
                 ->first();
 
             $firstOrder = Invoice::where('customer_id', $request->client)
