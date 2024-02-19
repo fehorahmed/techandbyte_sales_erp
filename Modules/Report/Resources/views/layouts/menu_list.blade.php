@@ -1,6 +1,6 @@
 <?php
 $menu = [
-    'report.purchase', 'report.sale','report.party_ledger','report.supplier_statement'
+    'report.purchase', 'report.sale','report.party_ledger','report.supplier_statement','report.vat_certificate_six_point_six'
 ];
 ?>
 
@@ -49,6 +49,16 @@ $menu = [
                 <span class="pcoded-micon"><i
                         class="feather {{ in_array(Route::currentRouteName(), $subMenu) ? 'icon-check-circle' : 'icon-circle' }}"></i></span>
                 <span class="pcoded-mtext">Supplier Report</span>
+            </a>
+        </li>
+        <?php
+        $subMenu = ['report.vat_certificate_six_point_six'];
+        ?>
+        <li class="{{ in_array(Route::currentRouteName(), $subMenu) ? 'active' : '' }}">
+            <a href="{{ route('report.vat_certificate_six_point_six') }}">
+                <span class="pcoded-micon"><i
+                        class="feather {{ in_array(Route::currentRouteName(), $subMenu) ? 'icon-check-circle' : 'icon-circle' }}"></i></span>
+                <span class="pcoded-mtext">Vat Certificate 6.6</span>
             </a>
         </li>
     </ul>

@@ -37,6 +37,8 @@ Route::middleware('auth')->group(function () {
     Route::get('get-account-subtype-json',[CommonController::class, 'accountSubtypeJson'])->name('get_subtype_list');
     Route::get('get-customers-json',[CommonController::class, 'customersJson'])->name('get_customers_json');
     Route::get('get-suppliers-json',[CommonController::class, 'suppliersJson'])->name('get_suppliers_json');
+       Route::get('get-client-json', [CommonController::class,'clientJson'])->name('client_json');
+
 
 });
 

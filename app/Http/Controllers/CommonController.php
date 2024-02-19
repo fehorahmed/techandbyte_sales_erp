@@ -15,7 +15,7 @@ use Modules\Product\Entities\SupplierProduct;
 use Modules\Purchase\Entities\ProductPurchaseDetail;
 use Modules\Supplier\Entities\Supplier;
 use Modules\Account\Entities\AccountHeadType;
-
+use Modules\Client\Entities\Client;
 class CommonController extends Controller
 {
     public function cash()
@@ -240,6 +240,28 @@ class CommonController extends Controller
             ->get()->toArray();
 
         return response()->json($subTypes);
+    }
+    
+      public function clientJson(Request $request)
+    {
+        if (!$request->searchTerm) {
+            $clients = Client::orderBy('name','asc')->limit(10)->get();
+        } else {
+            $clients = Client::where('name', 'like','%' . $request->searchTerm.'%')
+                ->orderBy('name','asc')
+                ->limit(50)->get();
+        }
+
+        $data = array();
+
+        foreach ($clients as $client) {
+            $data[] = [
+                'id' => $client->id,
+                'text' =>$client->name.'|'.$client->address,
+            ];
+        }
+
+        echo json_encode($data);
     }
 
 }

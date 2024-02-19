@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Modules\Client\Entities\Client;
+use Modules\Account\Entities\TransactionLog;
 use Modules\Customer\Entities\Customer;
 use Modules\Inventory\Entities\Inventory;
 use Modules\Inventory\Entities\InventoryOrder;
@@ -817,5 +818,28 @@ class ReportController extends Controller
         }
 
         return view('report::report.supplier_statement', compact('suppliers', 'allSuppliers'));
+    }
+    
+    public function vatCertificateSixPointSix(Request $request)
+    {
+
+
+        $vats = [];
+        $selectParty = null;
+
+        if ($request->party) {
+            $selectParty = Client::where('id', $request->party)->first();
+
+
+            $query = TransactionLog::where('id', $request->party);
+            if ($request->start && $request->start != '' && $request->end && $request->end != '') {
+                $query->whereBetween('date', [Carbon::parse($request->start)->format('Y-m-d'), Carbon::parse($request->end)->format('Y-m-d')]);
+            }
+            $vats = $query->orderBy('date')->get();
+
+        }
+
+
+        return view('report::report.vat_certificate_six_point_six', compact('vats', 'selectParty'));
     }
 }
