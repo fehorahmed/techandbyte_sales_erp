@@ -12,5 +12,6 @@
     "Loan": true,
     "Task": true,
     "Migrate": true,
-    "Inventory": true
+    "Inventory": true,
+    "Report": true
 }

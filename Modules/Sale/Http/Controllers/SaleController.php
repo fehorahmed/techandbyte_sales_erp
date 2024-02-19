@@ -16,6 +16,7 @@ use Modules\Account\Entities\AccVoucher;
 use Modules\Account\Entities\Cash;
 use Modules\Account\Entities\TransactionLog;
 use Modules\Bank\Entities\Bank;
+use Modules\Client\Entities\Client;
 use Modules\Customer\Entities\Customer;
 use Modules\Inventory\Entities\Inventory;
 use Modules\Inventory\Entities\InventoryLog;
@@ -32,7 +33,7 @@ class SaleController extends Controller
     public function addSale()
     {
 
-        $customers = Customer::orderBy('name', 'desc')->get();
+        $customers = Client::orderBy('name', 'desc')->get();
         $banks = Bank::get();
         return view('sale::sale.add_sale', compact('customers', 'banks'));
     }
@@ -111,151 +112,159 @@ class SaleController extends Controller
 
             DB::beginTransaction();
 
-        $invoice_no = Invoice::max('invoice');
-        if ($invoice_no) {
-            $invoice_no += 1;
-        } else {
-            $invoice_no = 1000;
-        }
-
-
-        $invoice = new Invoice();
-        $invoice->customer_id = $request->customer;
-        $invoice->date = Carbon::parse($request->date)->format('Y-m-d');
-        $invoice->total_amount = round($request->grand_total_price);
-        $invoice->invoice_details = $request->inva_details;
-        $invoice->paid_amount = $request->paid;
-        $invoice->due_amount = 0;
-        $invoice->invoice = $invoice_no;
-        $invoice->total_discount = $request->discount;
-        $invoice->total_vat_amnt = $request->total_vat ?? 0;
-        $invoice->invoice_discount = 0;
-        $invoice->status = 1;
-        $invoice->payment_type = 1;
-        $invoice->save();
-
-
-
-        $counter = 0;
-        $subTotal = 0;
-        $sumVal = 0;
-
-
-
-        foreach ($request->product as $reqProduct) {
-
-            $product = Product::where('id', $reqProduct)->first();
-
-            $inventory = Inventory::where('product_id', $product->id)->where('batch_no', $request->batch_name[$counter])->first();
-
-            $invoiceDetail = new InvoiceDetail();
-            $invoiceDetail->invoice_id = $invoice->id;
-            $invoiceDetail->product_id = $product->id;
-            $invoiceDetail->rate = $request->product_rate[$counter];
-            $invoiceDetail->quantity = $request->quantity[$counter];
-
-            $invoiceDetail->batch_id = $request->batch_no[$counter];
-
-            $invoiceDetail->total_price = ($request->quantity[$counter] * $request->product_rate[$counter]);
-            $invoiceDetail->save();
-
-            $subTotal += $invoiceDetail->total_price;
-
-
-            $inventory->quantity = $inventory->quantity - $request->quantity[$counter];
-            if ($inventory->save()) {
-                //Inventory Log
-                $inv_log = new InventoryLog();
-                $inv_log->inventory_id =  $inventory->id;
-                $inv_log->order_id =  $invoice->id;
-                $inv_log->quantity =  $request->quantity[$counter];
-                $inv_log->type =  'stock_out';
-                $inv_log->remark =  'Sale Order';
-                $inv_log->save();
+            $invoice_no = Invoice::max('invoice');
+            if ($invoice_no) {
+                $invoice_no += 1;
+            } else {
+                $invoice_no = 1000;
             }
 
-            $sumVal += $request->product_rate[$counter] * $request->quantity[$counter];
 
-            $counter++;
-        }
+            $invoice = new Invoice();
+            $invoice->customer_id = $request->customer;
+            $invoice->date = Carbon::parse($request->date)->format('Y-m-d');
+            $invoice->total_amount = round($request->grand_total_price);
+            $invoice->invoice_details = $request->inva_details;
+            $invoice->paid_amount = $request->paid;
+            $invoice->due_amount = 0;
+            $invoice->invoice = $invoice_no;
+            $invoice->total_discount = $request->discount;
+            $invoice->total_vat_amnt = $request->total_vat ?? 0;
+            $invoice->invoice_discount = 0;
+            $invoice->status = 1;
+            $invoice->payment_type = 1;
+            $invoice->save();
 
-        $invoice->invoice_discount = 0;
-        $due = round($subTotal - $request->discount) - $request->paid;
-        $invoice->due_amount = $due;
 
-        $invoice->save();
 
-        // Sales Payment
-        if ($request->paid > 0) {
-            if ($request->payment_type == 1 ) {
-                $payment = new SalePayment();
-                $payment->invoice_id = $invoice->id;
-                $payment->customer_id = $request->customer;
-                $payment->transaction_method = $request->payment_type;
-                $payment->amount = $request->paid;
-                $payment->date = Carbon::parse($request->date)->format('Y-m-d');
-                $payment->save();
+            $counter = 0;
+            $subTotal = 0;
+            $sumVal = 0;
 
-                Cash::first()->increment('amount', $request->paid);
 
-                $log = new TransactionLog();
-                $log->date = Carbon::parse($request->date)->format('Y-m-d');
-                $log->particular = 'Payment for ' . $invoice_no;
-                $log->transaction_type = 1;
-                $log->transaction_method = $request->payment_type;
-                $log->amount = $request->paid;
-                $log->sale_payment_id = $payment->id;
-                $log->save();
-            } else {
-                $image = 'img/no_image.png';
 
-                if ($request->cheque_image) {
-                    $image = 'img/no_image.png';
+            foreach ($request->product as $reqProduct) {
 
-                    $file = $request->file('cheque_image');
-                    $filename = Uuid::uuid1()->toString() . '.' . $file->extension();
-                    $destinationPath = 'uploads/transaction_cheque';
-                    $file->move($destinationPath, $filename);
-                    $image = 'uploads/transaction_cheque/' . $filename;
+                $product = Product::where('id', $reqProduct)->first();
+
+                $inventory = Inventory::where('product_id', $product->id)->where('batch_no', $request->batch_name[$counter])->first();
+
+                $invoiceDetail = new InvoiceDetail();
+                $invoiceDetail->invoice_id = $invoice->id;
+                $invoiceDetail->product_id = $product->id;
+                $invoiceDetail->rate = $request->product_rate[$counter];
+                $invoiceDetail->quantity = $request->quantity[$counter];
+
+                $invoiceDetail->batch_id = $request->batch_no[$counter];
+
+                $invoiceDetail->total_price = ($request->quantity[$counter] * $request->product_rate[$counter]);
+                $invoiceDetail->save();
+
+                $subTotal += $invoiceDetail->total_price;
+
+
+                $inventory->quantity = $inventory->quantity - $request->quantity[$counter];
+                if ($inventory->save()) {
+                    //Inventory Log
+                    $inv_log = new InventoryLog();
+                    $inv_log->inventory_id =  $inventory->id;
+                    $inv_log->order_id =  $invoice->id;
+                    $inv_log->quantity =  $request->quantity[$counter];
+                    $inv_log->type =  'stock_out';
+                    $inv_log->remark =  'Sale Order';
+                    $inv_log->save();
                 }
 
-                $payment = new SalePayment();
-                $payment->invoice_id = $invoice->id;
-                $payment->customer_id = $request->customer;
-                $payment->transaction_method = 2;
-                $payment->bank_id = $request->bank;
-                $payment->cheque_no = $request->cheque_no;
-                $payment->cheque_image = $image;
-                $payment->amount = $request->paid;
-                $payment->date = Carbon::parse($request->date)->format('Y-m-d');
-                $payment->save();
+                $sumVal += $request->product_rate[$counter] * $request->quantity[$counter];
 
-                Bank::find($request->bank)->increment('amount', $request->paid);
-
-
-                $log = new TransactionLog();
-                $log->date = Carbon::parse($request->date)->format('Y-m-d');
-                $log->particular = 'Payment for ' . $invoice_no;
-                $log->transaction_type = 1;
-                $log->transaction_method = 2;
-                $log->bank_id = $request->bank;
-                $log->cheque_no = $request->cheque_no;
-                $log->cheque_image = $image;
-                $log->amount = $request->paid;
-                $log->sale_payment_id = $payment->id;
-                $log->save();
+                $counter++;
             }
-        }
+
+            $invoice->invoice_discount = 0;
+            $due = round($subTotal - $request->discount) - $request->paid;
+            $invoice->due_amount = $due;
+
+            $invoice->save();
+
+            // Sales Payment
+            if ($request->paid > 0) {
+
+                $point_amount = ($request->paid / 1000);
+                $record = Client::find($request->customer);
+                if ($record) {
+                    $record->increment('point', $point_amount);
+                    $record->save();
+                }
+
+
+
+                if ($request->payment_type == 1) {
+                    $payment = new SalePayment();
+                    $payment->invoice_id = $invoice->id;
+                    $payment->customer_id = $request->customer;
+                    $payment->transaction_method = $request->payment_type;
+                    $payment->amount = $request->paid;
+                    $payment->date = Carbon::parse($request->date)->format('Y-m-d');
+                    $payment->save();
+
+                    Cash::first()->increment('amount', $request->paid);
+
+                    $log = new TransactionLog();
+                    $log->date = Carbon::parse($request->date)->format('Y-m-d');
+                    $log->particular = 'Payment for ' . $invoice_no;
+                    $log->transaction_type = 1;
+                    $log->transaction_method = $request->payment_type;
+                    $log->amount = $request->paid;
+                    $log->sale_payment_id = $payment->id;
+                    $log->save();
+                } else {
+                    $image = 'img/no_image.png';
+
+                    if ($request->cheque_image) {
+                        $image = 'img/no_image.png';
+
+                        $file = $request->file('cheque_image');
+                        $filename = Uuid::uuid1()->toString() . '.' . $file->extension();
+                        $destinationPath = 'uploads/transaction_cheque';
+                        $file->move($destinationPath, $filename);
+                        $image = 'uploads/transaction_cheque/' . $filename;
+                    }
+
+                    $payment = new SalePayment();
+                    $payment->invoice_id = $invoice->id;
+                    $payment->customer_id = $request->customer;
+                    $payment->transaction_method = 2;
+                    $payment->bank_id = $request->bank;
+                    $payment->cheque_no = $request->cheque_no;
+                    $payment->cheque_image = $image;
+                    $payment->amount = $request->paid;
+                    $payment->date = Carbon::parse($request->date)->format('Y-m-d');
+                    $payment->save();
+
+                    Bank::find($request->bank)->increment('amount', $request->paid);
+
+
+                    $log = new TransactionLog();
+                    $log->date = Carbon::parse($request->date)->format('Y-m-d');
+                    $log->particular = 'Payment for ' . $invoice_no;
+                    $log->transaction_type = 1;
+                    $log->transaction_method = 2;
+                    $log->bank_id = $request->bank;
+                    $log->cheque_no = $request->cheque_no;
+                    $log->cheque_image = $image;
+                    $log->amount = $request->paid;
+                    $log->sale_payment_id = $payment->id;
+                    $log->save();
+                }
+            }
 
             DB::commit();
             return redirect()->route('sale.sale_receipt_all');
-        }catch (\Exception $exception) {
+        } catch (\Exception $exception) {
             DB::rollBack();
-            dd($exception);
-            return redirect()->back()->with('error', $exception)->withInput();
+
+            return redirect()->back()->with('error', $exception->getMessage())->withInput();
         }
-
-
     }
 
     public function saleReceipt()

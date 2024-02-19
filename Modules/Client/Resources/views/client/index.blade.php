@@ -21,6 +21,7 @@
                                         <th>Email</th>
                                         <th>Phone</th>
                                         <th>Address</th>
+                                        <th>Point</th>
                                         <th>Status</th>
                                         <th>Action</th>
                                     </tr>
@@ -58,6 +59,10 @@
                     {
                         data: 'address',
                         name: 'address'
+                    },
+                    {
+                        data: 'point',
+                        name: 'point'
                     },
                     {
                         data: 'status',

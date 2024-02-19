@@ -15,10 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email');
-            $table->foreignId('client_category_id');
+            $table->foreignId('client_category_id')->nullable();
             $table->string('address')->nullable();
             $table->string('phone');
-            $table->integer('point')->default(0);
+            $table->float('point', 8, 2)->default(0);
             $table->string('fax')->nullable();
             $table->string('city')->nullable();
             $table->string('state')->nullable();

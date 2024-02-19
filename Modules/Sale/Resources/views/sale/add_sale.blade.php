@@ -298,29 +298,41 @@
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label>Payment Type</label>
-                                                    <select class="form-control is-valid-border select2" name="payment_type" id="payment_type">
+                                                    <select class="form-control is-valid-border select2"
+                                                        name="payment_type" id="payment_type">
                                                         <option value="">Select Option</option>
-                                                        <option value="1" {{ old('payment_type') == '1' ? 'selected' : '' }}>Cash</option>
-                                                        <option value="2" {{ old('payment_type') == '2' ? 'selected' : '' }}>Bank</option>
+                                                        <option value="1"
+                                                            {{ old('payment_type') == '1' ? 'selected' : '' }}>Cash
+                                                        </option>
+                                                        <option value="2"
+                                                            {{ old('payment_type') == '2' ? 'selected' : '' }}>Bank
+                                                        </option>
                                                     </select>
                                                 </div>
                                                 <div id="isBankNature">
                                                     <div class="form-group">
                                                         <label>Bank</label>
-                                                        <select class="form-control is-valid-border select2" name="bank">
+                                                        <select class="form-control is-valid-border select2"
+                                                            name="bank">
                                                             <option value="">Select Bank</option>
-                                                            @foreach($banks as $bank)
-                                                                <option value="{{ $bank->id }}"{{ old('bank') == $bank->id ? ' selected' : '' }}>{{ $bank->bank_name }} (Ac : {{$bank->ac_number}})</option>
+                                                            @foreach ($banks as $bank)
+                                                                <option
+                                                                    value="{{ $bank->id }}"{{ old('bank') == $bank->id ? ' selected' : '' }}>
+                                                                    {{ $bank->bank_name }} (Ac : {{ $bank->ac_number }})
+                                                                </option>
                                                             @endforeach
                                                         </select>
                                                     </div>
                                                     <div class="form-group">
                                                         <label>Cheque No.</label>
-                                                        <input class="form-control is-valid-border" type="text" name="cheque_no" placeholder="Enter Cheque No." value="{{ old('cheque_no') }}">
+                                                        <input class="form-control is-valid-border" type="text"
+                                                            name="cheque_no" placeholder="Enter Cheque No."
+                                                            value="{{ old('cheque_no') }}">
                                                     </div>
                                                     <div class="form-group">
                                                         <label>Cheque Image.</label>
-                                                        <input type="file" name="cheque_image" class="form-control value="{{ old('cheque_image') }}">
+                                                        <input type="file" name="cheque_image"
+                                                            class="form-control value="{{ old('cheque_image') }}">
                                                     </div>
                                                 </div>
                                                 <div class="form-group">
@@ -584,7 +596,7 @@
 
                 Swal.fire({
                     title: 'Are you sure?',
-                    text: "You want to add the Customer!",
+                    text: "You want to add the Client!",
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#28a745',
@@ -595,7 +607,7 @@
                     if (result.isConfirmed) {
                         $.ajax({
                             method: "Post",
-                            url: "{{ route('customer.add_ajax_customer') }}",
+                            url: "{{ route('client.add_ajax_client') }}",
                             data: formData,
                             processData: false,
                             contentType: false,

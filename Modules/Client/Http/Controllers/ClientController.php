@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Modules\Client\Entities\Client;
 use Modules\Client\Entities\ClientCategory;
@@ -179,5 +180,46 @@ class ClientController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function addAjaxPost(Request $request)
+    {
+        $rules = [
+            'name' => 'required|string|max:255',
+            'email' => ['nullable', 'string', 'email', 'max:255', Rule::unique('customers')],
+            'phone' => 'required|string|digits:11',
+            'address' => 'nullable|string|max:255',
+        ];
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'message' => $validator->errors()->first()]);
+        }
+
+        try {
+            DB::beginTransaction();
+            $customer = new Client();
+            $customer->name = $request->name;
+            $customer->email = $request->email;
+            $customer->phone = $request->phone;
+            $customer->address = $request->address;
+            $customer->status = 1;
+            $customer->created_by = Auth::user()->id;
+            $customer->save();
+
+            // $acc_subcode = new AccSubcode();
+            // $acc_subcode->subTypeId = 4;
+            // $acc_subcode->name = $request->name;
+            // $acc_subcode->referenceNo = $customer->id;
+            // $acc_subcode->created_by = Auth::user()->id;
+            // $acc_subcode->updated_by = 0;
+            // $acc_subcode->status = 1;
+            // $acc_subcode->save();
+
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'added', 'customer' => $customer]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $e]);
+        }
     }
 }

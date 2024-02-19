@@ -29,7 +29,7 @@ class TransactionController extends Controller
 
     public function datatable()
     {
-        $query = Transaction::with('headType','subHeadType');
+        $query = Transaction::with('headType', 'subHeadType');
         return DataTables::eloquent($query)
             ->addIndexColumn()
             ->addColumn('action', function (Transaction $transaction) {
@@ -37,11 +37,9 @@ class TransactionController extends Controller
             })
             ->addColumn('headType', function (Transaction $transaction) {
                 return $transaction->headType->name ?? '';
-
             })
             ->addColumn('subHeadType', function (Transaction $transaction) {
                 return $transaction->subHeadType->name ?? '';
-
             })
             ->addColumn('transaction_type', function (Transaction $transaction) {
                 if ($transaction->transaction_type == 1)
@@ -49,13 +47,13 @@ class TransactionController extends Controller
                 else
                     return '<span class="badge badge-warning">Expense</span>';
             })
-            ->editColumn('date', function(Transaction $transaction) {
-                return date('d-m-Y',strtotime($transaction->date));
+            ->editColumn('date', function (Transaction $transaction) {
+                return date('d-m-Y', strtotime($transaction->date));
             })
             ->orderColumn('date', function ($query, $transaction) {
                 $query->orderBy('date', $transaction)->orderBy('created_at', 'desc');
             })
-            ->rawColumns(['action','transaction_type'])
+            ->rawColumns(['action', 'transaction_type'])
             ->toJson();
     }
 
@@ -65,7 +63,7 @@ class TransactionController extends Controller
     public function create()
     {
         $banks = Bank::get();
-        return view('account::transaction.create',compact('banks'));
+        return view('account::transaction.create', compact('banks'));
     }
 
     /**
@@ -97,13 +95,12 @@ class TransactionController extends Controller
 
                     if ($request->amount > $cash->amount)
                         $validator->errors()->add('amount', 'Insufficient balance.');
-                }elseif($request->payment_type == 2){
+                } elseif ($request->payment_type == 2) {
                     $bankAccount = Bank::find($request->bank);
 
                     if ($request->amount > $bankAccount->amount)
                         $validator->errors()->add('amount', 'Insufficient balance2.');
                 }
-
             }
         });
 
@@ -111,9 +108,9 @@ class TransactionController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        try{
+        try {
 
-          DB::beginTransaction();
+            DB::beginTransaction();
 
             $image = null;
             if ($request->payment_type == 2) {
@@ -135,10 +132,10 @@ class TransactionController extends Controller
             $transaction->transaction_method = $request->payment_type;
             $transaction->bank_id = $request->payment_type == 2 ? $request->bank : null;
             $transaction->cheque_no = $request->payment_type == 2 ? $request->cheque_no : null;
-            $transaction->cheque_date = date('Y-m-d',strtotime($request->cheque_date));
+            $transaction->cheque_date = date('Y-m-d', strtotime($request->cheque_date));
             $transaction->cheque_image = $image;
             $transaction->amount = $request->amount;
-            $transaction->date = date('Y-m-d',strtotime($request->date));
+            $transaction->date = date('Y-m-d', strtotime($request->date));
             $transaction->note = $request->note;
             $transaction->save();
             $transaction->receipt_no = 1000 + $transaction->id;
@@ -168,13 +165,13 @@ class TransactionController extends Controller
             $accountHeadSubType = AccountHeadSubType::find($request->account_head_sub_type);
 
             $log = new TransactionLog();
-            $log->date = date('Y-m-d',strtotime($request->date));
+            $log->date = date('Y-m-d', strtotime($request->date));
             $log->particular = $accountHeadSubType->name;
             $log->transaction_type = $request->type;
             $log->transaction_method = $request->payment_type;
             $transaction->bank_id = $request->payment_type == 2 ? $request->bank : null;
             $transaction->cheque_no = $request->payment_type == 2 ? $request->cheque_no : null;
-            $transaction->cheque_date = date('Y-m-d',strtotime($request->cheque_date));
+            $transaction->cheque_date = date('Y-m-d', strtotime($request->cheque_date));
             $transaction->cheque_image = $image;
             $log->amount = $request->amount;
             $log->note = $request->note;
@@ -183,15 +180,15 @@ class TransactionController extends Controller
 
 
             DB::commit();
-            return redirect()->route('account.transaction_all')->with('message','Transaction added');
-        }catch (\Exception $e){
+            return redirect()->route('account.transaction_all')->with('message', 'Transaction added');
+        } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error',$e)->withInput();
+            return redirect()->back()->with('error', $e->getMessage())->withInput();
         }
 
-//        return redirect()->route('transaction.details', ['transaction' => $transaction->id]);
+        //        return redirect()->route('transaction.details', ['transaction' => $transaction->id]);
 
-//        return redirect()->route('account.transaction_all')->with('message', 'Information added successfully');
+        //        return redirect()->route('account.transaction_all')->with('message', 'Information added successfully');
     }
 
     /**
@@ -209,7 +206,7 @@ class TransactionController extends Controller
     {
         $accountHeadSubType = AccountHeadSubType::findOrFail($id);
         $accountHeads = AccountHeadType::get();
-        return view('account::transaction.edit', compact('accountHeadSubType','accountHeads'));
+        return view('account::transaction.edit', compact('accountHeadSubType', 'accountHeads'));
     }
 
     /**
@@ -230,7 +227,8 @@ class TransactionController extends Controller
         return redirect()->route('account.transaction_all')->with('message', 'Information updated successfully');
     }
 
-    public function transactionDetails(Transaction $transaction) {
+    public function transactionDetails(Transaction $transaction)
+    {
         return view('account::transaction.details', compact('transaction'));
     }
 }

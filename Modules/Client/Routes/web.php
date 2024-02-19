@@ -34,4 +34,6 @@ Route::prefix('client-category')->middleware('auth')->name('client.')->group(fun
     Route::get('edit/{client_category}', [ClientCategoryController::class, 'edit'])->name('category.edit');
     Route::post('edit/{client_category}', [ClientCategoryController::class, 'update'])->name('category.update');
     Route::get('index/datatable', [ClientCategoryController::class, 'datatable'])->name('client_category_datatable');
+
+    Route::post('add-ajax-customer', [ClientController::class, 'addAjaxPost'])->name('add_ajax_client');
 });
