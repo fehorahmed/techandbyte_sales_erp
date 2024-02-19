@@ -23,7 +23,9 @@ class InventoryOrder extends Model
     public function supplier() {
         return $this->belongsTo(Supplier::class);
     }
-
+    public function sum_quantity(){
+        return $this->hasMany(InventoryOrderDetail::class)->sum('quantity');
+    }
     protected static function newFactory(): InventoryOrderFactory
     {
         //return InventoryOrderFactory::new();

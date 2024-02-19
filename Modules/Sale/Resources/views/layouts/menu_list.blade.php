@@ -1,6 +1,7 @@
 <?php
 $menu = [
-    'sale.sale_add','sale.sale_receipt_all','sale.sale_receipt_details'
+    'sale.sale_add','sale.sale_receipt_all','sale.sale_receipt_details',
+    'client.index', 'client.create', 'client.edit', 'client.category.index', 'client.category.create', 'client.category.edit'
 ];
 ?>
 
@@ -32,5 +33,6 @@ $menu = [
                 <span class="pcoded-mtext">All Order</span>
             </a>
         </li>
+        @include('client::layouts.menu_list')
     </ul>
 </li>

@@ -1,5 +1,8 @@
 <?php
-$menu = ['purchase.purchase_add', 'purchase.purchase_receipt_all', 'purchase.purchase_receipt_details'];
+$menu = [
+    'purchase.purchase_add', 'purchase.purchase_receipt_all', 'purchase.purchase_receipt_details',
+    'supplier.supplier_add','supplier.supplier_all','supplier.supplier_edit'
+];
 ?>
 
 <li class="pcoded-hasmenu {{ in_array(Route::currentRouteName(), $menu) ? 'active pcoded-trigger' : '' }}">
@@ -28,5 +31,6 @@ $menu = ['purchase.purchase_add', 'purchase.purchase_receipt_all', 'purchase.pur
                 <span class="pcoded-mtext">All Order</span>
             </a>
         </li>
+        @include('supplier::layouts.menu_list')
     </ul>
 </li>

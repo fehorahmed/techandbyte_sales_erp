@@ -185,6 +185,19 @@
             width: 120px;
             margin-left: 35%;
         }
+        
+        .pcoded .pcoded-header .navbar-logo[logo-theme=theme1] {
+            background-color: #143257;
+        }
+        .pcoded .pcoded-navbar[navbar-theme=theme1] {
+            background: #143257;
+        }
+        .pcoded .pcoded-navbar[navbar-theme=theme1] .main-menu {
+            background-color: #143257;
+        }
+        .pcoded .pcoded-navbar[navbar-theme=theme1] .pcoded-item li.pcoded-hasmenu .pcoded-submenu {
+            background: #143257;
+        }
     </style>
     @yield('style')
 </head>
@@ -244,30 +257,83 @@
                                         <span class="pcoded-mtext">Dashboard</span>
                                     </a>
                                 </li>
+                                
+                                <?php
+                                    $top_menu = [
+                                        'warehouse.index', 'warehouse.create', 'warehouse.store', 'warehouse.edit', 'warehouse.update',
+                                        'product.unit_add', 'product.unit_all', 'product.brand_all', 'product.brand_edit', 'product.brand_add', 'product.unit_edit', 'product.category_add', 'product.category_all', 'product.category_edit', 'product.sub_category_add', 'product.sub_category_all', 'product.sub_category_edit', 'product.product_add', 'product.product_all', 'product.product_edit'
+                                    ];
+                                ?>
+                                <li class="pcoded-hasmenu {{ in_array(Route::currentRouteName(), $top_menu) ? 'active pcoded-trigger' : '' }}" dropdown-icon="style1" subitem-icon="style1">
+                                    <a href="javascript:void(0)">
+                                        <span class="pcoded-micon"><i class="feather icon-user-plus"></i></span>
+                                        <span class="pcoded-mtext">Settings</span>
+                                    </a>
+                                    <ul class="pcoded-submenu">
+                                        @include('warehouse::layouts.menu_list')
+                                        @include('product::layouts.menu_list')
+                                    </ul>
+                                </li>
+                                @include('purchase::layouts.menu_list')
+                                @include('inventory::layouts.menu_list')
+                                @include('sale::layouts.menu_list')
+                                @include('task::layouts.menu_list')
+                                @include('promotion::layouts.menu_list')
+                                @include('loan::layouts.menu_list')
+                                <?php
+                                $top_menu = [
+                                     'cash','bank.bank_add','bank.bank_all','bank.bank_edit'
+                                ];
+                                ?>
+                                <li class="pcoded-hasmenu {{ in_array(Route::currentRouteName(), $top_menu) ? 'active pcoded-trigger' : '' }}" dropdown-icon="style1" subitem-icon="style1">
+                                    <a href="javascript:void(0)">
+                                        <span class="pcoded-micon"><i class="feather icon-user-plus"></i></span>
+                                        <span class="pcoded-mtext">Cash / Bank</span>
+                                    </a>
+                                    <ul class="pcoded-submenu">
+                                        <?php
+                                        $menu = [
+                                            'cash'
+                                        ];
+                                        ?>
+                                        <li class="{{ Route::currentRouteName() == 'cash' ? 'active' : '' }}">
+                                            <a href="{{ route('cash') }}">
+                                                <span class="pcoded-micon"><i class="feather icon-briefcase"></i></span>
+                                                <span class="pcoded-mtext">Cash</span>
+                                            </a>
+                                        </li>
+                                        @include('bank::layouts.menu_list')
+                                    </ul>
+                                </li>
+                                @include('account::layouts.menu_list')
+                                @include('report::layouts.menu_list')
+                                
+                                
                                 <?php
                                 $menu = [
                                     'cash'
                                 ];
                                 ?>
-                                <li class="{{ Route::currentRouteName() == 'cash' ? 'active' : '' }}">
-                                    <a href="{{ route('cash') }}">
-                                        <span class="pcoded-micon"><i class="feather icon-briefcase"></i></span>
-                                        <span class="pcoded-mtext">Cash</span>
-                                    </a>
-                                </li>
-                                @include('bank::layouts.menu_list')
-                                @include('supplier::layouts.menu_list')
-                                @include('warehouse::layouts.menu_list')
-                                @include('client::layouts.menu_list')
-                                @include('product::layouts.menu_list')
-                                @include('purchase::layouts.menu_list')
-                                @include('inventory::layouts.menu_list')
-                                @include('customer::layouts.menu_list')
-                                @include('sale::layouts.menu_list')
-                                @include('account::layouts.menu_list')
-                                @include('loan::layouts.menu_list')
-                                @include('promotion::layouts.menu_list')
-                                @include('task::layouts.menu_list')
+                                <!--<li class="{{ Route::currentRouteName() == 'cash' ? 'active' : '' }}">-->
+                                <!--    <a href="{{ route('cash') }}">-->
+                                <!--        <span class="pcoded-micon"><i class="feather icon-briefcase"></i></span>-->
+                                <!--        <span class="pcoded-mtext">Cash</span>-->
+                                <!--    </a>-->
+                                <!--</li>-->
+                                <!--@include('bank::layouts.menu_list')-->
+                                <!--@include('supplier::layouts.menu_list')-->
+                                <!--@include('warehouse::layouts.menu_list')-->
+                                <!--@include('client::layouts.menu_list')-->
+                                <!--@include('product::layouts.menu_list')-->
+                                <!--@include('purchase::layouts.menu_list')-->
+                                <!--@include('inventory::layouts.menu_list')-->
+                                <!--@include('customer::layouts.menu_list')-->
+                                <!--@include('sale::layouts.menu_list')-->
+                                <!--@include('account::layouts.menu_list')-->
+                                <!--@include('loan::layouts.menu_list')-->
+                                <!--@include('promotion::layouts.menu_list')-->
+                                <!--@include('task::layouts.menu_list')-->
+                                <!--@include('report::layouts.menu_list')-->
                             </ul>
                         </div>
                     </nav>

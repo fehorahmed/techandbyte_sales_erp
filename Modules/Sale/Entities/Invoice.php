@@ -20,7 +20,9 @@ class Invoice extends Model
         return $this->belongsTo(Customer::class);
     }
 
-
+    public function sum_quantity(){
+        return $this->hasMany(InvoiceDetail::class,'invoice_id','id')->sum('quantity');
+    }
     protected static function newFactory()
     {
         return \Modules\Sale\Database\factories\InvoiceFactory::new();
