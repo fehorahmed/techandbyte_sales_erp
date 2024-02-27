@@ -52,6 +52,28 @@ $menu = [
     </a>
     <ul class="pcoded-submenu">
         <?php
+        $subMenu = ['account.chart_of_account'];
+        ?>
+        <li class="{{ in_array(Route::currentRouteName(), $subMenu) ? 'active' : '' }}">
+            <a href="{{ route('account.chart_of_account') }}">
+                <span class="pcoded-micon"><i
+                        class="feather {{ in_array(Route::currentRouteName(), $subMenu) ? 'icon-check-circle' : 'icon-circle' }}"></i></span>
+                <span class="pcoded-mtext">Chart Of Account</span>
+            </a>
+        </li>
+        
+        <?php
+        $subMenu = ['account.financialyear_add', 'account.financialyear_all', 'account.financialyear_edit'];
+        ?>
+        <li class="{{ in_array(Route::currentRouteName(), $subMenu) ? 'active' : '' }}">
+            <a href="{{ route('account.financialyear_all') }}">
+                <span class="pcoded-micon"><i
+                        class="feather {{ in_array(Route::currentRouteName(), $subMenu) ? 'icon-check-circle' : 'icon-circle' }}"></i></span>
+                <span class="pcoded-mtext">Financial Year</span>
+            </a>
+        </li>
+        
+        <?php
         $subMenu = ['account.account_head_type_all'];
         ?>
         <li class="{{ in_array(Route::currentRouteName(), $subMenu) ? 'active' : '' }}">
@@ -85,17 +107,6 @@ $menu = [
 
 
         <?php
-        $subMenu = ['account.chart_of_account'];
-        ?>
-        <li class="{{ in_array(Route::currentRouteName(), $subMenu) ? 'active' : '' }}">
-            <a href="{{ route('account.chart_of_account') }}">
-                <span class="pcoded-micon"><i
-                        class="feather {{ in_array(Route::currentRouteName(), $subMenu) ? 'icon-check-circle' : 'icon-circle' }}"></i></span>
-                <span class="pcoded-mtext">Chart Of Account</span>
-            </a>
-        </li>
-
-        <?php
         $subMenu = ['account.sub_account_all', 'account.sub_account_add', 'account.sub_account_edit'];
         ?>
         <!--<li class="{{ in_array(Route::currentRouteName(), $subMenu) ? 'active' : '' }}">-->
@@ -117,16 +128,7 @@ $menu = [
         <!--    </a>-->
         <!--</li>-->
 
-        <?php
-        $subMenu = ['account.financialyear_add', 'account.financialyear_all', 'account.financialyear_edit'];
-        ?>
-        <li class="{{ in_array(Route::currentRouteName(), $subMenu) ? 'active' : '' }}">
-            <a href="{{ route('account.financialyear_all') }}">
-                <span class="pcoded-micon"><i
-                        class="feather {{ in_array(Route::currentRouteName(), $subMenu) ? 'icon-check-circle' : 'icon-circle' }}"></i></span>
-                <span class="pcoded-mtext">Financial Year</span>
-            </a>
-        </li>
+        
         {{--
         <?php
         $subMenu = ['account.opening_balance', 'account.opening_balance_add', 'account.opening_balance_edit'];

@@ -18,9 +18,8 @@
                     <a href="#!" onclick="javascript:toggleFullScreen()">
                         <i class="feather icon-maximize full-screen"></i>
                     </a>
-                    <a href="{{ route('purchase.purchase_add') }}"> <button class="btn btn-primary">Purchase
-                            Order</button></a>
-                    <a href="{{ route('sale.sale_add') }}"><button class="btn btn-success">Sale Order</button></a>
+                    <a href="{{ route('purchase.purchase_add') }}"> <button class="btn" style="background-color: #c00000;color: #fff;">Purchase</button></a>
+                    <a href="{{ route('sale.sale_add') }}"><button class="btn" style="background-color: #c00000;color: #fff;">Sale</button></a>
                 </li>
             </ul>
             <ul class="nav-right">
