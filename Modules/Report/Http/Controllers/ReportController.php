@@ -819,10 +819,10 @@ class ReportController extends Controller
 
         return view('report::report.supplier_statement', compact('suppliers', 'allSuppliers'));
     }
-    
+
     public function vatCertificateSixPointSix(Request $request)
     {
-
+//return($request->all());
 
         $vats = [];
         $selectParty = null;

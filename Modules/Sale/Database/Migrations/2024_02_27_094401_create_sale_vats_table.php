@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('sale_vats', function (Blueprint $table) {
             $table->id();
+            $table->bigInteger('customer_id');
             $table->foreignId('invoice_id');
             $table->float('amount',8,2);
             $table->unsignedTinyInteger('status')->comment('0=Initial, 1=Paid');

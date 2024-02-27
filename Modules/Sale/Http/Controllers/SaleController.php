@@ -25,6 +25,7 @@ use Modules\Purchase\Entities\ProductPurchaseDetail;
 use Modules\Sale\Entities\Invoice;
 use Modules\Sale\Entities\InvoiceDetail;
 use Modules\Sale\Entities\SalePayment;
+use Modules\Sale\Entities\SaleVat;
 use Ramsey\Uuid\Uuid;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -129,7 +130,7 @@ class SaleController extends Controller
             $invoice->due_amount = 0;
             $invoice->invoice = $invoice_no;
             $invoice->total_discount = $request->discount;
-            $invoice->total_vat_amnt = $request->total_vat ?? 0;
+            $invoice->total_vat_amnt = $request->vat ;
             $invoice->invoice_discount = 0;
             $invoice->status = 1;
             $invoice->payment_type = 1;
@@ -181,10 +182,20 @@ class SaleController extends Controller
             }
 
             $invoice->invoice_discount = 0;
-            $due = round($subTotal - $request->discount) - $request->paid;
+            $due = round($subTotal - $request->discount) - $request->paid + $request->vat;
             $invoice->due_amount = $due;
 
             $invoice->save();
+
+            //Vat amount
+            if($request->vat > 0){
+                $saleVat = new SaleVat();
+                $saleVat->invoice_id  = $invoice->id;
+                $saleVat->customer_id = $request->customer;
+                $saleVat->amount = $request->vat;
+                $saleVat->status = 0;
+                $saleVat->save();
+            }
 
             // Sales Payment
             if ($request->paid > 0) {
@@ -259,7 +270,7 @@ class SaleController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('sale.sale_receipt_all');
+            return redirect()->route('sale.sale_receipt_details',['invoice'=>$invoice->id]);
         } catch (\Exception $exception) {
             DB::rollBack();
 

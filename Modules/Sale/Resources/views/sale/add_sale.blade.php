@@ -349,21 +349,26 @@
                                                         <th id="product_sub_total"> ৳0.00 </th>
                                                     </tr>
                                                     <tr>
-                                                        <th colspan="4" class="text-right"> Discount (Tk)
+                                                        <th colspan="4" class="text-right"> Vat (TK/%)
                                                         </th>
                                                         <td>
                                                             <div class="form-group">
-                                                                <input type="text"
-                                                                    class="form-control {{ $errors->has('discount') ? 'is-invalid' : 'is-valid-border' }}"
-                                                                    id="discount"
-                                                                    value="{{ empty(old('discount')) ? ($errors->has('discount') ? '' : '0') : old('discount') }}">
+                                                                <input type="text" class="form-control {{ $errors->has('vat') ? 'is-invalid' : 'is-valid-border' }}" id="vat" value="{{ empty(old('vat')) ? ($errors->has('vat') ? '' : '0') : old('vat') }}">
+                                                                <span>৳<span id="vat_amount">0.00</span></span>
+                                                                <input type="hidden" class="vat_amount" name="vat" value="{{ empty(old('vat')) ? ($errors->has('vat') ? '' : '0') : old('vat') }}">
+                                                                <input type="hidden" class="vat_percentage" name="vat_percentage" value="{{ empty(old('vat_percentage')) ? ($errors->has('vat_percentage') ? '' : '0') : old('vat_percentage') }}">
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th colspan="4" class="text-right"> Discount (Tk/%)
+                                                        </th>
+                                                        <td>
+                                                            <div class="form-group">
+                                                                <input type="text" class="form-control {{ $errors->has('discount') ? 'is-invalid' : 'is-valid-border' }}" id="discount" value="{{ empty(old('discount')) ? ($errors->has('discount') ? '' : '0') : old('discount') }}">
                                                                 <span>৳<span id="purchase_discount">0.00</span></span>
-                                                                <input type="hidden" class="purchase_discount"
-                                                                    name="discount"
-                                                                    value="{{ empty(old('discount')) ? ($errors->has('discount') ? '' : '0') : old('discount') }}">
-                                                                <input type="hidden" class="discount_percentage"
-                                                                    name="discount_percentage"
-                                                                    value="{{ empty(old('discount_percentage')) ? ($errors->has('discount_percentage') ? '' : '0') : old('discount_percentage') }}">
+                                                                <input type="hidden" class="purchase_discount" name="discount" value="{{ empty(old('discount')) ? ($errors->has('discount') ? '' : '0') : old('discount') }}">
+                                                                <input type="hidden" class="discount_percentage" name="discount_percentage" value="{{ empty(old('discount_percentage')) ? ($errors->has('discount_percentage') ? '' : '0') : old('discount_percentage') }}">
                                                             </div>
                                                         </td>
                                                     </tr>
@@ -371,9 +376,7 @@
                                                     <tr>
                                                         <th colspan="4" class="text-right">Grand Total</th>
                                                         <th>
-                                                            <input type="text" step="any"
-                                                                class="form-control grand_total_price is-valid-border"
-                                                                name="grand_total_price" readonly>
+                                                            <input type="text" step="any" class="form-control grand_total_price is-valid-border" name="grand_total_price" readonly>
                                                         </th>
                                                     </tr>
                                                     <tr>
@@ -543,14 +546,10 @@
             $('.select2').select2();
             initSelect2();
             addProduct__delete();
-            $('body').on('keyup',
-                '.quantity, .product_rate,.discount_percent,.vat_percent,.product,#discount,.shipping_cost',
-                function() {
+            $('body').on('keyup', '.quantity, .product_rate,.discount_percent,.vat_percent,.product,#discount,#vat,.shipping_cost', function() {
                     calculate();
                 });
-            $('body').on('change',
-                '.quantity, .product_rate,.discount_percent,.vat_percent,.product,#discount,.shipping_cost',
-                function() {
+            $('body').on('change', '.quantity, .product_rate,.discount_percent,.vat_percent,.product,#discount,#vat,.shipping_cost', function() {
                     calculate();
                 });
 
@@ -650,6 +649,7 @@
             let productDiscountTotal = 0;
             let productVatTotal = 0;
             let discount = $("#discount").val() || "0";
+            let vat = $("#vat").val() || "0";
             let shipping_cost = $(".shipping_cost").val() || "0";
 
             $('.product-item').each(function(i) {
@@ -695,12 +695,24 @@
                 purchase_discount_amount = discount;
                 $('.discount_percentage').val(0);
             }
+
+            //vat formula
+            if (vat.includes('%')) {
+                let vat_percent = vat.split('%')[0];
+                vat_total = (productSubTotal * vat_percent) / 100;
+                $('.vat_percentage').val(vat_percent);
+            } else {
+                vat_total = vat;
+                $('.vat_percentage').val(0);
+            }
+
             $('.total_discount').val(productDiscountTotal + parseInt(purchase_discount_amount));
             $('.total_vat').val(productVatTotal);
 
             let grandTotal = parseFloat(productSubTotal) - parseFloat(purchase_discount_amount) + productVatTotal +
-                parseInt(shipping_cost);
+                parseInt(shipping_cost)+parseInt(vat_total);
             $('#purchase_discount').html(parseFloat(purchase_discount_amount).toFixed(2));
+            $('#vat_amount').html(parseFloat(vat_total).toFixed(2));
 
             $('#paid').val(grandTotal);
             let paid = $('#paid').val() || 0;
@@ -712,6 +724,7 @@
 
             $('.net_total').val(Math.round(grandTotal).toFixed(2));
             $('.purchase_discount').val(purchase_discount_amount);
+            $('.vat_amount').val(vat_total);
             $('#due').html('৳' + due.toFixed(2));
             $('#paid').val(Math.round(grandTotal.toFixed(2)));
             let change = parseFloat(paid) - Math.round(grandTotal) > 0 ? parseFloat(paid) - Math.round(grandTotal) : 0.00;

@@ -95,12 +95,12 @@
                                                             <th style="width:50%">Total:</th>
                                                             <td>৳{{ number_format($subTotal, 2) }}</td>
                                                         </tr>
-                                                        {{-- <tr>
+                                                        <tr>
                                                             <th>Total Vat</th>
                                                             <td>৳{{ number_format($invoice->total_vat_amnt, 2) }}</td>
-                                                        </tr> --}}
+                                                        </tr>
                                                         <tr>
-                                                            <th>Purchase Discount</th>
+                                                            <th>Sale Discount</th>
                                                             <td>৳{{ number_format($invoice->total_discount, 2) }}</td>
                                                         </tr>
                                                         {{-- <tr>

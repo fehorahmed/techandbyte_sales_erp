@@ -105,7 +105,7 @@
             <div class="card card-outline card-default">
                 <!-- /.card-header -->
                 <div class="card-body">
-                    <form action="" method="get">
+                    <form action="{{route('report.vat_certificate_six_point_six')}}" method="get">
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
