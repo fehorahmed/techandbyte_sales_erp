@@ -22,8 +22,10 @@ Route::prefix('report')->middleware('auth')->name('report.')->group(function () 
     Route::get('sale', [ReportController::class, 'sale'])->name('sale');
     Route::get('party-ledger', [ReportController::class,'partyLedger'])->name('party_ledger');
     Route::get('supplier-statement', [ReportController::class,'supplierStatement'])->name('supplier_statement');
-    
-     //Vat Certificate 6.6
-    Route::get('report/vat-certificate-6.6', [ReportController::class,'vatCertificateSixPointSix'])->name('vat_certificate_six_point_six');
 
+     //Vat Certificate 6.6
+    Route::get('vat-payment', [ReportController::class,'vatPayment'])->name('vat_payment');
+    Route::get('vat-register', [ReportController::class,'vatRegister'])->name('vat_register');
+    Route::get('vat-certificate-6.6', [ReportController::class,'vatCertificateSixPointSix'])->name('vat_certificate_six_point_six');
+    Route::post('vat-payout', [ReportController::class,'vatPayout'])->name('vat_payout');
 });

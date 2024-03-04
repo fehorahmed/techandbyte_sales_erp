@@ -16,6 +16,10 @@ return new class extends Migration
             $table->bigInteger('customer_id');
             $table->foreignId('invoice_id');
             $table->float('amount',8,2);
+            $table->string('date')->nullable();
+            $table->bigInteger('bank_id')->nullable();
+            $table->string('payment_date')->nullable();
+            $table->string('vat_document')->nullable();
             $table->unsignedTinyInteger('status')->comment('0=Initial, 1=Paid');
             $table->foreign('invoice_id')->on('invoices')->references('id');
             $table->timestamps();

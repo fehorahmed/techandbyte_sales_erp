@@ -193,6 +193,7 @@ class SaleController extends Controller
                 $saleVat->invoice_id  = $invoice->id;
                 $saleVat->customer_id = $request->customer;
                 $saleVat->amount = $request->vat;
+                $saleVat->date = Carbon::parse($request->date)->format('Y-m-d');
                 $saleVat->status = 0;
                 $saleVat->save();
             }

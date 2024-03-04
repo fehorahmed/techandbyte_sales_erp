@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('batch_id')->nullable();
             $table->date('expiry_date')->nullable();
             $table->decimal('total_amount',20,2)->default(0.00)->nullable();
+            $table->decimal('per_pcs_cost',50,3)->default(0.00)->nullable();
             $table->float('discount_percent',20,2)->nullable();
             $table->decimal('discount_amount',20,2)->default(0.00);
             $table->decimal('vat_amount_percent',20,2)->default(0.00);

@@ -20,3 +20,10 @@ if (! function_exists('voucherNo')) {
         return $voucherNo;
     }
 }
+
+function englishToBangla($number)
+{
+    $bn = ["১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯", "০"];
+    $en = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
+    return str_replace($en,$bn,$number);
+}

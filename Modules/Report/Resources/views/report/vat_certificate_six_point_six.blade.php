@@ -110,15 +110,23 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="start">Start Date</label>
-                                    <input type="text" value="{{ request('start') }}" autocomplete="off" name="start"
-                                           id="start" class="form-control date-picker" placeholder="Start Date">
+                                    <div class="input-group date">
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-calendar"></i>
+                                        </div>
+                                        <input type="text" class="form-control pull-right" id="start" name="start" value="{{ request()->get('start')??date('Y-m-d')  }}" autocomplete="off">
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="end">End Date</label>
-                                    <input type="text" value="{{ request('end') }}" autocomplete="off" name="end"
-                                           id="end" class="form-control date-picker" placeholder="End Date">
+                                    <div class="input-group date">
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-calendar"></i>
+                                        </div>
+                                        <input type="text" class="form-control pull-right" id="end" name="end" value="{{ request()->get('end')??date('Y-m-d')  }}" autocomplete="off">
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -198,7 +206,7 @@
                                         <p>উৎসে কর কর্তন সনদপত্র নং : ১২৩৪৫</p>
                                     </div>
                                     <div class="col-6 text-right">
-                                        <p>জারির তারিখঃ ১২/১২/২০২৩</p>
+                                        <p>জারির তারিখঃ {{ englishToBangla(date('d-m-Y')) }}</p>
                                     </div>
                                     <div class="col-12">
                                         <p>এই মর্মে প্রত্যয়ন করা যাইতেছে যে, আইনের ধারা ৪৯ অনুযায়ী উৎসে কর কর্তনযোগ্য সরবরাহ হইতে প্রযোজ্য মূল্য সংযোজন কর বাবদ উৎসে কর কর্তন করা হইল। কর্তনকৃত মূল্য সংযোজন করের অর্থ বুক ট্রান্সফার / ট্রেজারি চালান / দাখিলপ্ত্রে বৃদ্ধিকারী সমন্বয়ের মাধ্যমে সরকারি কোষাগারে জমা প্রদান করা হইয়াছে। কপি এতদসংগে সংযুক্ত করা হইল (প্রযোজ্য ক্ষেত্রে)।</p>
@@ -226,38 +234,44 @@
                                         </tr>
                                         </thead>
                                         <tbody>
-
+                                        <?php
+                                        $totalBaseAmount = 0;
+                                        ?>
+                                        @foreach($vats as $vat)
                                             <tr>
-
-                                                <td class="text-center">১</td>
-                                                <td class="text-center">কারিম</td>
+                                                <td class="text-center">{{ englishToBangla($loop->iteration) }}</td>
+                                                <td class="text-center">{{$vat->customer->name ?? ''}}</td>
                                                 <td class="text-center">২৩৪৫৬</td>
                                                 <td class="text-center">
-
                                                         ৪৫৩৪৫
                                                         ,১২/১২/২০২৩
                                                         (৫৪৫৩২)
-
                                                 </td>
-                                                <td class="text-center">১২/১২/২০২৩</td>
-                                                <td class="text-center">১২০০০.০০</td>
-                                                <td class="text-center">১২০০০.০০</td>
-                                                <td class="text-center">১২০০০.০০</td>
+                                                <td class="text-center">{{ englishToBangla(\Carbon\Carbon::parse($vat->date)->format('d-m-Y'))}}</td>
+                                                <td class="text-center">{{ englishToBangla(number_format($vat->invoice->total_amount,2)) }}</td>
+                                                <td class="text-center">{{ englishToBangla(number_format($vat->amount,2)) }}</td>
+                                                <td class="text-center">{{ englishToBangla(number_format($vat->amount,2)) }}</td>
                                                 <td class="extra_column">
-                                                    <a href="" download class="btn btn-success btn-sm extra_column">Pdf</a>
+                                                    @if(\File::exists(public_path($vat->vat_document)))
+                                                        <a href="{{ asset($vat->vat_document) }}" download class="btn btn-success btn-sm extra_column">Pdf</a>
+                                                    @endif
                                                 </td>
                                             </tr>
+                                            <?php
+                                            $totalBaseAmount += $vat->invoice->total_amount ?? 0;
+                                            ?>
+                                        @endforeach
                                         </tbody>
                                         <tfoot>
                                         <tr>
                                             <th colspan="5" class="text-right">সর্বমোট</th>
 
                                             <th class="text-right"
-                                                colspan="">৫০০.০০</th>
+                                                colspan="">{{englishToBangla(number_format($totalBaseAmount,2))}}</th>
                                             <th class="text-right"
-                                                colspan="">৩০০.০০</th>
+                                                colspan="">{{englishToBangla(number_format($vats->sum('amount'),2))}}</th>
                                             <th class="text-right"
-                                                colspan="">৩০০.০০</th>
+                                                colspan="">{{englishToBangla(number_format($vats->sum('amount'),2))}}</th>
                                             <th class="extra_column"></th>
                                         </tr>
                                         </tfoot>
@@ -299,7 +313,11 @@
 @section('script')
     <script>
         $(function () {
-
+            $('#start, #end').datepicker({
+                autoclose: true,
+                format: 'yyyy-mm-dd',
+                orientation: 'bottom'
+            });
             $('#party').select2({
                 ajax: {
                     url: "{{ route('client_json') }}",

@@ -127,6 +127,10 @@ class PurchaseController extends Controller
             if ($request->amount > $bankAccount->amount)
                 return redirect()->back()->withInput()->with('error', 'Insufficient balance.');
         }
+
+        $totalCost = $request->duty+$request->freight+$request->ait+$request->at+$request->at+$request->etc;
+        $baseAmount = $request->grand_total_price-$totalCost;
+
         try {
 
             DB::beginTransaction();
@@ -164,6 +168,7 @@ class PurchaseController extends Controller
                 $productPurchaseDetail->product_purchase_id = $productPurchase->id;
                 $productPurchaseDetail->product_id = $product->id;
                 $productPurchaseDetail->rate = $request->product_rate[$counter];
+                $productPurchaseDetail->per_pcs_cost = ($totalCost*$request->product_rate[$counter])/$baseAmount;
                 $productPurchaseDetail->quantity = $request->quantity[$counter];
                 $productPurchaseDetail->total_amount = ($request->quantity[$counter] * $request->product_rate[$counter]);
                 $productPurchaseDetail->save();
@@ -377,6 +382,8 @@ class PurchaseController extends Controller
             if ($request->amount > $bankAccount->amount)
                 return redirect()->back()->withInput()->with('error', 'Insufficient balance.');
         }
+        $totalCost = $request->duty+$request->freight+$request->ait+$request->at+$request->at+$request->etc;
+        $baseAmount = $request->grand_total_price-$totalCost;
         try {
 
             DB::beginTransaction();
@@ -417,6 +424,7 @@ class PurchaseController extends Controller
             $inventoryOrderDetail->inventory_order_id = $inventoryOrder->id;
             $inventoryOrderDetail->product_id = $product->id;
             $inventoryOrderDetail->rate = $request->product_rate[$counter];
+            $inventoryOrderDetail->per_pcs_cost = ($totalCost*$request->product_rate[$counter])/$baseAmount;
             $inventoryOrderDetail->batch_id = $inventoryOrder->batch_no;
             $inventoryOrderDetail->selling_rate = $request->selling_rate[$counter];
             $inventoryOrderDetail->quantity = $request->quantity[$counter];

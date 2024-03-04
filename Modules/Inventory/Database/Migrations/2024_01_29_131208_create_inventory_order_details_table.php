@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('product_id')->nullable();
             $table->decimal('quantity', 20, 2)->nullable();
             $table->decimal('rate', 20, 2)->default(0.00)->nullable();
+            $table->decimal('per_pcs_cost',50,3)->default(0.00)->nullable();
             $table->decimal('selling_rate', 20, 2)->default(0.00)->nullable();
             $table->string('batch_id')->nullable();
             $table->date('expiry_date')->nullable();

@@ -39,8 +39,7 @@
                                         <div class="input-group-addon">
                                             <i class="fa fa-calendar"></i>
                                         </div>
-                                        <input type="text" class="form-control pull-right"
-                                               id="start" name="start" value="{{ request()->get('start')??date('Y-m-d')  }}" autocomplete="off">
+                                        <input type="text" class="form-control pull-right" id="start" name="start" value="{{ request()->get('start')??date('Y-m-d')  }}" autocomplete="off">
                                     </div>
                                     <!-- /.input group -->
                                 </div>
@@ -54,8 +53,7 @@
                                         <div class="input-group-addon">
                                             <i class="fa fa-calendar"></i>
                                         </div>
-                                        <input type="text" class="form-control pull-right"
-                                               id="end" name="end" value="{{ request()->get('end')??date('Y-m-d')  }}" autocomplete="off">
+                                        <input type="text" class="form-control pull-right" id="end" name="end" value="{{ request()->get('end')??date('Y-m-d')  }}" autocomplete="off">
                                     </div>
                                     <!-- /.input group -->
                                 </div>

@@ -1,6 +1,6 @@
 <?php
 $menu = [
-    'report.purchase', 'report.sale','report.party_ledger','report.supplier_statement','report.vat_certificate_six_point_six'
+    'report.purchase', 'report.sale','report.party_ledger','report.supplier_statement','report.vat_certificate_six_point_six','report.vat_payment','report.vat_register'
 ];
 ?>
 
@@ -52,6 +52,26 @@ $menu = [
             </a>
         </li>
         <?php
+        $subMenu = ['report.vat_payment'];
+        ?>
+        <li class="{{ in_array(Route::currentRouteName(), $subMenu) ? 'active' : '' }}">
+            <a href="{{ route('report.vat_payment') }}">
+            <span class="pcoded-micon"><i
+                    class="feather {{ in_array(Route::currentRouteName(), $subMenu) ? 'icon-check-circle' : 'icon-circle' }}"></i></span>
+                <span class="pcoded-mtext">Vat Payment</span>
+            </a>
+        </li>
+        <?php
+        $subMenu = ['report.vat_register'];
+        ?>
+        <li class="{{ in_array(Route::currentRouteName(), $subMenu) ? 'active' : '' }}">
+            <a href="{{ route('report.vat_register') }}">
+            <span class="pcoded-micon"><i
+                    class="feather {{ in_array(Route::currentRouteName(), $subMenu) ? 'icon-check-circle' : 'icon-circle' }}"></i></span>
+                <span class="pcoded-mtext">Vat Register</span>
+            </a>
+        </li>
+        <?php
         $subMenu = ['report.vat_certificate_six_point_six'];
         ?>
         <li class="{{ in_array(Route::currentRouteName(), $subMenu) ? 'active' : '' }}">
@@ -61,5 +81,6 @@ $menu = [
                 <span class="pcoded-mtext">Vat Certificate 6.6</span>
             </a>
         </li>
+
     </ul>
 </li>

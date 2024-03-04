@@ -185,7 +185,7 @@
             width: 120px;
             margin-left: 35%;
         }
-        
+
         .pcoded .pcoded-header .navbar-logo[logo-theme=theme1] {
             background-color: #143257;
         }
@@ -257,7 +257,7 @@
                                         <span class="pcoded-mtext">Dashboard</span>
                                     </a>
                                 </li>
-                                
+
                                 <?php
                                     $top_menu = [
                                         'warehouse.index', 'warehouse.create', 'warehouse.store', 'warehouse.edit', 'warehouse.update',
@@ -307,8 +307,8 @@
                                 </li>
                                 @include('account::layouts.menu_list')
                                 @include('report::layouts.menu_list')
-                                
-                                
+
+
                                 <?php
                                 $menu = [
                                     'cash'

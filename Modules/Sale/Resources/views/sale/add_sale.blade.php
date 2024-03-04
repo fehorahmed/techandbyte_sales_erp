@@ -145,39 +145,6 @@
                                                                 value="{{ old('quantity.' . $loop->index) }}">
                                                         </div>
                                                     </td>
-                                                    {{-- <td>
-                                                        <div
-                                                            class="form-group {{ $errors->has('discount_percent.' . $loop->index) ? 'has-error' : '' }}">
-                                                            <input type="text" class="form-control discount_percent"
-                                                                name="discount_percent[]"
-                                                                value="{{ old('discount_percent.' . $loop->index) }}">
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <div
-                                                            class="form-group {{ $errors->has('discount_value.' . $loop->index) ? 'has-error' : '' }}">
-                                                            <input type="text" class="form-control discount_value"
-                                                                name="discount_value[]"
-                                                                value="{{ old('discount_value.' . $loop->index) }}"
-                                                                readonly>
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <div
-                                                            class="form-group {{ $errors->has('vat_percent.' . $loop->index) ? 'has-error' : '' }}">
-                                                            <input type="text" class="form-control vat_percent"
-                                                                name="vat_percent[]"
-                                                                value="{{ old('vat_percent.' . $loop->index) }}">
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <div
-                                                            class="form-group {{ $errors->has('vat_value.' . $loop->index) ? 'has-error' : '' }}">
-                                                            <input type="text" class="form-control vat_value"
-                                                                name="vat_value[]"
-                                                                value="{{ old('vat_value.' . $loop->index) }}" readonly>
-                                                        </div>
-                                                    </td> --}}
                                                     <td class="total-cost" style="vertical-align: middle">৳0.00</td>
                                                     <td class="text-center">
                                                         <a role="button" class="btn-sm btn-remove"
