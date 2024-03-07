@@ -189,12 +189,15 @@
         .pcoded .pcoded-header .navbar-logo[logo-theme=theme1] {
             background-color: #143257;
         }
+
         .pcoded .pcoded-navbar[navbar-theme=theme1] {
             background: #143257;
         }
+
         .pcoded .pcoded-navbar[navbar-theme=theme1] .main-menu {
             background-color: #143257;
         }
+
         .pcoded .pcoded-navbar[navbar-theme=theme1] .pcoded-item li.pcoded-hasmenu .pcoded-submenu {
             background: #143257;
         }
@@ -251,20 +254,55 @@
                     <nav class="pcoded-navbar">
                         <div class="pcoded-inner-navbar main-menu">
                             <ul class="pcoded-item pcoded-left-item">
-                                <li class="{{ Route::currentRouteName() == 'dashboard' ? 'active' : '' }}">
+                                {{-- <li class="{{ Route::currentRouteName() == 'dashboard' ? 'active' : '' }}">
                                     <a href="{{ route('dashboard') }}">
                                         <span class="pcoded-micon"><i class="feather icon-home"></i></span>
                                         <span class="pcoded-mtext">Dashboard</span>
                                     </a>
+                                </li> --}}
+
+                                <?php
+                                $top_menu = ['dashboard', 'dashboard2'];
+                                ?>
+
+                                <li class="pcoded-hasmenu {{ in_array(Route::currentRouteName(), $top_menu) ? 'active pcoded-trigger' : '' }}"
+                                    dropdown-icon="style1" subitem-icon="style1">
+                                    <a href="javascript:void(0)">
+                                        <span class="pcoded-micon"><i class="feather icon-home"></i></span>
+                                        <span class="pcoded-mtext">Dashboard</span>
+                                    </a>
+                                    <ul class="pcoded-submenu">
+                                        <?php
+                                        $subMenu = ['dashboard'];
+                                        ?>
+                                        <li
+                                            class="{{ in_array(Route::currentRouteName(), $subMenu) ? 'active' : '' }}">
+                                            <a href="{{ route('dashboard') }}">
+                                                <span class="pcoded-micon"><i
+                                                        class="feather {{ in_array(Route::currentRouteName(), $subMenu) ? 'icon-check-circle' : 'icon-circle' }}"></i></span>
+                                                <span class="pcoded-mtext">Dashboard 1</span>
+                                            </a>
+                                        </li>
+                                        <?php
+                                        $subMenu = ['dashboard2'];
+                                        ?>
+                                        <li
+                                            class="{{ in_array(Route::currentRouteName(), $subMenu) ? 'active' : '' }}">
+                                            <a href="{{ route('dashboard2') }}">
+                                                <span class="pcoded-micon"><i
+                                                        class="feather {{ in_array(Route::currentRouteName(), $subMenu) ? 'icon-check-circle' : 'icon-circle' }}"></i></span>
+                                                <span class="pcoded-mtext">Dashboard 2</span>
+                                            </a>
+                                        </li>
+
+                                    </ul>
                                 </li>
 
                                 <?php
-                                    $top_menu = [
-                                        'warehouse.index', 'warehouse.create', 'warehouse.store', 'warehouse.edit', 'warehouse.update',
-                                        'product.unit_add', 'product.unit_all', 'product.brand_all', 'product.brand_edit', 'product.brand_add', 'product.unit_edit', 'product.category_add', 'product.category_all', 'product.category_edit', 'product.sub_category_add', 'product.sub_category_all', 'product.sub_category_edit', 'product.product_add', 'product.product_all', 'product.product_edit'
-                                    ];
+                                $top_menu = ['warehouse.index', 'warehouse.create', 'warehouse.store', 'warehouse.edit', 'warehouse.update', 'product.unit_add', 'product.unit_all', 'product.brand_all', 'product.brand_edit', 'product.brand_add', 'product.unit_edit', 'product.category_add', 'product.category_all', 'product.category_edit', 'product.sub_category_add', 'product.sub_category_all', 'product.sub_category_edit', 'product.product_add', 'product.product_all', 'product.product_edit'];
                                 ?>
-                                <li class="pcoded-hasmenu {{ in_array(Route::currentRouteName(), $top_menu) ? 'active pcoded-trigger' : '' }}" dropdown-icon="style1" subitem-icon="style1">
+                                <li class="pcoded-hasmenu {{ in_array(Route::currentRouteName(), $top_menu) ? 'active pcoded-trigger' : '' }}"
+                                    dropdown-icon="style1" subitem-icon="style1">
                                     <a href="javascript:void(0)">
                                         <span class="pcoded-micon"><i class="feather icon-user-plus"></i></span>
                                         <span class="pcoded-mtext">Settings</span>
@@ -281,24 +319,22 @@
                                 @include('promotion::layouts.menu_list')
                                 @include('loan::layouts.menu_list')
                                 <?php
-                                $top_menu = [
-                                     'cash','bank.bank_add','bank.bank_all','bank.bank_edit'
-                                ];
+                                $top_menu = ['cash', 'bank.bank_add', 'bank.bank_all', 'bank.bank_edit'];
                                 ?>
-                                <li class="pcoded-hasmenu {{ in_array(Route::currentRouteName(), $top_menu) ? 'active pcoded-trigger' : '' }}" dropdown-icon="style1" subitem-icon="style1">
+                                <li class="pcoded-hasmenu {{ in_array(Route::currentRouteName(), $top_menu) ? 'active pcoded-trigger' : '' }}"
+                                    dropdown-icon="style1" subitem-icon="style1">
                                     <a href="javascript:void(0)">
                                         <span class="pcoded-micon"><i class="feather icon-user-plus"></i></span>
                                         <span class="pcoded-mtext">Cash / Bank</span>
                                     </a>
                                     <ul class="pcoded-submenu">
                                         <?php
-                                        $menu = [
-                                            'cash'
-                                        ];
+                                        $menu = ['cash'];
                                         ?>
                                         <li class="{{ Route::currentRouteName() == 'cash' ? 'active' : '' }}">
                                             <a href="{{ route('cash') }}">
-                                                <span class="pcoded-micon"><i class="feather icon-briefcase"></i></span>
+                                                <span class="pcoded-micon"><i
+                                                        class="feather icon-briefcase"></i></span>
                                                 <span class="pcoded-mtext">Cash</span>
                                             </a>
                                         </li>
@@ -310,9 +346,7 @@
 
 
                                 <?php
-                                $menu = [
-                                    'cash'
-                                ];
+                                $menu = ['cash'];
                                 ?>
                                 <!--<li class="{{ Route::currentRouteName() == 'cash' ? 'active' : '' }}">-->
                                 <!--    <a href="{{ route('cash') }}">-->
@@ -420,7 +454,8 @@
     <script type="text/javascript"
         src="{{ asset('themes/backend/files/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js') }}">
     </script>
-
+    <script type="text/javascript" src="{{ asset('themes/backend/files/assets/pages/dashboard/analytic-dashboard.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('themes/backend/files/assets/js/script.js') }}"></script>
     <script src="{{ asset('themes/backend/files/bower_components/sweetalert2/sweetalert2.min.js') }}"></script>
     <script src="{{ asset('themes/backend/files/assets/js/sweetalert.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -433,6 +468,8 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
+
+
             var message = '{{ session('message') }}';
             var error = '{{ session('error') }}';
             if (!window.performance || window.performance.navigation.type != window.performance.navigation

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CommonController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,9 +19,13 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard_new');
-})->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('dashboard',[DashboardController::class,'dashboard'])->name('dashboard');
+    Route::get('dashboard2',[DashboardController::class,'dashboard2'])->name('dashboard2');
+
+    Route::get('dashboard-sale-information',[DashboardController::class,'dashboardSaleInformation'])->name('dashboard_sale_information');
+});
 
 Route::middleware('auth')->group(function () {
 
