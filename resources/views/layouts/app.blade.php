@@ -454,8 +454,7 @@
     <script type="text/javascript"
         src="{{ asset('themes/backend/files/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js') }}">
     </script>
-    <script type="text/javascript" src="{{ asset('themes/backend/files/assets/pages/dashboard/analytic-dashboard.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('themes/backend/files/assets/js/script.js') }}"></script>
+
     <script src="{{ asset('themes/backend/files/bower_components/sweetalert2/sweetalert2.min.js') }}"></script>
     <script src="{{ asset('themes/backend/files/assets/js/sweetalert.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

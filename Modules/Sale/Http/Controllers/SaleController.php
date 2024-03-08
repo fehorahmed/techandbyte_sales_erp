@@ -130,7 +130,7 @@ class SaleController extends Controller
             $invoice->due_amount = 0;
             $invoice->invoice = $invoice_no;
             $invoice->total_discount = $request->discount;
-            $invoice->total_vat_amnt = $request->vat ;
+            $invoice->total_vat_amnt = $request->vat;
             $invoice->invoice_discount = 0;
             $invoice->status = 1;
             $invoice->payment_type = 1;
@@ -188,7 +188,7 @@ class SaleController extends Controller
             $invoice->save();
 
             //Vat amount
-            if($request->vat > 0){
+            if ($request->vat > 0) {
                 $saleVat = new SaleVat();
                 $saleVat->invoice_id  = $invoice->id;
                 $saleVat->customer_id = $request->customer;
@@ -271,7 +271,7 @@ class SaleController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('sale.sale_receipt_details',['invoice'=>$invoice->id]);
+            return redirect()->route('sale.sale_receipt_details', ['invoice' => $invoice->id]);
         } catch (\Exception $exception) {
             DB::rollBack();
 
