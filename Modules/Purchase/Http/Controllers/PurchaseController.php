@@ -436,6 +436,7 @@ class PurchaseController extends Controller
             $inventory = new Inventory();
             $inventory->batch_no  = $inventoryOrder->batch_no;
             $inventory->product_id = $product->id;
+            $inventory->purchase_rate = $request->product_rate[$counter];
             $inventory->selling_rate = $request->selling_rate[$counter];
             $inventory->quantity = $request->quantity[$counter];
             if ($inventory->save()) {
