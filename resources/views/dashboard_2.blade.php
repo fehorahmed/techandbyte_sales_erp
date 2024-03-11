@@ -506,9 +506,9 @@
                 type: "doughnut",
                 data: {
                     datasets: [{
-                        data: [{{ $daily_sale_info_query[0]->t_amount }},
-                            {{ $daily_sale_info_query[0]->p_amount }},
-                            {{ $daily_sale_info_query[0]->d_amount }}
+                        data: [{{ isset($daily_sale_info_query[0])?$daily_sale_info_query[0]->t_amount:0 }},
+                            {{ isset($daily_sale_info_query[0])?$daily_sale_info_query[0]->p_amount:0 }},
+                            {{ isset($daily_sale_info_query[0])?$daily_sale_info_query[0]->d_amount:0 }}
                         ],
                         backgroundColor: ["#fe9365", "#01a9ac", "#fe5d70"],
                         label: "Dataset 1"

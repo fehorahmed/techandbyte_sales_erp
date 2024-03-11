@@ -43,23 +43,23 @@
                     <div class="row align-items-end margin_left_item">
                         <div class="col-6 offset-3 text-center item_box">
                             <h6 class="text-white margin_bottom_zero"><strong>Today's Sale:</strong></h6>
-                            <h5 class="text-white m-b-0"><strong>100,000</strong></h5>
+                            <h5 class="text-white m-b-0"><strong>{{$today_sales}}</strong></h5>
                         </div>
                     </div>
                     <div class="row align-items-end margin_left_item">
                         <div class="col-5 text-center item_box">
                             <h6 class="text-white margin_bottom_zero"><strong>Today's Expense:</strong></h6>
-                            <h5 class="text-white m-b-0"><strong>100,000</strong></h5>
+                            <h5 class="text-white m-b-0"><strong>{{$today_expense}}</strong></h5>
                         </div>
                         <div class="col-5 offset-2 text-center item_box">
                             <h6 class="text-white margin_bottom_zero"><strong>Total Stock Value</strong></h6>
-                            <h5 class="text-white m-b-0"><strong>100,000</strong></h5>
+                            <h5 class="text-white m-b-0"><strong>{{$today_stock_value??0}}</strong></h5>
                         </div>
                     </div>
                     <div class="row align-items-end mb-4 margin_left_item">
                         <div class="col-6 offset-3 text-center item_box">
                             <h6 class="text-white margin_bottom_zero"><strong>Cash In Hand</strong></h6>
-                            <h5 class="text-white m-b-0"><strong>100,000</strong></h5>
+                            <h5 class="text-white m-b-0"><strong>{{$cash_in_hand->amount??0}}</strong></h5>
                         </div>
                     </div>
                     <div class="row align-items-end mb-4 margin_left_item">

@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Modules\Account\Entities\Cash;
+use Modules\Account\Entities\TransactionLog;
+use Modules\Inventory\Entities\Inventory;
 use Modules\Purchase\Entities\ProductPurchase;
 use Modules\Sale\Entities\Invoice;
 
@@ -12,7 +15,19 @@ class DashboardController extends Controller
 {
     public function dashboard()
     {
-        return view('dashboard_new');
+
+        $today_expense= TransactionLog::where(['transaction_type'=>2,'date'=>now()])->sum('amount');
+        $today_sales= Invoice::where(['date'=>now()])->sum('total_amount');
+        $today_stock_value= Inventory::select(DB::raw('SUM(purchase_rate * quantity) as total_amount'))->value('total_amount');
+        $cash_in_hand= Cash::first();
+
+
+        $data['today_expense']=$today_expense??0;
+        $data['today_sales']=$today_sales??0;
+        $data['today_stock_value']=$today_stock_value??0;
+        $data['cash_in_hand']=$today_stock_value??0;
+
+        return view('dashboard_new')->with($data);
     }
     public function dashboard2()
     {

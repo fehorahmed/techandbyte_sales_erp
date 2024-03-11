@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('batch_no');
             $table->foreignId('product_id');
             $table->float('selling_rate', 8, 2);
+            $table->float('purchase_rate', 8, 2);
             $table->foreignId('quantity');
             $table->foreign('product_id')->on('products')->references('id');
             $table->index('batch_no');

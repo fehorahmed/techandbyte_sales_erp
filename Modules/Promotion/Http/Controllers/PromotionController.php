@@ -7,6 +7,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Modules\Account\Entities\TransactionLog;
+use Modules\Bank\Entities\Bank;
 use Modules\Promotion\Entities\Promotion;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -37,7 +39,8 @@ class PromotionController extends Controller
      */
     public function create()
     {
-        return view('promotion::promotion.create');
+        $banks=Bank::where('status',1)->get();
+        return view('promotion::promotion.create',compact('banks'));
     }
 
     /**
@@ -50,6 +53,7 @@ class PromotionController extends Controller
             "title" => 'required|string|max:255|unique:promotions,title',
             "promotion_type" => 'required|string|max:255',
             "platform" => 'required|string|max:255',
+            "payment_type" => 'required|numeric',
             "cost" => 'required|numeric',
             "date" => 'required|date|max:255',
             "details" => 'nullable|string|max:255',
@@ -64,6 +68,17 @@ class PromotionController extends Controller
         $data->details = $request->details;
         $data->created_by = Auth::id();
         if ($data->save()) {
+
+            // $transaction_log= new TransactionLog();
+            // $transaction_log->date=now();
+            // $transaction_log->particular="promotion head";
+            // $transaction_log->transaction_type = 2;
+            // $transaction_log->transaction_method = 12;
+            // $transaction_log->amount = $request->cost;
+
+
+
+
             return redirect()->route('promotion.index')->with('message', 'Information added');
         } else {
             return redirect()->back()->with('error', 'Something went wrong.');
