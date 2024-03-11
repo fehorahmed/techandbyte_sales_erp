@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->bigInteger('customer_id');
             $table->string('date')->nullable();
+            $table->double('base_amount',20,2)->default(0.00);
             $table->double('total_amount',20,2)->default(0.00);
             $table->double('paid_amount',20,2)->default(0.00);
             $table->double('due_amount',20,2)->default(0.00);

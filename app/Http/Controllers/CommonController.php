@@ -241,7 +241,7 @@ class CommonController extends Controller
 
         return response()->json($subTypes);
     }
-    
+
       public function clientJson(Request $request)
     {
         if (!$request->searchTerm) {

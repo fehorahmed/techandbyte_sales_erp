@@ -285,10 +285,9 @@
                                                         </th>
                                                     </tr>
                                                     <tr>
-                                                        <th colspan="4" class="text-right">AIT</th>
+                                                        <th colspan="4" class="text-right">AIT (5%)</th>
                                                         <th>
-                                                            <input type="number" step="any" id="ait" value="{{old('ait')}}"
-                                                                class="form-control ait is-valid-border" name="ait">
+                                                            <input type="number" step="any" id="ait" value="{{old('ait')}}" class="form-control ait is-valid-border" name="ait" readonly>
                                                         </th>
                                                     </tr>
                                                     <tr>
@@ -560,11 +559,11 @@
             let duty = parseFloat($("#duty").val()) || 0;
             let freight = parseFloat($("#freight").val()) || 0;
             let c_and_f = parseFloat($("#c_and_f").val()) || 0;
-            let ait = parseFloat($("#ait").val()) || 0;
+            // let ait = parseFloat($("#ait").val()) || 0;
             let at = parseFloat($("#at").val()) || 0;
             let etc = parseFloat($("#etc").val()) || 0;
 
-            let total_others = (duty + freight + c_and_f + ait + at + etc);
+            let total_others = (duty + freight + c_and_f + at + etc);
           //  alert(total_others);
 
             $('.product-item').each(function(i) {
@@ -602,22 +601,12 @@
             $('#total_amount').html('৳' + productSubTotal.toFixed(2));
             $('#product_sub_total').html('৳' + productSubTotal.toFixed(2));
 
-            //discount formula
-            // if (discount.includes('%')) {
-            //    let discount_percent = discount.split('%')[0];
-            //    purchase_discount_amount = (productSubTotal * discount_percent) / 100;
-            //    $('.discount_percentage').val(discount_percent);
-            // } else {
-            //     purchase_discount_amount = discount;
-            //     $('.discount_percentage').val(0);
-            // }
-            // $('.total_discount').val(productDiscountTotal + parseInt(purchase_discount_amount));
-            // $('.total_vat').val(productVatTotal);
+            let ait = parseFloat(productSubTotal.toFixed(2)*0.05);
+            $('.ait').val(ait.toFixed(2));
 
-            let grandTotal = parseFloat(productSubTotal + total_others);
-            // $('#purchase_discount').html(parseFloat(purchase_discount_amount).toFixed(2));
+            let grandTotal = parseFloat(productSubTotal + total_others+ait);
 
-            $('#paid').val(grandTotal);
+            $('#paid').val(grandTotal.toFixed(2));
             let paid = $('#paid').val() || 0;
 
             let due = parseFloat(grandTotal) - parseFloat(paid);
@@ -625,7 +614,6 @@
                 confirm('Due amount is not negative');
             }
             $('.grand_total_price').val(grandTotal.toFixed(2));
-            // $('.purchase_discount').val(purchase_discount_amount);
             $('#due').html('৳' + due.toFixed(2));
         }
 
@@ -682,7 +670,6 @@
 
                 $(this).closest('tr').find('.unit').val(data.unit);
                 $(this).closest('tr').find('.vat_percent').val(data.vat);
-                // $(this).closest('tr').find('.product_rate').val(data.rate);
             });
         }
     </script>

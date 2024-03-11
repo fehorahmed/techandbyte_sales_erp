@@ -16,6 +16,7 @@ use Modules\Bank\Entities\Bank;
 use Modules\Inventory\Entities\Inventory;
 use Modules\Inventory\Entities\InventoryOrder;
 use Modules\Inventory\Entities\InventoryOrderDetail;
+use Modules\Purchase\Entities\Ait;
 use Modules\Purchase\Entities\ProductPurchase;
 use Modules\Purchase\Entities\ProductPurchaseDetail;
 use Modules\Purchase\Entities\PurchasePayment;
@@ -101,7 +102,7 @@ class PurchaseController extends Controller
         ];
 
         if ($request->paid > 0) {
-             $rules['payment_type'] = 'required';
+            $rules['payment_type'] = 'required';
         }
 
         if ($request->payment_type == '2') {
@@ -382,150 +383,159 @@ class PurchaseController extends Controller
             if ($request->amount > $bankAccount->amount)
                 return redirect()->back()->withInput()->with('error', 'Insufficient balance.');
         }
-        $totalCost = $request->duty+$request->freight+$request->ait+$request->at+$request->at+$request->etc;
-        $baseAmount = $request->grand_total_price-$totalCost;
+
         try {
 
             DB::beginTransaction();
 
-        $inventoryOrder = new InventoryOrder();
-        $inventoryOrder->product_purchase_id  = $productPurchase->id;
-        $inventoryOrder->lc_no = $request->lc_no;
-        $inventoryOrder->batch_no = $request->batch_no;
-        $inventoryOrder->supplier_id = $request->supplier;
-        $inventoryOrder->duty = $request->duty;
-        $inventoryOrder->freight = $request->freight;
-        $inventoryOrder->c_and_f = $request->c_and_f;
-        $inventoryOrder->ait = $request->ait;
-        $inventoryOrder->at = $request->at;
-        $inventoryOrder->etc = $request->etc;
-        $inventoryOrder->purchase_date = Carbon::parse($request->date)->format('Y-m-d');
-        $inventoryOrder->grand_total_amount = $request->grand_total_price;
-        $inventoryOrder->purchase_details = $request->purchase_details;
-        $inventoryOrder->previous_paid = $request->previous_paid;
-        $inventoryOrder->paid_amount = $request->paid;
-        $inventoryOrder->due_amount = 0;
-        $inventoryOrder->total_discount = $request->discount;
-        $inventoryOrder->total_vat_amount = $request->total_vat ?? 0;
-        $inventoryOrder->invoice_discount = 0;
-        $inventoryOrder->status = 1;
-        $inventoryOrder->payment_type = 1;
-        $inventoryOrder->save();
-        $inventoryOrder->chalan_no = 'IO' . str_pad($inventoryOrder->id, 8, 0, STR_PAD_LEFT);
-        $inventoryOrder->save();
+            $inventoryOrder = new InventoryOrder();
+            $inventoryOrder->product_purchase_id  = $productPurchase->id;
+            $inventoryOrder->lc_no = $request->lc_no;
+            $inventoryOrder->batch_no = $request->batch_no;
+            $inventoryOrder->supplier_id = $request->supplier;
+            $inventoryOrder->duty = $request->duty;
+            $inventoryOrder->freight = $request->freight;
+            $inventoryOrder->c_and_f = $request->c_and_f;
+            $inventoryOrder->ait = $request->ait;
+            $inventoryOrder->at = $request->at;
+            $inventoryOrder->etc = $request->etc;
+            $inventoryOrder->purchase_date = Carbon::parse($request->date)->format('Y-m-d');
+            $inventoryOrder->grand_total_amount = $request->grand_total_price;
+            $inventoryOrder->purchase_details = $request->purchase_details;
+            $inventoryOrder->previous_paid = $request->previous_paid;
+            $inventoryOrder->paid_amount = $request->paid;
+            $inventoryOrder->due_amount = 0;
+            $inventoryOrder->total_discount = $request->discount;
+            $inventoryOrder->total_vat_amount = $request->total_vat ?? 0;
+            $inventoryOrder->invoice_discount = 0;
+            $inventoryOrder->status = 1;
+            $inventoryOrder->payment_type = 1;
+            $inventoryOrder->save();
+            $inventoryOrder->chalan_no = 'IO' . str_pad($inventoryOrder->id, 8, 0, STR_PAD_LEFT);
+            $inventoryOrder->save();
 
-        $counter = 0;
-        $subTotal = 0;
+            $counter = 0;
+            $subTotal = 0;
 
-        foreach ($request->product as $reqProduct) {
-            $product = Product::where('id', $reqProduct)->first();
+            foreach ($request->product as $reqProduct) {
+                $product = Product::where('id', $reqProduct)->first();
 
-            $inventoryOrderDetail = new InventoryOrderDetail();
-            $inventoryOrderDetail->inventory_order_id = $inventoryOrder->id;
-            $inventoryOrderDetail->product_id = $product->id;
-            $inventoryOrderDetail->rate = $request->product_rate[$counter];
-            $inventoryOrderDetail->per_pcs_cost = ($totalCost*$request->product_rate[$counter])/$baseAmount;
-            $inventoryOrderDetail->batch_id = $inventoryOrder->batch_no;
-            $inventoryOrderDetail->selling_rate = $request->selling_rate[$counter];
-            $inventoryOrderDetail->quantity = $request->quantity[$counter];
-            $inventoryOrderDetail->total_amount = ($request->quantity[$counter] * $request->product_rate[$counter]);
-            $inventoryOrderDetail->save();
+                $inventoryOrderDetail = new InventoryOrderDetail();
+                $inventoryOrderDetail->inventory_order_id = $inventoryOrder->id;
+                $inventoryOrderDetail->product_id = $product->id;
+                $inventoryOrderDetail->rate = $request->product_rate[$counter];
+                $inventoryOrderDetail->per_pcs_cost = $request->per_pcs_cost[$counter];
+                $inventoryOrderDetail->batch_id = $inventoryOrder->batch_no;
+                $inventoryOrderDetail->selling_rate = $request->selling_rate[$counter];
+                $inventoryOrderDetail->quantity = $request->quantity[$counter];
+                $inventoryOrderDetail->total_amount = ($request->quantity[$counter] * $request->product_rate[$counter]);
+                $inventoryOrderDetail->save();
 
-            $subTotal += $inventoryOrderDetail->total_amount;
+                $subTotal += $inventoryOrderDetail->total_amount;
 
-            $inventory = new Inventory();
-            $inventory->batch_no  = $inventoryOrder->batch_no;
-            $inventory->product_id = $product->id;
-            $inventory->selling_rate = $request->selling_rate[$counter];
-            $inventory->quantity = $request->quantity[$counter];
-            if ($inventory->save()) {
-                $inv_log = new InventoryLog();
-                $inv_log->inventory_id =  $inventory->id;
-                $inv_log->order_id =  $inventoryOrder->id;
-                $inv_log->quantity =  $request->quantity[$counter];
-                $inv_log->type =  'stock_in';
-                $inv_log->remark =  'Inventory Order';
-                $inv_log->save();
-            }
-
-            $counter++;
-        }
-
-        $due = ($subTotal + $inventoryOrder->duty + $inventoryOrder->freight + $inventoryOrder->c_and_f + $inventoryOrder->ait + $inventoryOrder->at + $inventoryOrder->etc) - $request->paid-$request->previous_paid;
-        $inventoryOrder->due_amount = $due;
-
-        $inventoryOrder->save();
-
-        $productPurchase->status = 0;
-        $productPurchase->save();
-
-
-        // Purchase Payment
-        if ($request->paid > 0) {
-            if ($request->payment_type == 1) {
-                $payment = new PurchasePayment();
-                $payment->product_purchase_id  = $productPurchase->id;
-                $payment->inventory_order_id   = $inventoryOrder->id;
-                $payment->supplier_id = $request->supplier;
-                $payment->transaction_method = $request->payment_type;
-                $payment->amount = $request->paid;
-                $payment->date = Carbon::parse($request->date)->format('Y-m-d');
-                $payment->save();
-
-
-                Cash::first()->decrement('amount', $request->paid);
-
-                $log = new TransactionLog();
-                $log->date = Carbon::parse($request->date)->format('Y-m-d');
-                $log->particular = 'Purchase Paid-' . $inventoryOrder->chalan_no;
-                $log->transaction_type = 2;
-                $log->transaction_method = $request->payment_type;
-                $log->amount = $request->paid;
-                $log->purchase_payment_id  = $payment->id;
-                $log->save();
-
-            } else {
-                $image = 'img/no_image.png';
-
-                if ($request->cheque_image) {
-                    $image = 'img/no_image.png';
-
-                    $file = $request->file('cheque_image');
-                    $filename = Uuid::uuid1()->toString() . '.' . $file->extension();
-                    $destinationPath = 'uploads/transaction_cheque';
-                    $file->move($destinationPath, $filename);
-                    $image = 'uploads/transaction_cheque/' . $filename;
+                $inventory = new Inventory();
+                $inventory->batch_no  = $inventoryOrder->batch_no;
+                $inventory->product_id = $product->id;
+                $inventory->selling_rate = $request->selling_rate[$counter];
+                $inventory->quantity = $request->quantity[$counter];
+                if ($inventory->save()) {
+                    $inv_log = new InventoryLog();
+                    $inv_log->inventory_id =  $inventory->id;
+                    $inv_log->order_id =  $inventoryOrder->id;
+                    $inv_log->quantity =  $request->quantity[$counter];
+                    $inv_log->type =  'stock_in';
+                    $inv_log->remark =  'Inventory Order';
+                    $inv_log->save();
                 }
 
-                $payment = new PurchasePayment();
-                $payment->product_purchase_id  = $productPurchase->id;
-                $payment->supplier_id = $request->supplier;
-                $payment->transaction_method = $request->payment_type;
-                $payment->amount = $request->paid;
-                $payment->date = Carbon::parse($request->date)->format('Y-m-d');
-                $payment->bank_id = $request->bank;
-                $payment->cheque_no = $request->cheque_no;
-                $payment->cheque_image = $image;
-                $payment->amount = $request->paid;
-                $payment->date = Carbon::parse($request->date)->format('Y-m-d');
-                $payment->save();
-
-                Bank::find($request->bank)->decrement('amount', $request->paid);
-
-                $log = new TransactionLog();
-                $log->date = Carbon::parse($request->date)->format('Y-m-d');
-                $log->particular = 'Purchase Paid' . $inventoryOrder->chalan_no;
-                $log->transaction_type = 2;
-                $log->transaction_method = $request->payment_type;
-                $log->bank_id = $request->bank;
-                $log->cheque_no = $request->cheque_no;
-                $log->cheque_image = $image;
-                $log->amount = $request->paid;
-                $log->purchase_payment_id = $payment->id;
-                $log->save();
-
+                $counter++;
             }
-        }
+
+            $due = ($subTotal + $inventoryOrder->duty + $inventoryOrder->freight + $inventoryOrder->c_and_f + $inventoryOrder->ait + $inventoryOrder->at + $inventoryOrder->etc) - $request->paid-$request->previous_paid;
+            $inventoryOrder->due_amount = $due;
+            $inventoryOrder->base_amount = $subTotal;
+            $inventoryOrder->save();
+
+            $productPurchase->status = 0;
+            $productPurchase->save();
+
+            //Vat amount
+            if ($request->ait > 0) {
+                $saleVat = new Ait();
+                $saleVat->inventory_order_id  = $inventoryOrder->id;
+                $saleVat->supplier_id = $request->supplier;
+                $saleVat->amount = $request->ait;
+                $saleVat->date = Carbon::parse($request->date)->format('Y-m-d');
+                $saleVat->status = 0;
+                $saleVat->save();
+            }
+
+            // Purchase Payment
+            if ($request->paid > 0) {
+                if ($request->payment_type == 1) {
+                    $payment = new PurchasePayment();
+                    $payment->product_purchase_id  = $productPurchase->id;
+                    $payment->inventory_order_id   = $inventoryOrder->id;
+                    $payment->supplier_id = $request->supplier;
+                    $payment->transaction_method = $request->payment_type;
+                    $payment->amount = $request->paid;
+                    $payment->date = Carbon::parse($request->date)->format('Y-m-d');
+                    $payment->save();
+
+
+                    Cash::first()->decrement('amount', $request->paid);
+
+                    $log = new TransactionLog();
+                    $log->date = Carbon::parse($request->date)->format('Y-m-d');
+                    $log->particular = 'Purchase Paid-' . $inventoryOrder->chalan_no;
+                    $log->transaction_type = 2;
+                    $log->transaction_method = $request->payment_type;
+                    $log->amount = $request->paid;
+                    $log->purchase_payment_id  = $payment->id;
+                    $log->save();
+
+                } else {
+                    $image = 'img/no_image.png';
+
+                    if ($request->cheque_image) {
+                        $image = 'img/no_image.png';
+
+                        $file = $request->file('cheque_image');
+                        $filename = Uuid::uuid1()->toString() . '.' . $file->extension();
+                        $destinationPath = 'uploads/transaction_cheque';
+                        $file->move($destinationPath, $filename);
+                        $image = 'uploads/transaction_cheque/' . $filename;
+                    }
+
+                    $payment = new PurchasePayment();
+                    $payment->product_purchase_id  = $productPurchase->id;
+                    $payment->supplier_id = $request->supplier;
+                    $payment->transaction_method = $request->payment_type;
+                    $payment->amount = $request->paid;
+                    $payment->date = Carbon::parse($request->date)->format('Y-m-d');
+                    $payment->bank_id = $request->bank;
+                    $payment->cheque_no = $request->cheque_no;
+                    $payment->cheque_image = $image;
+                    $payment->amount = $request->paid;
+                    $payment->date = Carbon::parse($request->date)->format('Y-m-d');
+                    $payment->save();
+
+                    Bank::find($request->bank)->decrement('amount', $request->paid);
+
+                    $log = new TransactionLog();
+                    $log->date = Carbon::parse($request->date)->format('Y-m-d');
+                    $log->particular = 'Purchase Paid' . $inventoryOrder->chalan_no;
+                    $log->transaction_type = 2;
+                    $log->transaction_method = $request->payment_type;
+                    $log->bank_id = $request->bank;
+                    $log->cheque_no = $request->cheque_no;
+                    $log->cheque_image = $image;
+                    $log->amount = $request->paid;
+                    $log->purchase_payment_id = $payment->id;
+                    $log->save();
+
+                }
+            }
 
             DB::commit();
             return redirect()->route('inventory.inventory_receipt_details', ['inventoryOrder' => $inventoryOrder->id]);

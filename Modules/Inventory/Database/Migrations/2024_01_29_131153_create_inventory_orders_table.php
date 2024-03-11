@@ -26,6 +26,7 @@ return new class extends Migration
             $table->float('at',8,2);
             $table->float('etc',8,2);
 
+            $table->double('base_amount',20,2);
             $table->double('grand_total_amount',20,2);
             $table->double('paid_amount',20,2);
             $table->double('due_amount',20,2);

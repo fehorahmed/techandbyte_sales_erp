@@ -174,7 +174,7 @@
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ $vat->date }}</td>
                                             <td>{{ $vat->customer->name ?? '' }}</td>
-                                            <td>{{ number_format($vat->invoice->total_amount,2) }}</td>
+                                            <td>{{ number_format($vat->invoice->base_amount,2) }}</td>
                                             <td>{{ number_format($vat->amount,2) }}</td>
                                         </tr>
                                     @endforeach

@@ -342,6 +342,92 @@
                                     </ul>
                                 </li>
                                 @include('account::layouts.menu_list')
+                                <?php
+                                $top_menu = ['report.vat_certificate_six_point_six','report.vat_payment','report.vat_register','report.ait_chalan','report.ait_payment','report.ait_register'];
+                                ?>
+                                <li class="pcoded-hasmenu {{ in_array(Route::currentRouteName(), $top_menu) ? 'active pcoded-trigger' : '' }}"
+                                    dropdown-icon="style1" subitem-icon="style1">
+                                    <a href="javascript:void(0)">
+                                        <span class="pcoded-micon"><i class="feather icon-menu"></i></span>
+                                        <span class="pcoded-mtext">VAT / AIT</span>
+                                    </a>
+                                    <ul class="pcoded-submenu">
+                                        <?php
+                                        $menu = ['report.vat_certificate_six_point_six','report.vat_payment','report.vat_register'];
+                                        ?>
+                                        <li class="pcoded-hasmenu {{ in_array(Route::currentRouteName(), $menu) ? 'active pcoded-trigger' : '' }}">
+                                            <a href="javascript:void(0)">
+                                                <span class="pcoded-micon"><i class="feather icon-package"></i></span>
+                                                <span class="pcoded-mtext">VAT..</span>
+                                            </a>
+                                            <ul class="pcoded-submenu">
+                                                <?php
+                                                $subMenu = ['report.vat_payment'];
+                                                ?>
+                                                <li class="{{ in_array(Route::currentRouteName(), $subMenu) ? 'active' : '' }}">
+                                                    <a href="{{ route('report.vat_payment') }}"><span class="pcoded-micon"><i class="feather {{ in_array(Route::currentRouteName(), $subMenu) ? 'icon-check-circle' : 'icon-circle' }}"></i></span>
+                                                        <span class="pcoded-mtext">Vat Payment</span>
+                                                    </a>
+                                                </li>
+                                                <?php
+                                                $subMenu = ['report.vat_register'];
+                                                ?>
+                                                <li class="{{ in_array(Route::currentRouteName(), $subMenu) ? 'active' : '' }}">
+                                                    <a href="{{ route('report.vat_register') }}"><span class="pcoded-micon"><i class="feather {{ in_array(Route::currentRouteName(), $subMenu) ? 'icon-check-circle' : 'icon-circle' }}"></i></span>
+                                                        <span class="pcoded-mtext">Vat Register</span>
+                                                    </a>
+                                                </li>
+                                                <?php
+                                                $subMenu = ['report.vat_certificate_six_point_six'];
+                                                ?>
+                                                <li class="{{ in_array(Route::currentRouteName(), $subMenu) ? 'active' : '' }}">
+                                                    <a href="{{ route('report.vat_certificate_six_point_six') }}"><span class="pcoded-micon"><i class="feather {{ in_array(Route::currentRouteName(), $subMenu) ? 'icon-check-circle' : 'icon-circle' }}"></i></span>
+                                                        <span class="pcoded-mtext">Vat Certificate 6.6</span>
+                                                    </a>
+                                                </li>
+
+                                            </ul>
+                                        </li>
+
+                                            <?php
+                                            $menu = ['report.ait_chalan','report.ait_payment','report.ait_register'];
+                                            ?>
+                                            <li class="pcoded-hasmenu {{ in_array(Route::currentRouteName(), $menu) ? 'active pcoded-trigger' : '' }}">
+                                                <a href="javascript:void(0)">
+                                                    <span class="pcoded-micon"><i class="feather icon-package"></i></span>
+                                                    <span class="pcoded-mtext">AIT..</span>
+                                                </a>
+                                                <ul class="pcoded-submenu">
+                                                    <?php
+                                                    $subMenu = ['report.ait_payment'];
+                                                    ?>
+                                                    <li class="{{ in_array(Route::currentRouteName(), $subMenu) ? 'active' : '' }}">
+                                                        <a href="{{ route('report.ait_payment') }}"><span class="pcoded-micon"><i class="feather {{ in_array(Route::currentRouteName(), $subMenu) ? 'icon-check-circle' : 'icon-circle' }}"></i></span>
+                                                            <span class="pcoded-mtext">AIT Payment</span>
+                                                        </a>
+                                                    </li>
+                                                    <?php
+                                                    $subMenu = ['report.ait_register'];
+                                                    ?>
+                                                    <li class="{{ in_array(Route::currentRouteName(), $subMenu) ? 'active' : '' }}">
+                                                        <a href="{{ route('report.ait_register') }}"><span class="pcoded-micon"><i class="feather {{ in_array(Route::currentRouteName(), $subMenu) ? 'icon-check-circle' : 'icon-circle' }}"></i></span>
+                                                            <span class="pcoded-mtext">AIT Register</span>
+                                                        </a>
+                                                    </li>
+                                                    <?php
+                                                    $subMenu = ['report.ait_chalan'];
+                                                    ?>
+                                                    <li class="{{ in_array(Route::currentRouteName(), $subMenu) ? 'active' : '' }}">
+                                                        <a href="{{ route('report.ait_chalan') }}"><span class="pcoded-micon"><i class="feather {{ in_array(Route::currentRouteName(), $subMenu) ? 'icon-check-circle' : 'icon-circle' }}"></i></span>
+                                                            <span class="pcoded-mtext">Ait Chalan</span>
+                                                        </a>
+                                                    </li>
+
+                                                </ul>
+                                            </li>
+
+                                    </ul>
+                                </li>
                                 @include('report::layouts.menu_list')
 
 

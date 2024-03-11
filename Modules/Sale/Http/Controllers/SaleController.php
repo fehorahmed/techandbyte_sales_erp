@@ -182,6 +182,7 @@ class SaleController extends Controller
             }
 
             $invoice->invoice_discount = 0;
+            $invoice->base_amount = $subTotal;
             $due = round($subTotal - $request->discount) - $request->paid + $request->vat;
             $invoice->due_amount = $due;
 

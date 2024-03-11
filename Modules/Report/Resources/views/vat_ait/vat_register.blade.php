@@ -60,18 +60,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="account_id">Paid Bank<span class="text-danger">*</span></label>
-                                    <select required name="bank_id" id="bank_id" class="form-control select2">
-                                        <option value="">Select bank</option>
-                                        @foreach ($banks as $bank)
-                                            <option value="{{ $bank->id }}"{{ request()->get('bank_id') == $bank->id ? ' selected' : '' }}>{{ $bank->bank_name }} (Ac : {{ $bank->ac_number }})</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-
                             <div class="col-md-2">
                                 <div class="form-group">
                                     <label>&nbsp;</label>
@@ -110,7 +98,6 @@
                                     @csrf
                                     <input type="hidden" name="start_date" value="{{ request('start_date') }}">
                                     <input type="hidden" name="end_date" value="{{ request('end_date') }}">
-                                    <input type="hidden" name="bank_id" value="{{ request('bank_id') }}">
                                     <div class="table-responsive">
                                         <table id="table" class="table table-bordered">
                                             <thead>
@@ -146,7 +133,7 @@
                                                     </td>
                                                     <td>{{ $vat->customer->name ?? '' }}</td>
                                                     <td class="text-center">
-                                                        {{ number_format($vat->invoice->total_amount,2) }}
+                                                        {{ number_format($vat->invoice->base_amount,2) }}
                                                     </td>
                                                     <td class="text-right">
                                                         {{ number_format($vat->amount,2) }}
@@ -156,7 +143,8 @@
                                             </tbody>
                                             <tfoot>
                                             <tr>
-                                                <th colspan="4" class="text-right">Total Amount</th>
+                                                <th class="extra_column"></th>
+                                                <th colspan="3" class="text-right">Total Amount</th>
                                                 <th class="text-right" colspan="">{{ number_format($saleVats->sum('amount'),2) }}</th>
                                             </tr>
                                             </tfoot>
@@ -201,11 +189,20 @@
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="document">Payment Date <span class="text-danger">*</span></label>
-                                    <input type="date" id="date" name="payment_date" class="form-control" >
+                                    <select name="bank_id" id="bank_id" class="form-control select2">
+                                        <option value="">Select bank</option>
+                                        @foreach ($banks as $bank)
+                                            <option value="{{ $bank->id }}">{{ $bank->bank_name }} (Ac : {{ $bank->ac_number }})</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                                 <div class="form-group">
                                     <label  for="document">Upload Document(pdf) <span class="text-danger">*</span></label>
                                     <input type="file" id="document" name="document" class="form-control" >
+                                </div>
+                                <div class="form-group">
+                                    <label for="document">Payment Date <span class="text-danger">*</span></label>
+                                    <input type="date" id="date" name="payment_date" class="form-control" >
                                 </div>
                             </div>
                         </div>
@@ -234,6 +231,7 @@
 
             $('body').on('click', '#modal-btn-save', function () {
                 var formData = new FormData($('#vat_payout_form')[0]);
+                formData.append('bank_id', $("#bank_id").val());
                 formData.append('document', $('#document')[0].files[0]);
                 formData.append('payment_date', $('#date').val());
                 $.ajax({

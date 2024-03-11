@@ -93,6 +93,7 @@
                                         <th style="white-space: nowrap" width="15%">Stock/Qty</th>
                                         <th style="white-space: nowrap" width="15%">Unit</th>
                                         <th style="white-space: nowrap" width="20%">Rate<span class="text-danger">*</span></th>
+                                        <th style="white-space: nowrap" width="20%">Per Pcs Cost</th>
                                         <th style="white-space: nowrap" width="20%">Quantity<span class="text-danger">*</span></th>
                                         <th style="white-space: nowrap" width="20%">Selling Rate<span class="text-danger">*</span></th>
                                         <th style="white-space: nowrap" width="15%">Total Cost</th>
@@ -141,6 +142,14 @@
                                                 </td>
                                                 <td>
                                                     <div
+                                                        class="form-group {{ $errors->has('per_pcs_cost.' . $loop->index) ? 'has-error' : '' }}">
+                                                        <input type="text" class="form-control per_pcs_cost"
+                                                               name="per_pcs_cost[]"
+                                                               value="{{ old('per_pcs_cost.' . $loop->index) }}" readonly>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div
                                                         class="form-group {{ $errors->has('quantity.' . $loop->index) ? 'has-error' : '' }}">
                                                         <input type="number" step="any"
                                                                class="form-control quantity" name="quantity[]"
@@ -150,7 +159,7 @@
                                                 <td>
                                                     <div
                                                         class="form-group {{ $errors->has('selling_rate.' . $loop->index) ? 'has-error' : '' }}">
-                                                        <input type="text" class="form-control selling_rate" name="selling_rate[]" value="{{ old('selling_rate.' . $loop->index) }}">
+                                                        <input required type="text" class="form-control selling_rate" name="selling_rate[]" value="{{ old('selling_rate.' . $loop->index) }}">
                                                     </div>
                                                 </td>
                                                 <td class="total-cost" style="vertical-align: middle">৳0.00</td>
@@ -199,6 +208,11 @@
                                                             <input type="text" class="form-control product_rate is-valid-border" value="{{$item->rate}}" name="product_rate[]">
                                                         </div>
                                                     </td>
+                                                    <td>
+                                                        <div class="form-group" style="min-width: 80px;">
+                                                            <input type="text" class="form-control per_pcs_cost is-valid-border" value="{{$item->per_pcs_cost}}" name="per_pcs_cost[]" readonly>
+                                                        </div>
+                                                    </td>
 
                                                     <td>
                                                         <div class="form-group">
@@ -207,14 +221,13 @@
                                                     </td>
                                                     <td>
                                                         <div class="form-group" style="min-width: 80px;">
-                                                            <input type="text" class="form-control selling_rate is-valid-border" value="" name="selling_rate[]">
+                                                            <input required type="text" class="form-control selling_rate is-valid-border" value="" name="selling_rate[]">
                                                         </div>
                                                     </td>
                                                     <td class="total-cost" style="vertical-align: middle">৳0.00</td>
                                                     <td class="text-center">
                                                         <a role="button" class="btn-sm btn-remove"
-                                                           style="cursor: pointer;"><i style="font-size: 20px; color:red;"
-                                                                                       class="feather icon-trash-2"></i></a>
+                                                           style="cursor: pointer;"><i style="font-size: 20px; color:red;" class="feather icon-trash-2"></i></a>
                                                     </td>
                                                 </tr>
                                             @endforeach
@@ -227,7 +240,7 @@
                                             <a role="button" class="btn btn-info btn-sm" id="btn-add-product">Add
                                                 Product</a>
                                         </td>
-                                        <th colspan="4" class="text-right">Total Amount</th>
+                                        <th colspan="6" class="text-right">Total Amount</th>
                                         <th id="total_amount">৳0.00</th>
                                         <td></td>
                                     </tr>
@@ -301,9 +314,9 @@
                                                         </th>
                                                     </tr>
                                                     <tr>
-                                                        <th colspan="4" class="text-right">AIT</th>
+                                                        <th colspan="4" class="text-right">AIT (5%)</th>
                                                         <th>
-                                                            <input type="number" step="any" id="ait"
+                                                            <input readonly type="number" step="any" id="ait"
                                                                    class="form-control ait is-valid-border" name="ait" value="{{old('ait',$productPurchase->ait)}}">
                                                         </th>
                                                     </tr>
@@ -330,7 +343,7 @@
                                                     <tr>
                                                         <th colspan="4" class="text-right">Previous Paid</th>
                                                         <th>
-                                                            <input type="text" step="any" class="form-control previous_paid" name="previous_paid" value="{{number_format($productPurchase->paid_amount,2)}}" readonly>
+                                                            <input type="text" step="any" class="form-control previous_paid" name="previous_paid" value="{{$productPurchase->paid_amount}}" readonly>
                                                         </th>
                                                     </tr>
                                                     <tr>
@@ -389,6 +402,11 @@
                         <input type="text" class="form-control  is-valid-border product_rate" name="product_rate[]">
                     </div>
                 </td>
+                <td>
+                    <div class="form-group">
+                        <input type="text" class="form-control  is-valid-border per_pcs_cost" name="per_pcs_cost[]" readonly>
+                    </div>
+                </td>
 
                 <td>
                     <div class="form-group">
@@ -398,7 +416,7 @@
                 </td>
                 <td>
                     <div class="form-group">
-                        <input type="text" class="form-control  is-valid-border selling_rate" name="selling_rate[]">
+                        <input required type="text" class="form-control  is-valid-border selling_rate" name="selling_rate[]">
                     </div>
                 </td>
                 <td class="total-cost" style="vertical-align: middle">৳0.00</td>
@@ -584,11 +602,11 @@
             let duty = parseFloat($("#duty").val()) || 0;
             let freight = parseFloat($("#freight").val()) || 0;
             let c_and_f = parseFloat($("#c_and_f").val()) || 0;
-            let ait = parseFloat($("#ait").val()) || 0;
+            // let ait = parseFloat($("#ait").val()) || 0;
             let at = parseFloat($("#at").val()) || 0;
             let etc = parseFloat($("#etc").val()) || 0;
 
-            let total_others = (duty + freight + c_and_f + ait + at + etc);
+            let total_others = (duty + freight + c_and_f + at + etc);
             //  alert(total_others);
 
             $('.product-item').each(function(i) {
@@ -638,7 +656,11 @@
             // $('.total_discount').val(productDiscountTotal + parseInt(purchase_discount_amount));
             // $('.total_vat').val(productVatTotal);
             let previous_paid = $('.previous_paid').val();
-            let grandTotal = parseFloat(productSubTotal + total_others);
+
+            let ait = parseFloat(productSubTotal.toFixed(2)*0.05);
+            $('.ait').val(ait.toFixed(2));
+
+            let grandTotal = parseFloat(productSubTotal + total_others + ait);
             // $('#purchase_discount').html(parseFloat(purchase_discount_amount).toFixed(2));
 
             $('#paid').val(grandTotal-previous_paid);

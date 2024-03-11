@@ -11,6 +11,7 @@ use Modules\Client\Entities\Client;
 use Modules\Account\Entities\TransactionLog;
 use Modules\Inventory\Entities\InventoryOrder;
 use Modules\Product\Entities\Product;
+use Modules\Purchase\Entities\Ait;
 use Modules\Sale\Entities\Invoice;
 use Modules\Sale\Entities\SalePayment;
 use Modules\Sale\Entities\SaleVat;
@@ -456,6 +457,7 @@ class ReportController extends Controller
         return view('report::report.supplier_statement', compact('suppliers', 'allSuppliers'));
     }
 
+    //Vat
     public function vatPayment(Request $request){
 
         $start = date('Y-m-d', strtotime($request->start_date));
@@ -476,7 +478,7 @@ class ReportController extends Controller
             $inWordBangla = new NumberToBangla();
         }
 
-        return view('report::report.vat_payment',compact('saleVats','inWordOfAmount','inWordBangla'));
+        return view('report::vat_ait.vat_payment',compact('saleVats','inWordOfAmount','inWordBangla'));
     }
     public function vatRegister(Request $request){
         $banks = Bank::get();
@@ -488,7 +490,7 @@ class ReportController extends Controller
         $inWordOfAmount = NULL;
         $inWordBangla = NULL;
 
-        if ($request->end_date && $request->start_date && $request->bank_id) {
+        if ($request->end_date && $request->start_date) {
             $query->where('status', 0);
             $query->whereBetween('date', [$start, $end]);
             $saleVats = $query->orderBy('date')->get();
@@ -498,7 +500,7 @@ class ReportController extends Controller
             $inWordBangla = new NumberToBangla();
         }
 
-        return view('report::report.vat_register',compact('saleVats','inWordOfAmount','banks','inWordBangla'));
+        return view('report::vat_ait.vat_register',compact('saleVats','inWordOfAmount','banks','inWordBangla'));
     }
 
     public function vatCertificateSixPointSix(Request $request)
@@ -518,7 +520,7 @@ class ReportController extends Controller
 
         }
 
-        return view('report::report.vat_certificate_six_point_six', compact('vats', 'selectParty'));
+        return view('report::vat_ait.vat_certificate_six_point_six', compact('vats', 'selectParty'));
     }
 
     public function vatPayout(Request $request)
@@ -574,5 +576,123 @@ class ReportController extends Controller
 
     }
 
+    //Ait
+    public function aitPayment(Request $request){
+
+        $start = date('Y-m-d', strtotime($request->start_date));
+        $end = date('Y-m-d', strtotime($request->end_date));
+        $query = Ait::query();
+
+        $aits = [];
+        $inWordOfAmount = NULL;
+        $inWordBangla = NULL;
+
+        if ($request->end_date && $request->start_date) {
+            $query->where('status', 0);
+            $query->whereBetween('date', [$start, $end]);
+            $aits = $query->orderBy('date')->get();
+
+            $inWordOfAmount = DecimalToWords::convert($aits->sum('amount'), 'Taka',
+                'Poisa');
+            $inWordBangla = new NumberToBangla();
+        }
+
+        return view('report::vat_ait.ait_payment',compact('aits','inWordOfAmount','inWordBangla'));
+    }
+    public function aitRegister(Request $request){
+        $banks = Bank::get();
+        $start = date('Y-m-d', strtotime($request->start_date));
+        $end = date('Y-m-d', strtotime($request->end_date));
+        $query = Ait::query();
+
+        $aits = [];
+        $inWordOfAmount = NULL;
+        $inWordBangla = NULL;
+
+        if ($request->end_date && $request->start_date) {
+            $query->where('status', 0);
+            $query->whereBetween('date', [$start, $end]);
+            $aits = $query->orderBy('date')->get();
+
+            $inWordOfAmount = DecimalToWords::convert($aits->sum('amount'), 'Taka',
+                'Poisa');
+            $inWordBangla = new NumberToBangla();
+        }
+
+        return view('report::vat_ait.ait_register',compact('aits','inWordOfAmount','banks','inWordBangla'));
+    }
+
+    public function aitChalan(Request $request)
+    {
+
+        $aits = [];
+        $selectParty = null;
+
+        if ($request->party) {
+            $selectParty = Supplier::where('id', $request->party)->first();
+
+            $query = Ait::where('supplier_id', $request->party)->where('status', 1);
+            if ($request->start && $request->start != '' && $request->end && $request->end != '') {
+                $query->whereBetween('date', [Carbon::parse($request->start)->format('Y-m-d'), Carbon::parse($request->end)->format('Y-m-d')]);
+            }
+            $aits = $query->orderBy('date')->get();
+
+        }
+
+        return view('report::vat_ait.ait_chalan', compact('aits', 'selectParty'));
+    }
+
+    public function aitPayout(Request $request)
+    {
+
+        $rules = [
+            'document' => 'required',
+            'payment_date' => 'required',
+            'bank_id' => 'required',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'message' => $validator->errors()->first()]);
+        }
+
+        if (!$request->ait_id){
+            return response()->json(['success' => false, 'message' => 'AIT payout is empty data, please check in vat register']);
+
+        }
+
+
+        $pdfFileLink = 'img/no_pdf.pdf';
+
+        if ($request->hasFile('document')) {
+            $file = $request->file('document');
+            $extension = $file->extension();
+            if ($extension == 'pdf') {
+                $filename = Uuid::uuid1()->toString() . '.' . $file->extension();
+                $destinationPath = 'uploads/vat_document';
+                $file->move($destinationPath, $filename);
+                $pdfFileLink = 'uploads/vat_document/' . $filename;
+            } else {
+                return response()->json(['success' => false, 'message' => 'Uploaded file must be a PDF.']);
+            }
+
+        }
+
+
+        //payout vat
+        $aitId = Ait::whereIn('id', $request->ait_id)
+            ->get()->pluck('id')->toArray();
+
+        Ait::whereIn('id', $aitId)->update([
+            'status' => 1,
+            'ait_document' => $pdfFileLink,
+            'bank_id' => $request->bank_id,
+            'payment_date' => Carbon::parse($request->payment_date)->format('Y-m-d'),
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'AIT checkout successful']);
+
+    }
 
 }
