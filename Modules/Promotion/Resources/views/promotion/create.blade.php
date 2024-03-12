@@ -8,6 +8,16 @@
                     <div class="card-header">
                         <div class="d-inline" style="float: left">
                             <h4>@yield('title')</h4>
+                            @if ($errors->any())
+                                <div class="alert alert-danger">
+                                    <ul>
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
+
                         </div>
                         <h5 style="float: right"><a href="{{ route('promotion.index') }}" class="btn btn-success">All
                                 Promotion</a></h5>
