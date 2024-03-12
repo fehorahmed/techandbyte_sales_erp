@@ -13,7 +13,8 @@
                                 Promotion</a></h5>
                     </div>
                     <div class="card-block mt-4">
-                        <form id="main" method="post" action="{{ route('promotion.store') }}">
+                        <form id="main" method="post" action="{{ route('promotion.store') }}"
+                            enctype="multipart/form-data">
                             @csrf
                             <div class="row">
                                 <div class="col-md-6">
@@ -89,17 +90,19 @@
                                     <div class="row mb-3">
                                         <label class="col-sm-4 col-form-label text-right">Payment Type</label>
                                         <div class="col-sm-8">
-                                            <select name="payment_type" class="form-control" id="payment_type">
+                                            <select name="transaction_method" class="form-control" id="transaction_method">
                                                 <option value="">Select One</option>
-                                                <option {{ old('payment_type') == '1' ? 'selected' : '' }} value="1">
+                                                <option {{ old('transaction_method') == '1' ? 'selected' : '' }}
+                                                    value="1">
                                                     Cash
                                                 </option>
-                                                <option {{ old('payment_type') == '2' ? 'selected' : '' }} value="2">
+                                                <option {{ old('transaction_method') == '2' ? 'selected' : '' }}
+                                                    value="2">
                                                     Bank
                                                 </option>
 
                                             </select>
-                                            @error('payment_type')
+                                            @error('transaction_method')
                                                 <span class="help-block">{{ $message }}</span>
                                             @enderror
                                         </div>
@@ -124,7 +127,8 @@
                                         <div class="row mb-3">
                                             <label class="col-sm-4 col-form-label text-right">Cheque No.</label>
                                             <div class="col-sm-8">
-                                                <input class="form-control is-valid-border" type="text" name="cheque_no" placeholder="Enter Cheque No." value="{{ old('cheque_no') }}">
+                                                <input class="form-control is-valid-border" type="text" name="cheque_no"
+                                                    placeholder="Enter Cheque No." value="{{ old('cheque_no') }}">
                                                 @error('cheque_no')
                                                     <span class="help-block">{{ $message }}</span>
                                                 @enderror
@@ -133,7 +137,8 @@
                                         <div class="row mb-3">
                                             <label class="col-sm-4 col-form-label text-right">Cheque Image.</label>
                                             <div class="col-sm-8">
-                                                <input type="file" name="cheque_image" class="form-control value="{{ old('cheque_image') }}">
+                                                <input type="file" name="cheque_image"
+                                                    class="form-control value="{{ old('cheque_image') }}">
                                                 @error('cheque_image')
                                                     <span class="help-block">{{ $message }}</span>
                                                 @enderror
@@ -174,19 +179,19 @@
 
 @section('script')
 
-<script>
-    $(function(){
-        $('#payment_type').change(function(){
-            var type = $(this).val();
-            if(type==1){
-                $('#bank_area').hide();
-            }else if(type==2){
-                $('#bank_area').show();
-            }else{
-                $('#bank_area').hide();
-            }
+    <script>
+        $(function() {
+            $('#transaction_method').change(function() {
+                var type = $(this).val();
+                if (type == 1) {
+                    $('#bank_area').hide();
+                } else if (type == 2) {
+                    $('#bank_area').show();
+                } else {
+                    $('#bank_area').hide();
+                }
+            })
+            $('#transaction_method').trigger('change')
         })
-        $('#payment_type').trigger('change')
-    })
-</script>
+    </script>
 @endsection

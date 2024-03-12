@@ -19,10 +19,20 @@ return new class extends Migration
             $table->unsignedInteger('cost');
             $table->date('date');
             $table->text('details')->nullable();
+
+            $table->tinyInteger('transaction_method')->comment('1=Cash; 2=Bank');
+            $table->foreignId('bank_id')->nullable();
+            $table->foreignId('branch_id')->nullable();
+            $table->foreignId('bank_account_id')->nullable();
+            $table->string('cheque_no')->nullable();
+            $table->string('cheque_image')->nullable();
+
+
             $table->foreignId('created_by');
             $table->foreignId('updated_by')->nullable();
             $table->foreign('created_by')->on('users')->references('id');
             $table->foreign('updated_by')->on('users')->references('id');
+            $table->foreign('bank_id')->on('banks')->references('id');
             $table->timestamps();
         });
     }

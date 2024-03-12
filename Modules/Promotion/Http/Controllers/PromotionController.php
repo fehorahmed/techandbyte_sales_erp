@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Modules\Account\Entities\TransactionLog;
 use Modules\Bank\Entities\Bank;
 use Modules\Promotion\Entities\Promotion;
+use Ramsey\Uuid\Uuid;
 use Yajra\DataTables\Facades\DataTables;
 
 class PromotionController extends Controller
@@ -39,8 +40,8 @@ class PromotionController extends Controller
      */
     public function create()
     {
-        $banks=Bank::where('status',1)->get();
-        return view('promotion::promotion.create',compact('banks'));
+        $banks = Bank::where('status', 1)->get();
+        return view('promotion::promotion.create', compact('banks'));
     }
 
     /**
@@ -53,7 +54,12 @@ class PromotionController extends Controller
             "title" => 'required|string|max:255|unique:promotions,title',
             "promotion_type" => 'required|string|max:255',
             "platform" => 'required|string|max:255',
-            "payment_type" => 'required|numeric',
+            "transaction_method" => 'required|numeric',
+            "bank_id" => 'nullable|numeric',
+            "branch_id" => 'nullable|numeric',
+            "bank_account_id" => 'nullable|numeric',
+            "cheque_no" => 'nullable|string',
+            "cheque_image" => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             "cost" => 'required|numeric',
             "date" => 'required|date|max:255',
             "details" => 'nullable|string|max:255',
@@ -61,7 +67,25 @@ class PromotionController extends Controller
 
         $data = new Promotion();
         $data->title = $request->title;
-        $data->promotion_type = $request->promotion_type;
+        if ($request->transaction_method == 1) {
+            $data->transaction_method = $request->transaction_method;
+        } elseif ($request->transaction_method == 2) {
+            $data->transaction_method = $request->transaction_method;
+            $data->bank_id = $request->bank_id;
+            $data->branch_id = $request->branch_id;
+            $data->bank_account_id = $request->bank_id;
+            $data->cheque_no = $request->cheque_no;
+            if ($request->cheque_image) {
+                $image = 'img/no_image.png';
+
+                $file = $request->file('cheque_image');
+                $filename = Uuid::uuid1()->toString() . '.' . $file->extension();
+                $destinationPath = 'uploads/transaction_cheque';
+                $file->move($destinationPath, $filename);
+                $image = 'uploads/transaction_cheque/' . $filename;
+            }
+            $data->cheque_image = $image;
+        }
         $data->platform = $request->platform;
         $data->cost = $request->cost;
         $data->date = $request->date;
@@ -69,15 +93,23 @@ class PromotionController extends Controller
         $data->created_by = Auth::id();
         if ($data->save()) {
 
-            // $transaction_log= new TransactionLog();
-            // $transaction_log->date=now();
-            // $transaction_log->particular="promotion head";
-            // $transaction_log->transaction_type = 2;
-            // $transaction_log->transaction_method = 12;
-            // $transaction_log->amount = $request->cost;
-
-
-
+            $transaction_log = new TransactionLog();
+            $transaction_log->date = now();
+            $transaction_log->particular = "promotion head";
+            $transaction_log->transaction_type = 2;
+            if ($request->transaction_method == 1) {
+                $transaction_log->transaction_method = $request->transaction_method;
+            } elseif ($request->transaction_method == 2) {
+                $transaction_log->transaction_method = $request->transaction_method;
+                $transaction_log->bank_id = $request->bank_id;
+                $transaction_log->branch_id = $request->branch_id;
+                $transaction_log->bank_account_id = $request->bank_id;
+                $transaction_log->cheque_no = $request->cheque_no;
+                $transaction_log->cheque_image = $image;
+            }
+            $transaction_log->amount = $request->cost;
+            $transaction_log->promotion_id = $data->id;
+            $transaction_log->save();
 
             return redirect()->route('promotion.index')->with('message', 'Information added');
         } else {
