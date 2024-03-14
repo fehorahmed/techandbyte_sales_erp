@@ -304,7 +304,7 @@
                                                 </div>
                                                 <div class="form-group">
                                                     <label>Sale Details</label>
-                                                    <textarea class="form-control is-valid-border" name="inva_details"></textarea>
+                                                    <textarea class="form-control is-valid-border" name="inva_details">{{old('inva_details')}}</textarea>
                                                 </div>
 
                                             </div>

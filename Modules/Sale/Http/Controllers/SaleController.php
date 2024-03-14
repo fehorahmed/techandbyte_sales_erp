@@ -85,7 +85,7 @@ class SaleController extends Controller
             'customer' => 'required',
             'lc_no' => 'nullable',
             'date' => 'required|date',
-            'inva_details' => 'nullable',
+            'inva_details' => 'nullable|string',
             'product.*' => 'required|numeric|min:0',
             'quantity.*' => 'required|numeric|min:0',
             'stock.*' => 'required|numeric|min:0',
@@ -276,7 +276,7 @@ class SaleController extends Controller
         } catch (\Exception $exception) {
             DB::rollBack();
 
-            return redirect()->back()->with('error', $exception->getMessage())->withInput();
+            return redirect()->back()->withInput()->with('error', $exception->getMessage());
         }
     }
 
