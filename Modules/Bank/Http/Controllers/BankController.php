@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Modules\Account\Entities\AccCoa;
+use Modules\Account\Entities\TransactionLog;
 use Modules\Bank\Entities\Bank;
 use Ramsey\Uuid\Uuid;
 use Yajra\DataTables\Facades\DataTables;
@@ -28,7 +29,7 @@ class BankController extends Controller
                 return '<a href="' . route('bank.bank_edit', ['bank' => $bank->id]) . '" class="btn-edit"><i style="color:#01a9ac;font-size: 17px;" class="feather icon-edit"></i></a>';
             })
             ->editColumn('amount', function (Bank $bank) {
-                return '৳'.number_format($bank->amount,2);
+                return '৳' . number_format($bank->amount, 2);
             })
             ->addColumn('signature_pic', function (Bank $bank) {
                 return '<img height="30px" src="' . asset($bank->signature_pic) . '"   alt="">';
@@ -49,6 +50,7 @@ class BankController extends Controller
             'ac_name' => ['required', 'string', 'max:255'],
             'ac_number' => 'required|string|numeric',
             'branch' => 'required|string|max:255',
+            'amount' => 'required|numeric|min:0',
             'signature_pic' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
@@ -70,6 +72,7 @@ class BankController extends Controller
             $bank->ac_name = $request->ac_name;
             $bank->ac_number = $request->ac_number;
             $bank->branch = $request->branch;
+            $bank->amount = $request->amount;
             $bank->status = 1;
             if ($request->signature_pic) {
 
@@ -81,37 +84,18 @@ class BankController extends Controller
 
                 $bank->signature_pic = $path;
             }
-            $bank->save();
+            if ($bank->save()) {
+                $transaction_log = new TransactionLog();
+                $transaction_log->date = now();
+                $transaction_log->particular = 'Bank Add';
+                $transaction_log->transaction_type = 3;
+                $transaction_log->transaction_method = 2;
+                $transaction_log->bank_id = $bank->id;
+                $transaction_log->amount = $request->amount;
+                $transaction_log->save();
+            }
 
-            // $acc_coa = new AccCoa();
-            // $acc_coa->HeadCode = $headcode;
-            // $acc_coa->HeadName = $request->bank_name;
-            // $acc_coa->PHeadName = 'Cash at Bank';
-            // $acc_coa->Pheadcode = 10205;
-            // $acc_coa->HeadLevel = 4;
-            // $acc_coa->IsActive = 1;
-            // $acc_coa->IsTransaction = 0;
-            // $acc_coa->IsGL = 0;
-            // $acc_coa->isCashNature = 0;
-            // $acc_coa->isBankNature = 1;
-            // $acc_coa->HeadType = 'A';
-            // $acc_coa->IsBudget = 0;
-            // $acc_coa->IsDepreciation = 0;
-            // $acc_coa->customer_id = 0;
-            // $acc_coa->supplier_id = 0;
-            // $acc_coa->bank_id = 0;
-            // $acc_coa->service_id = 0;
-            // $acc_coa->DepreciationRate = 0;
-            // $acc_coa->CreateBy = Auth::user()->id;
-            // $acc_coa->UpdateBy = 0;
-            // $acc_coa->isSubType = 0;
-            // $acc_coa->subType = 0;
-            // $acc_coa->isStock = 0;
-            // $acc_coa->isFixedAssetSch = 0;
-            // $acc_coa->noteNo = 0;
-            // $acc_coa->assetCode = 0;
-            // $acc_coa->depCode = 0;
-            // $acc_coa->save();
+
             DB::commit();
             return redirect()->route('bank.bank_all')->with('message', 'Information added');
         } catch (\Exception $e) {
