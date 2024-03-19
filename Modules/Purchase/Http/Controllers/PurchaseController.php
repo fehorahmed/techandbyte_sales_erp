@@ -154,7 +154,10 @@ class PurchaseController extends Controller
             $productPurchase->total_vat_amount = $request->total_vat ?? 0;
             $productPurchase->invoice_discount = 0;
             $productPurchase->status = 1;
-            $productPurchase->payment_type = 1;
+            $productPurchase->payment_type = $request->payment_type;
+            if ($request->payment_type == 2) {
+                $productPurchase->bank_id = $request->bank;
+            }
             $productPurchase->save();
             $productPurchase->chalan_no = 'PO' . str_pad($productPurchase->id, 8, 0, STR_PAD_LEFT);
             $productPurchase->save();
@@ -407,7 +410,10 @@ class PurchaseController extends Controller
             $inventoryOrder->total_vat_amount = $request->total_vat ?? 0;
             $inventoryOrder->invoice_discount = 0;
             $inventoryOrder->status = 1;
-            $inventoryOrder->payment_type = 1;
+            $inventoryOrder->payment_type = $request->payment_type;
+            if ($request->payment_type == 2) {
+                $productPurchase->bank_id = $request->bank;
+            }
             $inventoryOrder->save();
             $inventoryOrder->chalan_no = 'IO' . str_pad($inventoryOrder->id, 8, 0, STR_PAD_LEFT);
             $inventoryOrder->save();
