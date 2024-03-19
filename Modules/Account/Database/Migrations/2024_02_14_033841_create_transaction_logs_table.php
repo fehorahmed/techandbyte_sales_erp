@@ -28,12 +28,14 @@ return new class extends Migration
             $table->foreignId('purchase_payment_id')->nullable();
             $table->foreignId('sale_payment_id')->nullable();
             $table->foreignId('promotion_id')->nullable();
+            $table->foreignId('created_by')->nullable();
 
             $table->foreign('bank_id')->on('banks')->references('id');
             $table->foreign('transaction_id')->on('transactions')->references('id');
             $table->foreign('purchase_payment_id')->on('purchase_payments')->references('id');
             $table->foreign('sale_payment_id')->on('sale_payments')->references('id');
             $table->foreign('promotion_id')->on('promotions')->references('id');
+            $table->foreign('created_by')->on('users')->references('id');
             $table->timestamps();
         });
     }

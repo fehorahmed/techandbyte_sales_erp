@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Modules\Account\Entities\AccCoa;
 use Modules\Account\Entities\AccountHeadSubType;
 use Modules\Account\Entities\AccSubcode;
@@ -15,13 +16,53 @@ use Modules\Product\Entities\SupplierProduct;
 use Modules\Purchase\Entities\ProductPurchaseDetail;
 use Modules\Supplier\Entities\Supplier;
 use Modules\Account\Entities\AccountHeadType;
+use Modules\Account\Entities\TransactionLog;
 use Modules\Client\Entities\Client;
+
 class CommonController extends Controller
 {
     public function cash()
     {
         $cash = Cash::first();
-        return view('cash.all',compact('cash'));
+        return view('cash.all', compact('cash'));
+    }
+    public function addCash()
+    {
+        $cash = Cash::first();
+        return view('cash.add', compact('cash'));
+    }
+    public function addCashPost(Request $request)
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:0',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $cash = Cash::first();
+
+            if ($cash) {
+                $cash->amount =  $cash->amount + $request->amount;
+            } else {
+                $cash = new Cash();
+                $cash->amount = $request->amount;
+            }
+            if ($cash->save()) {
+                $transaction_log = new TransactionLog();
+                $transaction_log->date = now();
+                $transaction_log->particular = 'Cash Add';
+                $transaction_log->transaction_type = 3;
+                $transaction_log->transaction_method = 1;
+                $transaction_log->amount = $request->amount;
+                $transaction_log->created_by = auth()->id();
+                $transaction_log->save();
+            }
+            DB::commit();
+            return redirect()->route('cash')->with('success', 'Cash Added.');
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return redirect()->back()->with('error', $th->getMessage());
+        }
     }
 
     public function productsJson(Request $request)
@@ -225,7 +266,8 @@ class CommonController extends Controller
         echo json_encode($data);
     }
 
-    public function getAccountHeadType(Request $request) {
+    public function getAccountHeadType(Request $request)
+    {
         $types = AccountHeadType::where('transaction_type', $request->type)
             ->where('status', 1)
             ->orderBy('name')
@@ -233,7 +275,8 @@ class CommonController extends Controller
 
         return response()->json($types);
     }
-    public function getAccountHeadSubType(Request $request) {
+    public function getAccountHeadSubType(Request $request)
+    {
         $subTypes = AccountHeadSubType::where('account_head_type_id', $request->typeId)
             ->where('status', 1)
             ->orderBy('name')
@@ -242,13 +285,13 @@ class CommonController extends Controller
         return response()->json($subTypes);
     }
 
-      public function clientJson(Request $request)
+    public function clientJson(Request $request)
     {
         if (!$request->searchTerm) {
-            $clients = Client::orderBy('name','asc')->limit(10)->get();
+            $clients = Client::orderBy('name', 'asc')->limit(10)->get();
         } else {
-            $clients = Client::where('name', 'like','%' . $request->searchTerm.'%')
-                ->orderBy('name','asc')
+            $clients = Client::where('name', 'like', '%' . $request->searchTerm . '%')
+                ->orderBy('name', 'asc')
                 ->limit(50)->get();
         }
 
@@ -257,11 +300,10 @@ class CommonController extends Controller
         foreach ($clients as $client) {
             $data[] = [
                 'id' => $client->id,
-                'text' =>$client->name.'|'.$client->address,
+                'text' => $client->name . '|' . $client->address,
             ];
         }
 
         echo json_encode($data);
     }
-
 }
